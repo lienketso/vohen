@@ -1,0 +1,5 @@
+.header .header__top_fix {
+    padding: 25px 0;
+    background: linear-gradient(-180deg,#0a64b4,#318dde);
+    border-bottom: 1px solid rgba(0,0,0,.15);
+}

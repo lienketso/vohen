@@ -1,0 +1,29 @@
+.ps-main {
+    margin-bottom: 0;
+}
+
+.header--dashboard {
+    .header__left {
+        max-width: none;
+    }
+}
+
+.ps-main__wrapper {
+    background: #f9f9f9;
+    > .container {
+        max-width: none !important;
+        padding: 0;
+    }
+}
+
+.icon-home:before {
+    content: "\e600" !important;
+}
+
+.icon-database:before {
+    content: "\e65d" !important;
+}
+
+.icon-cog:before {
+    content: "\e672" !important;
+}

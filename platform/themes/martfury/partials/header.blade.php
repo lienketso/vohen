@@ -133,46 +133,47 @@
             </div>
             </div>
 
-            <nav class="navigation">
-                <div class="ps-container">
-                    <div class="navigation__left">
-                        <div class="menu--product-categories">
-                            <div class="menu__toggle"><i class="icon-menu"></i><span> {{ __('Shop by Department') }}</span></div>
-                            <div class="menu__content" style="display: none">
-                                <ul class="menu--dropdown">
-                                    {!! Theme::partial('product-categories-dropdown', compact('categories')) !!}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="navigation__right">
-                        {!! Menu::renderMenuLocation('main-menu', [
-                            'view'    => 'menu',
-                            'options' => ['class' => 'menu'],
-                        ]) !!}
-                        @if (is_plugin_active('ecommerce'))
-                            <ul class="navigation__extra">
-                                <li><a href="{{ route('public.orders.tracking') }}">{{ __('Track your order') }}</a></li>
-                                @php $currencies = get_all_currencies(); @endphp
-                                @if (count($currencies) > 1)
-                                    <li>
-                                        <div class="ps-dropdown">
-                                            <a href="{{ route('public.change-currency', get_application_currency()->title) }}"><span>{{ get_application_currency()->title }}</span></a>
-                                            <ul class="ps-dropdown-menu">
-                                                @foreach ($currencies as $currency)
-                                                    @if ($currency->id !== get_application_currency_id())
-                                                        <li><a href="{{ route('public.change-currency', $currency->title) }}"><span>{{ $currency->title }}</span></a></li>
-                                                    @endif
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    </li>
-                                @endif
-                            </ul>
-                        @endif
-                    </div>
-                </div>
-            </nav>
+{{--            <nav class="navigation">--}}
+{{--                <div class="ps-container">--}}
+{{--                    <div class="navigation__left">--}}
+{{--                        <div class="menu--product-categories">--}}
+{{--                            <div class="menu__toggle"><i class="icon-menu"></i><span> {{ __('Shop by Department') }}</span></div>--}}
+{{--                            <div class="menu__content" style="display: none">--}}
+{{--                                <ul class="menu--dropdown">--}}
+{{--                                    {!! Theme::partial('product-categories-dropdown', compact('categories')) !!}--}}
+{{--                                </ul>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    <div class="navigation__right">--}}
+{{--                        {!! Menu::renderMenuLocation('main-menu', [--}}
+{{--                            'view'    => 'menu',--}}
+{{--                            'options' => ['class' => 'menu'],--}}
+{{--                        ]) !!}--}}
+{{--                        @if (is_plugin_active('ecommerce'))--}}
+{{--                            <ul class="navigation__extra">--}}
+{{--                                <li><a href="{{ route('public.orders.tracking') }}">{{ __('Track your order') }}</a></li>--}}
+{{--                                @php $currencies = get_all_currencies(); @endphp--}}
+{{--                                @if (count($currencies) > 1)--}}
+{{--                                    <li>--}}
+{{--                                        <div class="ps-dropdown">--}}
+{{--                                            <a href="{{ route('public.change-currency', get_application_currency()->title) }}"><span>{{ get_application_currency()->title }}</span></a>--}}
+{{--                                            <ul class="ps-dropdown-menu">--}}
+{{--                                                @foreach ($currencies as $currency)--}}
+{{--                                                    @if ($currency->id !== get_application_currency_id())--}}
+{{--                                                        <li><a href="{{ route('public.change-currency', $currency->title) }}"><span>{{ $currency->title }}</span></a></li>--}}
+{{--                                                    @endif--}}
+{{--                                                @endforeach--}}
+{{--                                            </ul>--}}
+{{--                                        </div>--}}
+{{--                                    </li>--}}
+{{--                                @endif--}}
+{{--                            </ul>--}}
+{{--                        @endif--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </nav>--}}
+
         </header>
         @if (Theme::get('headerMobile'))
             {!! Theme::get('headerMobile') !!}

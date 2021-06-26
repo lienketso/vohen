@@ -60,7 +60,7 @@
                                 <div class="row">
                                     @if ($products->count() > 0)
                                         @foreach($products as $product)
-                                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-6 ">
+                                            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-6 ">
                                                 <div class="ps-product">
                                                     {!! Theme::partial('product-item', compact('product')) !!}
                                                 </div>

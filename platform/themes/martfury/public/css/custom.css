@@ -994,8 +994,35 @@ form .navigation--mobile-product > * {
   display: none;
 }
 
+.button_add {
+  padding-bottom: 20px;
+}
+
 .ps-product--detail .ps-product__shopping > * {
   margin-bottom: 20px;
+}
+
+.ps-block--category p {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.ps-product .ps-product__price.sale {
+  font-weight: bold;
+}
+
+.ps-block--shop-features .ps-block__header h3 {
+  padding-top: 20px;
+}
+
+.ps-page--product {
+  background: #fff;
+}
+
+.ps-product .ps-product__price.sale del {
+  position: absolute;
+  right: 0;
+  font-size: 13px;
 }
 
 @media (max-width: 479px) {

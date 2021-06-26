@@ -13,7 +13,7 @@
 
         <style>
             :root {
-                --color-1st: {{ theme_option('primary_color', '#fcb800') }};
+                --color-1st: {{ theme_option('primary_color', '#0a64b4') }};
                 --color-2nd: {{ theme_option('secondary_color', '#222222') }};
                 --primary-font: '{{ theme_option('primary_font', 'Work Sans') }}', sans-serif;
                 --button-text-color: {{ theme_option('button_text_color', '#000') }};

@@ -34,7 +34,7 @@ theme_option()
         'label'      => __('Primary color'),
         'attributes' => [
             'name'  => 'primary_color',
-            'value' => '#fcb800',
+            'value' => '#0a64b4',
         ],
     ])
     ->setField([

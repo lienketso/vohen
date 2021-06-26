@@ -118,16 +118,19 @@
                                         </figure>
                                         <input type="hidden" name="id" class="hidden-product-id" value="{{ ($product->is_variation || !$product->defaultVariation->product_id) ? $product->id : $product->defaultVariation->product_id }}"/>
 
+
+                                        <div class="ps-product__actions">
+                                            <a class="js-add-to-wishlist-button" href="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i></a>
+                                            <a class="js-add-to-compare-button" href="{{ route('public.compare.add', $product->id) }}" title="{{ __('Compare') }}"><i class="icon-chart-bars"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="button_add">
                                         @if (EcommerceHelper::isCartEnabled())
                                             <button class="ps-btn ps-btn--black" type="submit">{{ __('Add to cart') }}</button>
                                             @if (EcommerceHelper::isQuickBuyButtonEnabled())
                                                 <button class="ps-btn" type="submit" name="checkout">{{ __('Buy Now') }}</button>
                                             @endif
                                         @endif
-                                        <div class="ps-product__actions">
-                                            <a class="js-add-to-wishlist-button" href="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i></a>
-                                            <a class="js-add-to-compare-button" href="{{ route('public.compare.add', $product->id) }}" title="{{ __('Compare') }}"><i class="icon-chart-bars"></i></a>
-                                        </div>
                                     </div>
                                 </form>
                                 <div class="ps-product__specification">

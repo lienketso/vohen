@@ -3766,7 +3766,7 @@ var render = function() {
       _c("div", { staticClass: "row" }, [
         _vm._m(0),
         _vm._v(" "),
-        _c("div", { staticClass: "col-lg-9" }, [
+        _c("div", { staticClass: "col-lg-9 bg-white" }, [
           _vm.isLoading
             ? _c("div", { staticClass: "half-circle-spinner" }, [
                 _c("div", { staticClass: "circle circle-1" }),
@@ -3790,12 +3790,13 @@ var render = function() {
                 [
                   _c(
                     "div",
-                    { staticClass: "row" },
+                    { staticClass: "row " },
                     _vm._l(_vm.data, function(item) {
                       return _vm.data.length
                         ? _c("div", {
                             key: item.id,
-                            staticClass: "col-lg-2 col-6 ps-product",
+                            staticClass:
+                              "col-lg-2 col-6 col-half-offset ps-product",
                             domProps: { innerHTML: _vm._s(item) }
                           })
                         : _vm._e()

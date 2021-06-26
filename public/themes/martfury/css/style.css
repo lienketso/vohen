@@ -6102,7 +6102,6 @@ textarea.form-control {
 
 .widget_shop {
   padding: 25px 20px;
-  background-color: #f5f5f5;
 }
 .widget_shop .widget-title {
   margin-bottom: 25px;
@@ -10845,7 +10844,6 @@ html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background-color: #f4f4f4;
   border-bottom: 1px solid #e3e3e3;
 }
 .ps-product-list .ps-section__header h3 {
@@ -13512,7 +13510,7 @@ html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
 }
 .header .header__top {
   padding: 25px 0;
-  background-color: var(--color-1st);
+  background-color: linear-gradient(-180deg, #0a64b4, #318dde);
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 }
 .header .header__top .ps-container, .header .header__top .container {

@@ -17,16 +17,16 @@
                     </div>
                 </div>
 
-                <div class="col-lg-9">
+                <div class="col-lg-9 bg-white">
                 <div class="half-circle-spinner" v-if="isLoading">
                     <div class="circle circle-1"></div>
                     <div class="circle circle-2"></div>
                 </div>
                 <div class="tab-pane fade show active" v-if="!isLoading" :id="productCategory.slug"
                      role="tabpanel" :aria-labelledby="productCategory.slug + '-tab'" :key="productCategory.id">
-                    <div class="row">
+                    <div class="row ">
 
-                        <div class="col-lg-2 col-6 ps-product" v-for="item in data" :key="item.id" v-if="data.length" v-html="item"></div>
+                        <div class="col-lg-2 col-6 col-half-offset ps-product" v-for="item in data" :key="item.id" v-if="data.length" v-html="item"></div>
 
                     </div>
                 </div>

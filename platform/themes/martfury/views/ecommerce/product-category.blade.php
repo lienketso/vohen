@@ -3,7 +3,7 @@
         <div class="mt-40">
             <featured-brands-component url="{{ route('public.ajax.featured-brands') }}"></featured-brands-component>
         </div>
-        <div class="ps-layout--shop">
+        <div class="ps-layout--shop bg-white">
             <div class="ps-layout__left">
                 <form action="{{ $category->url }}" method="GET">
                     @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/filters')
@@ -12,7 +12,7 @@
             <div class="ps-layout__right">
                 <div class="ps-block--shop-features">
                     <div class="ps-block__header">
-                        <h3>{{ __('Recommended Items') }}</h3>
+                        <h3>{{ __('Sản phẩm đề xuất') }}</h3>
                         <div class="ps-block__navigation">
                             <a class="ps-carousel__prev" href="#recommended-products">
                                 <i class="icon-chevron-left"></i>
@@ -28,7 +28,7 @@
                 </div>
                 <div class="ps-shopping ps-tab-root">
                     <div class="ps-shopping__header">
-                        <p><strong> {{ $products->total() }}</strong> {{ __('Products found') }}</p>
+                        <p><strong> {{ $products->total() }}</strong> {{ __('Sản phẩm') }}</p>
                         <div class="ps-shopping__actions">
                             <form action="{{ URL::current() }}" method="GET">
                                 @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/sort')
@@ -60,7 +60,7 @@
                                 <div class="row">
                                     @if ($products->count() > 0)
                                         @foreach($products as $product)
-                                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-6 ">
+                                            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-6 ">
                                                 <div class="ps-product">
                                                     {!! Theme::partial('product-item', compact('product')) !!}
                                                 </div>

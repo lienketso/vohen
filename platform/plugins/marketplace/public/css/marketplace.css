@@ -1,1 +1,28 @@
-@charset "UTF-8";.ps-main{margin-bottom:0}.header--dashboard .header__left{max-width:none}.ps-main__wrapper{background:#f9f9f9}.ps-main__wrapper>.container{max-width:none!important;padding:0}.icon-home:before{content:""!important}.icon-database:before{content:""!important}.icon-cog:before{content:""!important}
+@charset "UTF-8";
+.ps-main {
+  margin-bottom: 0;
+}
+
+.header--dashboard .header__left {
+  max-width: none;
+}
+
+.ps-main__wrapper {
+  background: #f9f9f9;
+}
+.ps-main__wrapper > .container {
+  max-width: none !important;
+  padding: 0;
+}
+
+.icon-home:before {
+  content: "" !important;
+}
+
+.icon-database:before {
+  content: "" !important;
+}
+
+.icon-cog:before {
+  content: "" !important;
+}

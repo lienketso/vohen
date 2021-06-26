@@ -10,6 +10,7 @@
         <!-- Fonts-->
         <link href="https://fonts.googleapis.com/css?family={{ urlencode(theme_option('primary_font', 'Work Sans')) }}:300,400,500,600,700&amp;amp;subset=latin-ext" rel="stylesheet" type="text/css">
         <!-- CSS Library-->
+
         <style>
             :root {
                 --color-1st: {{ theme_option('primary_color', '#fcb800') }};
@@ -34,24 +35,27 @@
         {!! Theme::get('topHeader') !!}
 
         <header class="header header--1" data-sticky="{{ Theme::get('stickyHeader', 'true') }}">
-            <div class="container">
-            <div class="header_link">
-                <div class="link_header_left">
-                    <a href="#">Kênh người bán</a>
-                    <a href="#">suport@shoping.com</a>
-                </div>
-                <div class="link_header_right">
-                    @if (auth('customer')->check())
-                        <a href="{{ route('customer.overview') }}">{{ auth('customer')->user()->name }}</a>
-                        <a href="{{ route('customer.logout') }}">{{ __('Logout') }}</a>
-                    @else
-                        <a href="{{ route('customer.login') }}">{{ __('Login') }}</a><a href="{{ route('customer.register') }}">{{ __('Register') }}</a>
-                    @endif
-                </div>
+            <div class="b__header--top">
+                <div class="ps-container">
+                    <div class="b__top-info">
+                        <ul class="b__top--left b__top--ls">
+                            <li><a href="tel:0979823452">Hotline: +84 9 12345678</a></li>
+                            <li><a href="#">Kênh Người Bán</a></li>
+                            <li><a href="mailto:hotro@topsell.vn">hotro@topsell.vn</a></li>
+                        </ul>
+                        <ul class="b__top--right b__top--ls">
+                            @if (auth('customer')->check())
+                                <li><a href="{{ route('customer.overview') }}">{{ auth('customer')->user()->name }}</a></li>
+                                <li><a href="{{ route('customer.logout') }}">{{ __('Logout') }}</a></li>
+                            @else
+                                <li><a href="{{ route('customer.login') }}">{{ __('Login') }}</a><a href="{{ route('customer.register') }}">{{ __('Register') }}</a></li>
+                            @endif
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="header__top">
-                <div class="container">
+                <div class="ps-container">
 
                     <div class="header__left">
                         <div class="menu--product-categories">
@@ -81,24 +85,27 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <input class="form-control" name="q" type="text" placeholder="{{ __("I'm shopping for...") }}" id="input-search" autocomplete="off">
+                                <input class="form-control" name="q"
+                                       type="text" placeholder="{{ __("I'm shopping for...") }}"
+                                       id="input-search" autocomplete="off">
                                 <div class="spinner-icon">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
-                                <button type="submit" class="search_btn"><i class="fa fa-search"></i></button>
+                                <button type="submit" class="btn_search"><i class="fa fa-search"></i></button>
                                 <div class="ps-panel--search-result"></div>
                             </form>
-                            <div class="category_search">
-                                <ul class="b__tag">
-                                    <li><a href="">Vải thiều</a></li>
+                            <div class="b__tag">
+                                <ul>
                                     <li><a href="">Đặc sản 3 miền</a></li>
+                                    <li><a href="">Điểm bán xanh</a></li>
                                     <li><a href="">Đồ gia dụng</a></li>
                                     <li><a href="">Mỹ phẩm</a></li>
                                     <li><a href="">Đồ điện tử</a></li>
-                                    <li><a href="">Gia dụng</a></li>
+                                    <li><a href="">Thẻ điện thoại</a></li>
                                     <li><a href="">Mẹ và bé</a></li>
                                 </ul>
                             </div>
+
                         </div>
                         <div class="header__right">
                             <div class="header__actions">
@@ -119,61 +126,46 @@
                 </div>
             </div>
 
-
-            <div class="header_bottom">
-                <div class="container">
-                <ul>
-                    <li><a href="#">Sản phẩm chính hãng</a></li>
-                    <li><a href="#">Sản phẩm OCOP</a></li>
-                    <li><a href="#">Vé máy bay</a></li>
-                    <li><a href="#">Đặc sản vùng miền</a></li>
-                    <li><a href="#">Bách hóa online</a></li>
-                    <li><a href="#">Gian hàng việt</a></li>
-                </ul>
-            </div>
-            </div>
-
-{{--            <nav class="navigation">--}}
-{{--                <div class="ps-container">--}}
-{{--                    <div class="navigation__left">--}}
-{{--                        <div class="menu--product-categories">--}}
-{{--                            <div class="menu__toggle"><i class="icon-menu"></i><span> {{ __('Shop by Department') }}</span></div>--}}
-{{--                            <div class="menu__content" style="display: none">--}}
-{{--                                <ul class="menu--dropdown">--}}
-{{--                                    {!! Theme::partial('product-categories-dropdown', compact('categories')) !!}--}}
-{{--                                </ul>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="navigation__right">--}}
-{{--                        {!! Menu::renderMenuLocation('main-menu', [--}}
-{{--                            'view'    => 'menu',--}}
-{{--                            'options' => ['class' => 'menu'],--}}
-{{--                        ]) !!}--}}
-{{--                        @if (is_plugin_active('ecommerce'))--}}
-{{--                            <ul class="navigation__extra">--}}
-{{--                                <li><a href="{{ route('public.orders.tracking') }}">{{ __('Track your order') }}</a></li>--}}
-{{--                                @php $currencies = get_all_currencies(); @endphp--}}
-{{--                                @if (count($currencies) > 1)--}}
-{{--                                    <li>--}}
-{{--                                        <div class="ps-dropdown">--}}
-{{--                                            <a href="{{ route('public.change-currency', get_application_currency()->title) }}"><span>{{ get_application_currency()->title }}</span></a>--}}
-{{--                                            <ul class="ps-dropdown-menu">--}}
-{{--                                                @foreach ($currencies as $currency)--}}
-{{--                                                    @if ($currency->id !== get_application_currency_id())--}}
-{{--                                                        <li><a href="{{ route('public.change-currency', $currency->title) }}"><span>{{ $currency->title }}</span></a></li>--}}
-{{--                                                    @endif--}}
-{{--                                                @endforeach--}}
-{{--                                            </ul>--}}
-{{--                                        </div>--}}
-{{--                                    </li>--}}
-{{--                                @endif--}}
-{{--                            </ul>--}}
-{{--                        @endif--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </nav>--}}
-
+            {{--<nav class="navigation">--}}
+                {{--<div class="ps-container">--}}
+                    {{--<div class="navigation__left">--}}
+                        {{--<div class="menu--product-categories">--}}
+                            {{--<div class="menu__toggle"><i class="icon-menu"></i><span> {{ __('Shop by Department') }}</span></div>--}}
+                            {{--<div class="menu__content" style="display: none">--}}
+                                {{--<ul class="menu--dropdown">--}}
+                                    {{--{!! Theme::partial('product-categories-dropdown', compact('categories')) !!}--}}
+                                {{--</ul>--}}
+                            {{--</div>--}}
+                        {{--</div>--}}
+                    {{--</div>--}}
+                    {{--<div class="navigation__right">--}}
+                        {{--{!! Menu::renderMenuLocation('main-menu', [--}}
+                            {{--'view'    => 'menu',--}}
+                            {{--'options' => ['class' => 'menu'],--}}
+                        {{--]) !!}--}}
+                        {{--@if (is_plugin_active('ecommerce'))--}}
+                            {{--<ul class="navigation__extra">--}}
+                                {{--<li><a href="{{ route('public.orders.tracking') }}">{{ __('Track your order') }}</a></li>--}}
+                                {{--@php $currencies = get_all_currencies(); @endphp--}}
+                                {{--@if (count($currencies) > 1)--}}
+                                    {{--<li>--}}
+                                        {{--<div class="ps-dropdown">--}}
+                                            {{--<a href="{{ route('public.change-currency', get_application_currency()->title) }}"><span>{{ get_application_currency()->title }}</span></a>--}}
+                                            {{--<ul class="ps-dropdown-menu">--}}
+                                                {{--@foreach ($currencies as $currency)--}}
+                                                    {{--@if ($currency->id !== get_application_currency_id())--}}
+                                                        {{--<li><a href="{{ route('public.change-currency', $currency->title) }}"><span>{{ $currency->title }}</span></a></li>--}}
+                                                    {{--@endif--}}
+                                                {{--@endforeach--}}
+                                            {{--</ul>--}}
+                                        {{--</div>--}}
+                                    {{--</li>--}}
+                                {{--@endif--}}
+                            {{--</ul>--}}
+                        {{--@endif--}}
+                    {{--</div>--}}
+                {{--</div>--}}
+            {{--</nav>--}}
         </header>
         @if (Theme::get('headerMobile'))
             {!! Theme::get('headerMobile') !!}

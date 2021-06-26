@@ -10,6 +10,7 @@
                 </ul>
             </div>
             <div class="ps-section__content">
+
                 <div class="half-circle-spinner" v-if="isLoading">
                     <div class="circle circle-1"></div>
                     <div class="circle circle-2"></div>

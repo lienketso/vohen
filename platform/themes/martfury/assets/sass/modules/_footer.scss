@@ -1,5 +1,5 @@
 .ps-footer {
-    padding-top: 70px;
+    padding-top: 40px;
 
     &__widgets {
         display: flex;
@@ -21,7 +21,7 @@
 
             a {
                 display: inline-block;
-                color: $color-text;
+                color: #fff;
                 line-height: 20px;
                 margin-right: 10px;
                 position: relative;

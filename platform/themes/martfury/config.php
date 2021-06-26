@@ -54,6 +54,7 @@ return [
             $theme->asset()->usePath()->add('style', 'css/style.css', [], [], $version);
             $theme->asset()->usePath()->add('custom', 'css/custom.css', [], [], $version);
             $theme->asset()->usePath()->add('fix', 'css/fix.css', [], [], $version);
+            $theme->asset()->usePath()->add('responsive', 'css/responsive.css', [], [], $version);
 
             if (BaseHelper::siteLanguageDirection() == 'rtl') {
                 $theme->asset()->usePath()->add('rtl', 'css/rtl.css', [], [], $version);

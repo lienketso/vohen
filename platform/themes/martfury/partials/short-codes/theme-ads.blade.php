@@ -1,6 +1,6 @@
 @if (count($ads))
     <div class="ps-home-ads mt-40 mb-40">
-        <div class="container">
+        <div class="ps-container">
             <div class="row">
                 @for($i = 0; $i < count($ads); $i++)
                     <div class="col-lg-{{ 12 / count($ads) }}">

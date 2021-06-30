@@ -65,6 +65,7 @@
             <li><a @if (Route::currentRouteName() == 'marketplace.vendor.dashboard') class="active" @endif href="{{ route('marketplace.vendor.dashboard') }}"><i class="icon-home"></i>{{ __('Dashboard') }}</a></li>
             <li><a @if (Route::currentRouteName() == 'marketplace.vendor.products.index') class="active" @endif href="{{ route('marketplace.vendor.products.index') }}"><i class="icon-database"></i>{{ __('Products') }}</a></li>
             <li><a @if (Route::currentRouteName() == 'marketplace.vendor.orders') class="active" @endif href="{{ route('marketplace.vendor.orders') }}"><i class="icon-bag2"></i>{{ __('Orders') }}</a></li>
+            <li><a class="active" href="#"><i class="icon-accessibility"></i>Quản lý kho</a></li>
             <li><a @if (Route::currentRouteName() == 'marketplace.vendor.settings') class="active" @endif href="{{ route('marketplace.vendor.settings') }}"><i class="icon-cog"></i>{{ __('Settings') }}</a></li>
         </ul>
     </div>
@@ -91,7 +92,8 @@
                         <li><a @if (Route::currentRouteName() == 'marketplace.vendor.dashboard') class="active" @endif href="{{ route('marketplace.vendor.dashboard') }}"><i class="icon-home"></i>{{ __('Dashboard') }}</a></li>
                         <li><a @if (Route::currentRouteName() == 'marketplace.vendor.products.index') class="active" @endif href="{{ route('marketplace.vendor.products.index') }}"><i class="icon-database"></i>{{ __('Products') }}</a></li>
                         <li><a @if (Route::currentRouteName() == 'marketplace.vendor.orders') class="active" @endif href="{{ route('marketplace.vendor.orders') }}"><i class="icon-bag2"></i>{{ __('Orders') }}</a></li>
-                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.settings') class="active" @endif href="{{ route('marketplace.vendor.settings') }}"><i class="icon-cog"></i>{{ __('Settings') }}</a></li>
+                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.warehouse') class="active" @endif href="{{ route('marketplace.vendor.warehouse') }}"><i class="icon-accessibility"></i>Quản lý kho</a></li>
+                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.settings') class="active" @endif href="{{ route('marketplace.vendor.settings') }}"><i class="icon-cog"></i>Cấu hình</a></li>
                     </ul>
                 </div>
                 <div class="ps-sidebar__footer">

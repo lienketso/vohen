@@ -7,9 +7,13 @@ use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Marketplace\Http\Middleware\RedirectIfNotVendor;
 use Botble\Marketplace\Models\Store;
+use Botble\Marketplace\Models\Warehouse;
 use Botble\Marketplace\Repositories\Caches\StoreCacheDecorator;
+use Botble\Marketplace\Repositories\Caches\WarehouseCacheDecorator;
 use Botble\Marketplace\Repositories\Eloquent\StoreRepository;
+use Botble\Marketplace\Repositories\Eloquent\WarehouseRepository;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
+use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use Event;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Router;
@@ -27,6 +31,11 @@ class MarketplaceServiceProvider extends ServiceProvider
             $this->app->bind(StoreInterface::class, function () {
                 return new StoreCacheDecorator(
                     new StoreRepository(new Store)
+                );
+            });
+            $this->app->bind(WarehouseInterface::class, function () {
+                return new WarehouseCacheDecorator(
+                    new WarehouseRepository(new Warehouse())
                 );
             });
 

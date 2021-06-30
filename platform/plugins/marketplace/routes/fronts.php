@@ -43,5 +43,27 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
             'as'   => 'settings',
             'uses' => 'SettingController@index',
         ]);
+        // quản lý kho
+        Route::get('warehouse', [
+            'as'   => 'warehouse',
+            'uses' => 'WarehouseController@index',
+        ]);
+        Route::get('warehouse-create', [
+            'as'   => 'warehouse.create',
+            'uses' => 'WarehouseController@create',
+        ]);
+        Route::post('warehouse-create', [
+            'as'   => 'warehouse.create',
+            'uses' => 'WarehouseController@store',
+        ]);
+        Route::get('warehouse-edit/{id}', [
+            'as'   => 'warehouse.edit',
+            'uses' => 'WarehouseController@edit',
+        ]);
+        Route::post('warehouse-edit/{id}', [
+            'as'   => 'warehouse.edit',
+            'uses' => 'WarehouseController@update',
+        ]);
+
     });
 });

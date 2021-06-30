@@ -31,6 +31,7 @@
                                 <li @if (Route::currentRouteName() == 'customer.orders') class="active" @endif><a href="{{ route('customer.orders') }}"><i class="icon-papers"></i> {{ __('Orders') }}</a></li>
                                 <li @if (Route::currentRouteName() == 'customer.address' || Route::currentRouteName() == 'customer.address.create' || Route::currentRouteName() == 'customer.address.edit') class="active" @endif><a href="{{ route('customer.address') }}"><i class="icon-map-marker"></i> {{ __('Address') }}</a></li>
                                 <li @if (Route::currentRouteName() == 'customer.change-password') class="active" @endif><a href="{{ route('customer.change-password') }}"><i class="icon-lock"></i> {{ __('Change password') }}</a></li>
+                                <li ><a href="{{ route('customer.change-password') }}"><i class="icon-accessibility"></i> Quản lý kho</a></li>
                                 @if (is_plugin_active('marketplace'))
                                     <li><a href="{{ route('marketplace.vendor.dashboard') }}"><i class="icon-cart"></i> {{ __('Vendor dashboard') }}</a></li>
                                 @endif

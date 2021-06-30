@@ -13067,7 +13067,6 @@ html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
 }
 
 .mega-menu {
-  display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
   padding: 15px 30px 10px;
@@ -13305,7 +13304,7 @@ html:not([dir=rtl]) .noUi-horizontal .noUi-handle {
   top: 0;
   left: 100%;
   width: auto;
-  min-width: 530px;
+  min-width: 350px;
   visibility: hidden;
   opacity: 0;
   border-left: none;

@@ -64,6 +64,14 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
             'as'   => 'warehouse.edit',
             'uses' => 'WarehouseController@update',
         ]);
+        Route::get('warehouse-delete/{id}', [
+            'as'   => 'warehouse.delete',
+            'uses' => 'WarehouseController@destroy',
+        ]);
+        Route::get('warehouse-import/{id}', [
+            'as'   => 'warehouse.import',
+            'uses' => 'WarehouseController@import',
+        ]);
 
     });
 });

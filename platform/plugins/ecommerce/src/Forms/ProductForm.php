@@ -17,6 +17,7 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
 use Botble\Ecommerce\Repositories\Interfaces\TaxInterface;
+use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use EcommerceHelper;
 
 class ProductForm extends FormAbstract
@@ -37,6 +38,8 @@ class ProductForm extends FormAbstract
         $brands = [0 => trans('plugins/ecommerce::brands.no_brand')] + $brands;
 
         $productCollections = app(ProductCollectionInterface::class)->pluck('name', 'id');
+        //warehouse list
+        $warehouseList = app(WarehouseInterface::class)->pluck('name','id');
 
         $selectedProductCollections = [];
         if ($this->getModel()) {
@@ -177,6 +180,7 @@ class ProductForm extends FormAbstract
                         'title'          => trans('plugins/ecommerce::products.overview'),
                         'content'        => view('plugins/ecommerce::products.partials.general',
                             ['product' => $productId ? $this->getModel() : null])->render(),
+                        'warehouseList'=>$warehouseList,
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'priority'       => 2,
                     ],
@@ -205,6 +209,7 @@ class ProductForm extends FormAbstract
                             'productVariationsInfo'      => $productVariationsInfo,
                             'productsRelatedToVariation' => $productsRelatedToVariation,
                             'product'                    => $this->getModel(),
+                            'warehouseList'             =>$warehouseList
                         ])->render(),
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'after_wrapper'  => '</div>',

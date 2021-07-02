@@ -17,6 +17,7 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
 use Botble\Ecommerce\Repositories\Interfaces\TaxInterface;
 use Botble\Marketplace\Forms\Fields\CustomEditorField;
 use Botble\Marketplace\Http\Requests\ProductRequest;
+use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use EcommerceHelper;
 
 class ProductForm extends BaseProductForm
@@ -42,11 +43,19 @@ class ProductForm extends BaseProductForm
 
         $productCollections = app(ProductCollectionInterface::class)->pluck('name', 'id');
 
+        //warehouse list
+        $warehouseList = app(WarehouseInterface::class)->pluck('name','id');
+        $selectedWarehouse = [];
+
         $selectedProductCollections = [];
         if ($this->getModel()) {
             $selectedProductCollections = $this->getModel()->productCollections()->pluck('product_collection_id')
                 ->all();
+
+            $selectedWarehouse = $this->getModel()->warehouse()->pluck('warehouse_id')->all();
         }
+
+
 
         $productId = $this->getModel() ? $this->getModel()->id : null;
 
@@ -171,8 +180,12 @@ class ProductForm extends BaseProductForm
                 ->addMetaBoxes([
                     'general'    => [
                         'title'          => trans('plugins/ecommerce::products.overview'),
-                        'content'        => view('plugins/ecommerce::products.partials.general',
-                            ['product' => $productId ? $this->getModel() : null])->render(),
+                        'content'        => view('plugins/marketplace::themes.dashboard.products.general',
+                            ['product' => $productId ? $this->getModel() : null,
+                                'warehouseList'=>$warehouseList,
+                                'selectedWarehouse'=>$selectedWarehouse
+                            ]
+                        )->render(),
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'priority'       => 2,
                     ],
@@ -201,6 +214,7 @@ class ProductForm extends BaseProductForm
                             'productVariationsInfo'      => $productVariationsInfo,
                             'productsRelatedToVariation' => $productsRelatedToVariation,
                             'product'                    => $this->getModel(),
+                            'warehouseList'              => $warehouseList
                         ])->render(),
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'after_wrapper'  => '</div>',

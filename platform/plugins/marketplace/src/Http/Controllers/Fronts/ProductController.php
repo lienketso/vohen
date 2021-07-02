@@ -8,6 +8,7 @@ use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Http\Requests\ProductRequest;
 use Botble\Ecommerce\Repositories\Interfaces\GroupedProductInterface;
+use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
 use Botble\Ecommerce\Services\Products\StoreAttributesOfProductService;
@@ -15,6 +16,7 @@ use Botble\Ecommerce\Services\Products\StoreProductService;
 use Botble\Ecommerce\Services\StoreProductTagService;
 use Botble\Ecommerce\Traits\ProductActionsTrait;
 use Botble\Marketplace\Forms\ProductForm;
+use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use Botble\Marketplace\Tables\ProductTable;
 use Exception;
 use Illuminate\Contracts\View\Factory;
@@ -27,7 +29,13 @@ use Throwable;
 class ProductController extends BaseController
 {
     use ProductActionsTrait;
+    protected $productRepository;
+    protected $warehouseRepository;
 
+    public function __construct(ProductInterface $productRepository, WarehouseInterface $warehouseRepository){
+        $this->productRepository = $productRepository;
+        $this->warehouseRepository = $warehouseRepository;
+    }
     /**
      * @param ProductTable $dataTable
      * @return Factory|View
@@ -132,6 +140,10 @@ class ProductController extends BaseController
                     'qty' => 1,
                 ];
             }, array_filter(explode(',', $request->input('grouped_products', '')))));
+        }
+        //warehouse
+        if($request->has('warehouse_id')){
+            $product->warehouse()->sync($request->input('warehouse_id'));
         }
 
         return $response

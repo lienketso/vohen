@@ -74,7 +74,19 @@
     </div>
 </div>
 <div class="storehouse-info @if (old('with_storehouse_management', $product ? $product->with_storehouse_management : ($originalProduct->with_storehouse_management ?? 0)) == 0) hidden @endif">
+    <div class="form-group">
+        <label class="text-title-field">Kho hàng</label>
+        @foreach($warehouseList as $k=>$d)
+            <div class="item_warehouse">
+                <input type="checkbox" min="0"
+                       name="warehouse_id[]"
+                       value="{{$k}}"
+                       {{(in_array($k,$selectedWarehouse)) ? 'checked' : ''}}
+                > <span>{{$d}}</span>
+            </div>
+        @endforeach
 
+    </div>
     <div class="form-group">
         <label class="text-title-field">{{ trans('plugins/ecommerce::products.form.storehouse.quantity') }}</label>
         <input type="text"

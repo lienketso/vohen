@@ -8,6 +8,8 @@ use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\EnumCastable;
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
+use Botble\Marketplace\Models\ProductWarehouse;
+use Botble\Marketplace\Models\Warehouse;
 use EcommerceHelper;
 use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -105,6 +107,7 @@ class Product extends BaseModel
             $product->productAttributeSets()->detach();
             $product->productAttributes()->detach();
             $product->productCollections()->detach();
+            $product->warehouse()->detach();
             $product->discounts()->detach();
             $product->crossSales()->detach();
             $product->upSales()->detach();
@@ -625,4 +628,16 @@ class Product extends BaseModel
 
         return $this->price + $this->price * ($this->tax->percentage / 100);
     }
+
+    //warehouse
+    public function warehouse()
+    {
+        return $this->belongsToMany(
+            Warehouse::class,
+            'ec_product_warehouse',
+            'product_id',
+            'warehouse_id'
+        )->withTimestamps();
+    }
+
 }

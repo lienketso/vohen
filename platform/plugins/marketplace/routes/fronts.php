@@ -43,6 +43,28 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
             'as'   => 'settings',
             'uses' => 'SettingController@index',
         ]);
+
+        Route::resource('revenues', 'RevenueController')
+            ->parameters(['' => 'revenue'])
+            ->only(['index']);
+
+        Route::resource('withdrawals', 'WithdrawalController')
+            ->parameters(['' => 'withdrawal'])
+            ->only([
+                'index',
+                'create',
+                'store',
+                'edit',
+                'update'
+            ]);
+
+        Route::group(['prefix' => 'withdrawals'], function () {
+            Route::get('show/{id}', [
+                'as'   => 'withdrawals.show',
+                'uses' => 'WithdrawalController@show',
+            ]);
+        });
+
         // quản lý kho
         Route::get('warehouse', [
             'as'   => 'warehouse',
@@ -74,4 +96,19 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
         ]);
 
     });
+
+    Route::group(['prefix' => 'vendor', 'as' => 'marketplace.vendor.', 'middleware' => ['customer']], function () {
+
+        Route::get('become-vendor', [
+            'as'   => 'become-vendor',
+            'uses' => 'DashboardController@getBecomeVendor',
+        ]);
+
+        Route::post('become-vendor', [
+            'as'   => 'become-vendor',
+            'uses' => 'DashboardController@postBecomeVendor',
+        ]);
+
+    });
+
 });

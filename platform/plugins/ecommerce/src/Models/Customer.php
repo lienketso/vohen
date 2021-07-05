@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use RvMedia;
+use MacroableModels;
+use Illuminate\Support\Str;
 
 /**
  * @mixin \Eloquent
@@ -106,5 +108,21 @@ class Customer extends Authenticatable
             Review::where('customer_id', $customer->id)->delete();
             Wishlist::where('customer_id', $customer->id)->delete();
         });
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        if (class_exists('MacroableModels')) {
+            $method = 'get' . Str::studly($key) . 'Attribute';
+            if (MacroableModels::modelHasMacro(get_class($this), $method)) {
+                return call_user_func([$this, $method]);
+            }
+        }
+
+        return parent::__get($key);
     }
 }

@@ -61,13 +61,8 @@
         <button class="ps-drawer__close"><i class="icon icon-cross"></i></button>
     </div>
     <div class="ps-drawer__content">
-        <ul class="menu">
-            <li><a @if (Route::currentRouteName() == 'marketplace.vendor.dashboard') class="active" @endif href="{{ route('marketplace.vendor.dashboard') }}"><i class="icon-home"></i>{{ __('Dashboard') }}</a></li>
-            <li><a @if (Route::currentRouteName() == 'marketplace.vendor.products.index') class="active" @endif href="{{ route('marketplace.vendor.products.index') }}"><i class="icon-database"></i>{{ __('Products') }}</a></li>
-            <li><a @if (Route::currentRouteName() == 'marketplace.vendor.orders') class="active" @endif href="{{ route('marketplace.vendor.orders') }}"><i class="icon-bag2"></i>{{ __('Orders') }}</a></li>
-            <li><a class="active" href="#"><i class="icon-accessibility"></i>Quản lý kho</a></li>
-            <li><a @if (Route::currentRouteName() == 'marketplace.vendor.settings') class="active" @endif href="{{ route('marketplace.vendor.settings') }}"><i class="icon-cog"></i>{{ __('Settings') }}</a></li>
-        </ul>
+        @include('plugins/marketplace::themes.dashboard.partials.menu')
+
     </div>
 </aside>
 <div class="ps-site-overlay"></div>
@@ -88,13 +83,7 @@
             </div>
             <div class="ps-sidebar__content">
                 <div class="ps-sidebar__center">
-                    <ul class="menu">
-                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.dashboard') class="active" @endif href="{{ route('marketplace.vendor.dashboard') }}"><i class="icon-home"></i>{{ __('Dashboard') }}</a></li>
-                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.products.index') class="active" @endif href="{{ route('marketplace.vendor.products.index') }}"><i class="icon-database"></i>{{ __('Products') }}</a></li>
-                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.orders') class="active" @endif href="{{ route('marketplace.vendor.orders') }}"><i class="icon-bag2"></i>{{ __('Orders') }}</a></li>
-                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.warehouse') class="active" @endif href="{{ route('marketplace.vendor.warehouse') }}"><i class="icon-accessibility"></i>Quản lý kho</a></li>
-                        <li><a @if (Route::currentRouteName() == 'marketplace.vendor.settings') class="active" @endif href="{{ route('marketplace.vendor.settings') }}"><i class="icon-cog"></i>Cấu hình</a></li>
-                    </ul>
+                    @include('plugins/marketplace::themes.dashboard.partials.menu')
                 </div>
                 <div class="ps-sidebar__footer">
                     <div class="ps-copyright">

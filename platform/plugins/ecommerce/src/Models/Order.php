@@ -149,4 +149,17 @@ class Order extends BaseModel
     {
         return in_array($this->status, [OrderStatusEnum::PENDING, OrderStatusEnum::PROCESSING]);
     }
+
+    public function getIsFreeShippingAttribute()
+    {
+        return $this->shipping_amount == 0 && $this->discount_amount == 0 && $this->coupon_code;
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id')->withDefault();
+    }
 }

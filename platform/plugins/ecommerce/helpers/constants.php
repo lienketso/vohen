@@ -81,7 +81,7 @@ if (!defined('DISCOUNT_MODULE_SCREEN_NAME')) {
 }
 
 if (!defined('CUSTOMER_MODULE_SCREEN_NAME')) {
-    define('CUSTOMER_MODULE_SCREEN_NAME', 'payment');
+    define('CUSTOMER_MODULE_SCREEN_NAME', 'customer');
 }
 
 if (!defined('ECOMMERCE_PRODUCT_DETAIL_RENDER')) {
@@ -101,3 +101,68 @@ if (!defined('ECOMMERCE_ORDER_DETAIL_EXTRA_HTML')) {
 if (!defined('FLASH_SALE_MODULE_SCREEN_NAME')) {
     define('FLASH_SALE_MODULE_SCREEN_NAME', 'flash-sale');
 }
+
+if (!defined('PRODUCT_LABEL_MODULE_SCREEN_NAME')) {
+    define('PRODUCT_LABEL_MODULE_SCREEN_NAME', 'product-label');
+}
+
+if (!defined('RENDER_PRODUCTS_IN_CHECKOUT_PAGE')) {
+    define('RENDER_PRODUCTS_IN_CHECKOUT_PAGE', 'render_products_in_checkout_page');
+}
+
+if (!defined('PROCESS_GET_CHECKOUT_SUCCESS_IN_ORDER')) {
+    define('PROCESS_GET_CHECKOUT_SUCCESS_IN_ORDER', 'get_checkout_success_in_order');
+}
+
+if (!defined('HANDLE_PROCESS_ORDER_DATA_ECOMMERCE')) {
+    define('HANDLE_PROCESS_ORDER_DATA_ECOMMERCE', 'process_order_data');
+}
+
+if (!defined('HANDLE_PROCESS_POST_CHECKOUT_ORDER_DATA_ECOMMERCE')) {
+    define('HANDLE_PROCESS_POST_CHECKOUT_ORDER_DATA_ECOMMERCE', 'post_checkout_order');
+}
+
+if (!defined('PROCESS_GET_PAYMENT_STATUS_ORDER')) {
+    define('PROCESS_GET_PAYMENT_STATUS_ORDER', 'get_payment_status');
+}
+
+if (!defined('SEND_MAIL_AFTER_PROCESS_ORDER_MULTI_DATA')) {
+    define('SEND_MAIL_AFTER_PROCESS_ORDER_MULTI_DATA', 'send_mail_after_process_order_multi');
+}
+
+if (!defined('PROCESS_CHECKOUT_ORDER_DATA_ECOMMERCE')) {
+    define('PROCESS_CHECKOUT_ORDER_DATA_ECOMMERCE', 'checkout_order_data');
+}
+
+if (!defined('HANDLE_POST_APPLY_COUPON_CODE_ECOMMERCE')) {
+    define('HANDLE_POST_APPLY_COUPON_CODE_ECOMMERCE', 'post_apply_coupon_code');
+}
+
+if (!defined('HANDLE_POST_REMOVE_COUPON_CODE_ECOMMERCE')) {
+    define('HANDLE_POST_REMOVE_COUPON_CODE_ECOMMERCE', 'post_remove_coupon_code');
+}
+
+if (!defined('PROCESS_POST_SAVE_INFORMATION_CHECKOUT_ECOMMERCE')) {
+    define('PROCESS_POST_SAVE_INFORMATION_CHECKOUT_ECOMMERCE', 'post_save_information_checkout');
+}
+
+if (!defined('PROCESS_GET_CHECKOUT_RECOVER_ECOMMERCE')) {
+    define('PROCESS_GET_CHECKOUT_RECOVER_ECOMMERCE', 'get_checkout_recover');
+}
+
+if (!defined('PROCESS_CHECOUT_RULES_REQUEST_ECOMMERCE')) {
+    define('PROCESS_CHECOUT_RULES_REQUEST_ECOMMERCE', 'checkout_rules_request');
+}
+
+if (!defined('PROCESS_CHECOUT_MESSAGES_REQUEST_ECOMMERCE')) {
+    define('PROCESS_CHECOUT_MESSAGES_REQUEST_ECOMMERCE', 'checkout_messages_request');
+}
+
+if (!defined('ACTION_AFTER_ORDER_STATUS_COMPELETED_ECOMMERCE')) {
+    define('ACTION_AFTER_ORDER_STATUS_COMPELETED_ECOMMERCE', 'after_order_completed');
+}
+
+if (!defined('HANDLE_CUSTOMER_UPDATED_ECOMMERCE')) {
+    define('HANDLE_CUSTOMER_UPDATED_ECOMMERCE', 'customer_update');
+}
+

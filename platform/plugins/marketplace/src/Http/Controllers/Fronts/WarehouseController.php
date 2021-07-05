@@ -13,8 +13,10 @@ use Botble\Base\Forms\FormBuilder;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Marketplace\Forms\WarehouseForm;
+use Botble\Marketplace\Forms\WarehouseImportForm;
 use Botble\Marketplace\Http\Requests\WarehouseRequest;
 use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
+use Botble\Marketplace\Tables\WarehouseImportTable;
 use Botble\Marketplace\Tables\WarehouseTable;
 use Illuminate\Http\Request;
 use Mockery\Exception;
@@ -61,7 +63,7 @@ class WarehouseController extends BaseController
             ->setMessage(trans('core/base::notices.update_success_message'));
     }
 
-    public function destroy(Request$request,$id,BaseHttpResponse $response){
+    public function destroy(Request $request,$id,BaseHttpResponse $response){
         try{
             $store = $this->warehouseRepository->findOrFail($id);
             $this->warehouseRepository->delete($store);
@@ -71,6 +73,11 @@ class WarehouseController extends BaseController
                 ->setError()
                 ->setMessage($exception->getMessage());
         }
+    }
+
+    public function import($id, WarehouseImportTable $table){
+        page_title()->setTitle('Nhập sản phẩm vào kho');
+        return $table->render('plugins/marketplace::themes.dashboard.table.base');
     }
 
 

@@ -65,6 +65,7 @@ class WarehouseTable extends TableAbstract
         return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
             ->addColumn('operations', function ($item) {
                 return view('plugins/marketplace::themes.dashboard.table.actions', [
+                    'import'   => 'marketplace.vendor.warehouse.import',
                     'edit'   => 'marketplace.vendor.warehouse.edit',
                     'delete'=> 'marketplace.vendor.warehouse.delete',
                     'item'   => $item,

@@ -10,20 +10,24 @@ use Botble\Marketplace\Models\Revenue;
 use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Models\VendorInfo;
 use Botble\Marketplace\Models\Warehouse;
+use Botble\Marketplace\Models\WarehouseImport;
 use Botble\Marketplace\Models\Withdrawal;
 use Botble\Marketplace\Repositories\Caches\RevenueCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\StoreCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\VendorInfoCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\WarehouseCacheDecorator;
+use Botble\Marketplace\Repositories\Caches\WarehouseImportCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\WithdrawalCacheDecorator;
 use Botble\Marketplace\Repositories\Eloquent\RevenueRepository;
 use Botble\Marketplace\Repositories\Eloquent\StoreRepository;
 use Botble\Marketplace\Repositories\Eloquent\VendorInfoRepository;
+use Botble\Marketplace\Repositories\Eloquent\WarehouseImportRepository;
 use Botble\Marketplace\Repositories\Eloquent\WarehouseRepository;
 use Botble\Marketplace\Repositories\Eloquent\WithdrawalRepository;
 use Botble\Marketplace\Repositories\Interfaces\RevenueInterface;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
+use Botble\Marketplace\Repositories\Interfaces\WarehouseImportInterface;
 use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use Botble\Marketplace\Repositories\Interfaces\WithdrawalInterface;
 use Event;
@@ -50,11 +54,19 @@ class MarketplaceServiceProvider extends ServiceProvider
                     new StoreRepository(new Store)
                 );
             });
+
             $this->app->bind(WarehouseInterface::class, function () {
                 return new WarehouseCacheDecorator(
                     new WarehouseRepository(new Warehouse)
                 );
             });
+
+            $this->app->bind(WarehouseImportInterface::class, function () {
+                return new WarehouseImportCacheDecorator(
+                    new WarehouseImportRepository(new WarehouseImport)
+                );
+            });
+
             $this->app->bind(RevenueInterface::class, function () {
                 return new RevenueCacheDecorator(
                     new RevenueRepository(new Revenue)

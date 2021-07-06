@@ -123,6 +123,10 @@ use Botble\Ecommerce\Repositories\Interfaces\TaxInterface;
 use Botble\Ecommerce\Repositories\Interfaces\WishlistInterface;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleRemoveCouponService;
+use Botble\Marketplace\Models\Store;
+use Botble\Marketplace\Repositories\Caches\StoreCacheDecorator;
+use Botble\Marketplace\Repositories\Eloquent\StoreRepository;
+use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Cart;
 use EcommerceHelper;
 use EmailHandler;
@@ -172,7 +176,11 @@ class EcommerceServiceProvider extends ServiceProvider
                 new ProductRepository(new Product)
             );
         });
-
+//        $this->app->bind(StoreInterface::class, function () {
+//            return new StoreCacheDecorator(
+//                new StoreRepository(new Store)
+//            );
+//        });
         $this->app->bind(ProductCategoryInterface::class, function () {
             return new ProductCategoryCacheDecorator(
                 new ProductCategoryRepository(new ProductCategory)

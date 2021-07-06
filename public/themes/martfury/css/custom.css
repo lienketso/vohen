@@ -1025,6 +1025,75 @@ form .navigation--mobile-product > * {
   font-size: 13px;
 }
 
+.store_info_page {
+  padding-top: 50px;
+}
+
+.left_store_info {
+  border-right: 1px solid #ccc;
+  display: flex;
+}
+
+.desc_store_info {
+  padding-left: 20px;
+}
+
+.item_number {
+  position: relative;
+  top: 20px;
+}
+
+.item_number span {
+  padding-right: 20px;
+}
+
+.item_number span strong {
+  color: #0a64b4;
+}
+
+.desc_store_info a {
+  padding: 6px 20px;
+  display: inline-block;
+}
+
+.desc_store_info a.chat_now {
+  border: 1px solid #0c91e5;
+  color: #0c91e5;
+}
+
+.desc_store_info a.view_shop {
+  border: 1px solid #666;
+  color: #666;
+}
+
+.desc_store_info a.view_shop:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.bg_shop {
+  background-color: rgba(50, 115, 220, 0.1);
+  padding: 10px;
+}
+
+.logo_store_info {
+  width: 8rem;
+  height: 8rem;
+  display: inline-block;
+  border-radius: 50%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.09);
+  position: relative;
+}
+
+.logo_store_info img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+}
+
 @media (max-width: 479px) {
   .ps-carousel--nav .owl-dots .owl-dot {
     margin: 0 3px !important;

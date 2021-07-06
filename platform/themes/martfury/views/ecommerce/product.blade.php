@@ -161,6 +161,32 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="store_info_page">
+                            <div class="bg_shop">
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="left_store_info">
+                                        <div class="logo_store_info">
+                                            <a href="#"><img src="" alt=""></a>
+                                        </div>
+                                        <div class="desc_store_info">
+                                            <h4>Shoping name </h4>
+                                            <a href="#" class="chat_now"><i class="icon-chat"></i> Chat ngay</a>
+                                            <a href="#" class="view_shop"><i class="icon-chat"></i> Xem shop</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="item_number">
+                                        <span>Tham gia : <strong>2 Tháng trước</strong></span>
+                                        <span>Sản phẩm : <strong>120</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
                         <div class="ps-product__content ps-tab-root">
                             <ul class="ps-tab-list">
                                 <li class="active"><a href="#tab-description">{{ __('Description') }}</a></li>

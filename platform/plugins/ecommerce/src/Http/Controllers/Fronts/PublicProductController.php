@@ -19,6 +19,7 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductTagInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ReviewInterface;
 use Botble\Ecommerce\Services\Products\GetProductService;
+use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\SeoHelper\SeoOpenGraph;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
 use DB;
@@ -80,6 +81,7 @@ class PublicProductController
      * @param ReviewInterface $reviewRepository
      * @param SlugInterface $slugRepository
      */
+    protected $storeRepository;
     public function __construct(
         ProductInterface $productRepository,
         ProductCategoryInterface $productCategoryRepository,
@@ -139,6 +141,10 @@ class PublicProductController
 
         $products = $productService->getProduct($request, null, null, $with, $withCount);
 
+        //store Info
+//        $store = $this->storeRepository->getFirstBy(['id'=>$products->store_id]);
+//        dd($store);
+
         Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Products'), route('public.products'));
         SeoHelper::setTitle(__('Products'))->setDescription(__('Products'));
 
@@ -153,6 +159,7 @@ class PublicProductController
      */
     public function getProduct($slug)
     {
+
         $slug = $this->slugRepository->getFirstBy([
             'key'            => $slug,
             'reference_type' => Product::class,

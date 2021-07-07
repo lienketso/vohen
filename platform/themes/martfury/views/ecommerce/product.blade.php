@@ -168,19 +168,21 @@
                                 <div class="col-lg-7">
                                     <div class="left_store_info">
                                         <div class="logo_store_info">
-                                            <a href="#"><img src="" alt=""></a>
+                                            <a target="_blank" href="{{$product->store->url}}"><img
+                                                        src="{{ RvMedia::getImageUrl($product->store->logo, 'small', false, RvMedia::getDefaultImage()) }}"
+                                                             alt="{{$product->store->name}}"></a>
                                         </div>
                                         <div class="desc_store_info">
-                                            <h4>Shoping name </h4>
+                                            <h4>{{$product->store->name}} </h4>
                                             <a href="#" class="chat_now"><i class="icon-chat"></i> Chat ngay</a>
-                                            <a href="#" class="view_shop"><i class="icon-chat"></i> Xem shop</a>
+                                            <a target="_blank" href="{{$product->store->url}}" class="view_shop"><i class="icon-chat"></i> Xem shop</a>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-5">
                                     <div class="item_number">
-                                        <span>Tham gia : <strong>2 Tháng trước</strong></span>
-                                        <span>Sản phẩm : <strong>120</strong></span>
+                                        <span>Tham gia : <strong>{{$startStore}}</strong></span>
+                                        <span>Sản phẩm : <strong>{{$countProduct}}</strong></span>
                                     </div>
                                 </div>
                             </div>

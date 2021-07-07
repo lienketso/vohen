@@ -9,6 +9,7 @@ use Botble\Base\Traits\EnumCastable;
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
 use Botble\Marketplace\Models\ProductWarehouse;
+use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Models\Warehouse;
 use EcommerceHelper;
 use Exception;
@@ -69,6 +70,7 @@ class Product extends BaseModel
         'status',
         'views',
         'stock_status',
+        'store_id'
     ];
 
     /**
@@ -638,6 +640,10 @@ class Product extends BaseModel
             'product_id',
             'warehouse_id'
         )->withTimestamps();
+    }
+
+    public function store(){
+        return $this->belongsTo(Store::class,'store_id');
     }
 
 }

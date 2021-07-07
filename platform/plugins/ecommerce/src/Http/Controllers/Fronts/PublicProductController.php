@@ -22,6 +22,7 @@ use Botble\Ecommerce\Services\Products\GetProductService;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\SeoHelper\SeoOpenGraph;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
+use Carbon\Carbon;
 use DB;
 use EcommerceHelper;
 use Exception;
@@ -89,7 +90,8 @@ class PublicProductController
         BrandInterface $brandRepository,
         ProductVariationInterface $productVariationRepository,
         ReviewInterface $reviewRepository,
-        SlugInterface $slugRepository
+        SlugInterface $slugRepository,
+        StoreInterface $storeRepository
     ) {
         $this->productRepository = $productRepository;
         $this->productCategoryRepository = $productCategoryRepository;
@@ -98,6 +100,7 @@ class PublicProductController
         $this->productVariationRepository = $productVariationRepository;
         $this->reviewRepository = $reviewRepository;
         $this->slugRepository = $slugRepository;
+        $this->storeRepository = $storeRepository;
     }
 
     /**
@@ -198,6 +201,11 @@ class PublicProductController
             return redirect()->to($product->url);
         }
 
+        $countProduct = $this->productRepository->getModel()->where('store_id',$product->store_id)->count();
+        $startDate = $product->store->created_at;
+        $startStore = Carbon::createFromFormat('Y-m-d h:i:s',$startDate)->diffForHumans();
+
+
         SeoHelper::setTitle($product->name)->setDescription($product->description);
 
         $meta = new SeoOpenGraph;
@@ -239,7 +247,9 @@ class PublicProductController
             $selectedAttrs = $product->defaultVariation->productAttributes->pluck('id')->all();
         }
 
-        return Theme::scope('ecommerce.product', compact('product', 'selectedAttrs', 'productImages'), 'plugins/ecommerce::themes.product')->render();
+        return Theme::scope('ecommerce.product',
+            compact('product', 'countProduct','startStore', 'selectedAttrs', 'productImages'),
+            'plugins/ecommerce::themes.product')->render();
     }
 
     /**

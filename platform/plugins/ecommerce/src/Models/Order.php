@@ -9,6 +9,7 @@ use Botble\Ecommerce\Enums\ShippingMethodEnum;
 use Botble\Ecommerce\Repositories\Interfaces\ShipmentInterface;
 use Botble\Payment\Models\Payment;
 use Botble\Payment\Repositories\Interfaces\PaymentInterface;
+use EcommerceHelper;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -100,6 +101,14 @@ class Order extends BaseModel
     }
 
     /**
+     * @return string
+     */
+    public function getFullAddressAttribute()
+    {
+        return $this->address->address . ', ' . $this->address->city . ', ' . $this->address->state . ', ' . $this->address->country_name . (EcommerceHelper::isZipCodeEnabled() ? ', ' . $this->address->zip_code : '');
+    }
+
+    /**
      * @return HasMany
      */
     public function products()
@@ -150,6 +159,9 @@ class Order extends BaseModel
         return in_array($this->status, [OrderStatusEnum::PENDING, OrderStatusEnum::PROCESSING]);
     }
 
+    /**
+     * @return bool
+     */
     public function getIsFreeShippingAttribute()
     {
         return $this->shipping_amount == 0 && $this->discount_amount == 0 && $this->coupon_code;

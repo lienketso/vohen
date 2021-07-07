@@ -23,7 +23,7 @@ var ChangeProductSwatches = /*#__PURE__*/function () {
       var _self = this;
 
       var $body = $('body');
-      $body.on('click', ' .visual-swatch label, .product-attributes .text-swatch label', function (event) {
+      $body.on('click', '.product-attributes .visual-swatch label, .product-attributes .text-swatch label', function (event) {
         event.preventDefault();
         var $radio = $(event.currentTarget).find('input[type=radio]');
 
@@ -54,11 +54,11 @@ var ChangeProductSwatches = /*#__PURE__*/function () {
           if (attribute) {
             selectedAttributeSets++;
           }
-        });
+        }); // if (selectedAttributeSets === $(event.currentTarget).closest('.product-attributes').find('.attribute-swatches-wrapper').length) {
+        //     _self.getProductVariation($(event.currentTarget).closest('.product-attributes'));
+        // }
 
-        if (selectedAttributeSets === $(event.currentTarget).closest('.product-attributes').find('.attribute-swatches-wrapper').length) {
-          _self.getProductVariation($(event.currentTarget).closest('.product-attributes'));
-        }
+        _self.getProductVariation($(event.currentTarget).closest('.product-attributes'));
       });
     }
   }, {

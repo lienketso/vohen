@@ -18272,17 +18272,17 @@ var MainCheckout = /*#__PURE__*/function () {
   _createClass(MainCheckout, [{
     key: "init",
     value: function init() {
+      var target = '#main-checkout-product-info';
+
       var loadShippingFeeAtTheFirstTime = function loadShippingFeeAtTheFirstTime() {
-        var shippingMethod = $(document).find('input[name=shipping_method]').first();
+        var shippingMethod = $(document).find('input[name=shipping_method]:checked').first();
+
+        if (!shippingMethod.length) {
+          shippingMethod = $(document).find('input[name=shipping_method]').first();
+        }
 
         if (shippingMethod.length) {
           shippingMethod.trigger('click');
-          var target = '#main-checkout-product-info';
-
-          if ($('#main-checkout-product-info').is(':hidden')) {
-            target = '#main-checkout-product-info-mobile';
-          }
-
           $('.payment-info-loading').show();
           $('.mobile-total').text('...');
           $(target).load(window.location.href + '?shipping_method=' + shippingMethod.val() + '&shipping_option=' + shippingMethod.data('option') + ' ' + target + ' > *', function () {
@@ -18292,18 +18292,60 @@ var MainCheckout = /*#__PURE__*/function () {
       };
 
       loadShippingFeeAtTheFirstTime();
+
+      var loadShippingFreeTheFirstTime2 = function loadShippingFreeTheFirstTime2() {
+        var shippingMethods = $(target).find('input.shipping_method_input');
+
+        if (shippingMethods.length) {
+          var methods = {
+            'shipping_method': {},
+            'shipping_option': {}
+          };
+          var storeIds = [];
+          shippingMethods.map(function (i, shm) {
+            var val = $(shm).filter(':checked').val();
+            var sId = $(shm).data('id');
+
+            if (!storeIds.includes(sId)) {
+              storeIds.push(sId);
+            }
+
+            if (val) {
+              methods['shipping_method'][sId] = val;
+              methods['shipping_option'][sId] = $(shm).data('option');
+            }
+          });
+
+          if (Object.keys(methods['shipping_method']).length !== storeIds.length) {
+            shippingMethods.map(function (i, shm) {
+              var sId = $(shm).data('id');
+
+              if (!methods['shipping_method'][sId]) {
+                methods['shipping_method'][sId] = $(shm).val();
+                methods['shipping_option'][sId] = $(shm).data('option');
+                $(shm).prop('checked', true).trigger('change');
+              }
+            });
+          }
+
+          $('.payment-info-loading').show();
+          $(target).load(window.location.href + '?' + $.param(methods) + ' ' + target + ' > *', function () {
+            $('.payment-info-loading').hide();
+          });
+        }
+      };
+
+      loadShippingFreeTheFirstTime2();
+      $(document).on('change', 'input.shipping_method_input', function () {
+        loadShippingFreeTheFirstTime2();
+      });
       $(document).on('change', 'input[name=shipping_method]', function (event) {
         // Fixed: set shipping_option value based on shipping_method change:
-        $('input[name=shipping_option]').val($(event.currentTarget).data('option'));
-        var target = '#main-checkout-product-info';
-
-        if ($('#main-checkout-product-info').is(':hidden')) {
-          target = '#main-checkout-product-info-mobile';
-        }
-
+        var $this = $(event.currentTarget);
+        $('input[name=shipping_option]').val($this.data('option'));
         $('.payment-info-loading').show();
         $('.mobile-total').text('...');
-        $(target).load(window.location.href + '?shipping_method=' + $(event.currentTarget).val() + '&shipping_option=' + $(event.currentTarget).data('option') + ' ' + target + ' > *', function () {
+        $(target).load(window.location.href + '?shipping_method=' + $this.val() + '&shipping_option=' + $this.data('option') + ' ' + target + ' > *', function () {
           $('.payment-info-loading').hide();
         });
       });
@@ -18321,10 +18363,17 @@ var MainCheckout = /*#__PURE__*/function () {
             success: function success(res) {
               if (!res.error) {
                 $('.shipping-info-loading').show();
-                $('#shipping-method-wrapper').load(window.location.href + ' #shipping-method-wrapper > *', function () {
-                  $(document).find('input[name=shipping_method]:first-child').trigger('click');
-                  $('.shipping-info-loading').hide();
-                });
+                var $wrapper = $('#shipping-method-wrapper');
+
+                if ($wrapper.length) {
+                  $wrapper.load(window.location.href + ' #shipping-method-wrapper > *', function () {
+                    $(document).find('input[name=shipping_method]:first-child').trigger('click'); // need re-check
+
+                    $('.shipping-info-loading').hide();
+                  });
+                }
+
+                loadShippingFreeTheFirstTime2(); // marketplace
               }
             },
             error: function error(res) {

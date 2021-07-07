@@ -38,22 +38,130 @@ class EcommerceProduct {
             $groupContainer.find('.panel').hide();
 
             if (value) {
-                _.forEach(value, (value) => {
+                _.forEach(value, value => {
                     $groupContainer.find('.panel[data-id="' + value + '"]').show()
                 })
             }
             $('.select2-select').select2();
         });
+
         $('#attribute_sets').trigger('change');
 
         _self.$body.on('change', '.is-variation-default input', event => {
             let $current = $(event.currentTarget);
-            let isChecked = $(event.currentTarget).is(':checked');
+            let isChecked = $current.is(':checked');
             $('.is-variation-default input').prop('checked', false);
             if (isChecked) {
                 $current.prop('checked', true);
             }
-        })
+        });
+
+        $(document).on('change', '.table-check-all', event => {
+            let $current = $(event.currentTarget);
+            let set = $current.attr('data-set');
+            let checked = $current.prop('checked');
+            $(set).each((index, el) => {
+                if (checked) {
+                    $(el).prop('checked', true);
+                    $('.btn-trigger-delete-selected-variations').show();
+                } else {
+                    $(el).prop('checked', false);
+                    $('.btn-trigger-delete-selected-variations').hide();
+                }
+            });
+        });
+
+        $(document).on('change', '.checkboxes', event => {
+            let $current = $(event.currentTarget);
+
+            let $table = $current.closest('.table-hover-variants');
+
+            let ids = [];
+            $table.find('.checkboxes:checked').each((i, el) => {
+                ids[i] = $(el).val();
+            });
+
+            if (ids.length > 0) {
+                $('.btn-trigger-delete-selected-variations').show();
+            } else {
+                $('.btn-trigger-delete-selected-variations').hide();
+            }
+
+            if (ids.length !== $table.find('.checkboxes').length) {
+                $table.find('.table-check-all').prop('checked', false);
+            } else {
+                $table.find('.table-check-all').prop('checked', true);
+            }
+        });
+
+        $(document).on('click', '.btn-trigger-delete-selected-variations', event => {
+            event.preventDefault();
+            let $current = $(event.currentTarget);
+
+            let ids = [];
+            $('.table-hover-variants').find('.checkboxes:checked').each((i, el) => {
+                ids[i] = $(el).val();
+            });
+
+            if (ids.length === 0) {
+                Botble.showError(BotbleVariables.languages.tables.please_select_record);
+                return false;
+            }
+
+            $('#delete-selected-variations-button').data('href', $current.data('target'));
+
+            $('#delete-variations-modal').modal('show');
+        });
+
+        $('#delete-selected-variations-button').on('click', event => {
+            event.preventDefault();
+
+            let $current = $(event.currentTarget);
+
+            $current.addClass('button-loading');
+
+            let $table = $('.table-hover-variants');
+
+            let ids = [];
+            $table.find('.checkboxes:checked').each((i, el) => {
+                ids[i] = $(el).val();
+            });
+
+            $.ajax({
+                url: $current.data('href'),
+                type: 'DELETE',
+                data: {
+                    ids: ids
+                },
+                success: data => {
+                    if (data.error) {
+                        Botble.showError(data.message);
+                    } else {
+                        Botble.showSuccess(data.message);
+                    }
+
+                    $('.btn-trigger-delete-selected-variations').hide();
+                    $table.find('.table-check-all').prop('checked', false);
+                    $current.closest('.modal').modal('hide');
+                    $current.removeClass('button-loading');
+
+                    if ($table.find('tbody tr').length === ids.length) {
+                        $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', () => {
+                            _self.initElements();
+                            _self.handleEvents();
+                        });
+                    } else {
+                        ids.forEach(function (id) {
+                            $table.find('#variation-id-' + id).fadeOut(400).remove();
+                        });
+                    }
+                },
+                error: data => {
+                    Botble.handleError(data);
+                    $current.removeClass('button-loading');
+                }
+            });
+        });
     }
 
     initElements() {
@@ -143,7 +251,7 @@ class EcommerceProduct {
                 url: $current.data('target'),
                 type: 'POST',
                 data: {
-                    'attribute_sets': attributeSets,
+                    attribute_sets: attributeSets,
                 },
                 beforeSend: () => {
                     $current.addClass('button-loading');
@@ -156,7 +264,9 @@ class EcommerceProduct {
 
                         $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', () => {
                             _self.initElements();
+                            _self.handleEvents();
                         });
+
                         $('#select-attribute-sets-modal').modal('hide');
                     }
                     $current.removeClass('button-loading');
@@ -175,7 +285,7 @@ class EcommerceProduct {
     handleAddVariations() {
         let _self = this;
 
-        let createOrUpdateVariation = ($current) => {
+        let createOrUpdateVariation = $current => {
             let formData = $current.closest('.modal-content').find('.variation-form-wrapper').find('select,textarea,input').serialize();
 
             $.ajax({
@@ -193,8 +303,9 @@ class EcommerceProduct {
                         $current.closest('.modal.fade').modal('hide');
 
                         $('#product-variations-wrapper').load(window.location.href + ' #product-variations-wrapper > *', () => {
-                            _self.initElements()
-                        })
+                            _self.initElements();
+                            _self.handleEvents();
+                        });
                     }
                     $current.removeClass('button-loading');
                 },
@@ -236,8 +347,9 @@ class EcommerceProduct {
 
                         $('#generate-all-versions-modal').modal('hide');
                         $('#product-variations-wrapper').load(window.location.href + ' #product-variations-wrapper > *', () => {
-                            _self.initElements()
-                        })
+                            _self.initElements();
+                            _self.handleEvents();
+                        });
                     }
                     $current.removeClass('button-loading');
                 },
@@ -247,6 +359,46 @@ class EcommerceProduct {
                 error: data => {
                     Botble.handleError(data);
                     $current.removeClass('button-loading');
+                },
+            })
+        });
+
+        $(document).on('click', '.btn-trigger-add-new-product-variation', event => {
+            event.preventDefault();
+            let $current = $(event.currentTarget);
+            let buttonText = $current.text();
+            $.ajax({
+                url: $current.data('load-form'),
+                type: 'GET',
+                beforeSend: () => {
+                    $current.text($current.data('processing'));
+                },
+                success: res => {
+                    if (res.error) {
+                        Botble.showError(res.message);
+                    } else {
+                        $('#add-new-product-variation-modal .modal-body').html(res.data);
+                        _self.initElements();
+                        Botble.initResources();
+                        $('#add-new-product-variation-modal').modal('show');
+                        $('#store-product-variation-button').data('target', $current.data('target'));
+
+                        $('.list-gallery-media-images').each((index, item) => {
+                            let $current = $(item);
+                            if ($current.data('ui-sortable')) {
+                                $current.sortable('destroy');
+                            }
+                            $current.sortable();
+                        });
+                    }
+                    $current.text(buttonText);
+                },
+                complete: () => {
+                    $current.text(buttonText);
+                },
+                error: data => {
+                    $current.text(buttonText);
+                    Botble.handleError(data);
                 },
             })
         });
@@ -310,8 +462,8 @@ class EcommerceProduct {
                     url: $current.data('target'),
                     type: 'POST',
                     data: {
-                        addedAttributes: addedAttributes,
-                        addedAttributeSets: addedAttributeSets,
+                        added_attributes: addedAttributes,
+                        added_attribute_sets: addedAttributeSets,
                     },
                     beforeSend: () => {
                         $current.addClass('button-loading');
@@ -322,6 +474,7 @@ class EcommerceProduct {
                         } else {
                             $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', () => {
                                 _self.initElements();
+                                _self.handleEvents();
                             });
                             $('#confirm-delete-version-modal').modal('hide');
                             Botble.showSuccess(res.message);
@@ -336,8 +489,6 @@ class EcommerceProduct {
                         Botble.handleError(data);
                     },
                 });
-            } else {
-                Botble.showError('Không có thuộc tính nào được chọn!');
             }
         });
     }
@@ -347,7 +498,8 @@ class EcommerceProduct {
 
         $(document).on('click', '.btn-trigger-delete-version', event => {
             event.preventDefault();
-            $('#delete-version-button').data('target', $(event.currentTarget).data('target'));
+            $('#delete-version-button').data('target', $(event.currentTarget).data('target'))
+                .data('id', $(event.currentTarget).data('id'));
             $('#confirm-delete-version-modal').modal('show');
         });
 
@@ -365,9 +517,17 @@ class EcommerceProduct {
                     if (res.error) {
                         Botble.showError(res.message);
                     } else {
-                        $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', () => {
-                            _self.initElements()
-                        });
+                        let $table = $('.table-hover-variants');
+
+                        if ($table.find('tbody tr').length === 1) {
+                            $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', () => {
+                                _self.initElements();
+                                _self.handleEvents();
+                            });
+                        } else {
+                            $table.find('#variation-id-' + $current.data('id')).fadeOut(400).remove();
+                        }
+
                         $('#confirm-delete-version-modal').modal('hide');
                         Botble.showSuccess(res.message);
                     }
@@ -397,12 +557,6 @@ $(window).on('load', () => {
         event.preventDefault();
         $('#store-related-attributes-button').data('target', $(event.currentTarget).data('target'));
         $('#select-attribute-sets-modal').modal('show');
-    });
-
-    $(document).on('click', '.btn-trigger-add-new-product-variation', event => {
-        event.preventDefault();
-        $('#store-product-variation-button').data('target', $(event.currentTarget).data('target'));
-        $('#add-new-product-variation-modal').modal('show');
     });
 
     $(document).on('click', '.btn-trigger-generate-all-versions', event => {

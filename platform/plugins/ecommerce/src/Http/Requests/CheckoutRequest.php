@@ -40,6 +40,8 @@ class CheckoutRequest extends Request
             $rules['address.name'] = 'required|min:3|max:120';
         }
 
+        $rules = apply_filters(PROCESS_CHECOUT_RULES_REQUEST_ECOMMERCE, $rules);
+
         return $rules;
     }
 
@@ -57,6 +59,8 @@ class CheckoutRequest extends Request
             'address.city.required'    => trans('plugins/ecommerce::order.address_city_required'),
             'address.address.required' => trans('plugins/ecommerce::order.address_address_required'),
         ];
+
+        $messages = apply_filters(PROCESS_CHECOUT_MESSAGES_REQUEST_ECOMMERCE, $messages);
 
         return array_merge(parent::messages(), $messages);
     }

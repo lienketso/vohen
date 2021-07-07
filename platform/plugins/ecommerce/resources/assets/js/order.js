@@ -62,12 +62,12 @@ class OrderAdminManagement {
         $(document).on('click', '.btn-trigger-shipment', event => {
             event.preventDefault();
             let _self = $(event.currentTarget);
-            let $form_body = $('.shipment-create-wrap');
-            $form_body.toggleClass('hidden');
-            if (!$form_body.hasClass('shipment-data-loaded')) {
+            let $formBody = $('.shipment-create-wrap');
+            $formBody.toggleClass('hidden');
+            if (!$formBody.hasClass('shipment-data-loaded')) {
 
                 Botble.blockUI({
-                    target: $form_body,
+                    target: $formBody,
                     iconOnly: true,
                     overlayColor: 'none'
                 });
@@ -79,44 +79,44 @@ class OrderAdminManagement {
                         if (res.error) {
                             Botble.showError(res.message);
                         } else {
-                            $form_body.html(res.data);
-                            $form_body.addClass('shipment-data-loaded');
+                            $formBody.html(res.data);
+                            $formBody.addClass('shipment-data-loaded');
                             Botble.initResources();
                         }
-                        Botble.unblockUI($form_body);
+                        Botble.unblockUI($formBody);
                     },
                     error: data => {
                         Botble.handleError(data);
-                        Botble.unblockUI($form_body);
+                        Botble.unblockUI($formBody);
                     },
                 });
             }
         });
 
         $(document).on('change', '#store_id', event => {
-            let $form_body = $('.shipment-create-wrap');
+            let $formBody = $('.shipment-create-wrap');
             Botble.blockUI({
-                target: $form_body,
+                target: $formBody,
                 iconOnly: true,
                 overlayColor: 'none'
             });
 
             $('#select-shipping-provider').load($('.btn-trigger-shipment').data('target') + '?view=true&store_id=' + $(event.currentTarget).val() + ' #select-shipping-provider > *', () => {
-                Botble.unblockUI($form_body);
+                Botble.unblockUI($formBody);
                 Botble.initResources();
             });
         });
 
         $(document).on('change', '.shipment-form-weight', event => {
-            let $form_body = $('.shipment-create-wrap');
+            let $formBody = $('.shipment-create-wrap');
             Botble.blockUI({
-                target: $form_body,
+                target: $formBody,
                 iconOnly: true,
                 overlayColor: 'none'
             });
 
             $('#select-shipping-provider').load($('.btn-trigger-shipment').data('target') + '?view=true&store_id=' + $('#store_id').val() + '&weight=' + $(event.currentTarget).val() + ' #select-shipping-provider > *', () => {
-                Botble.unblockUI($form_body);
+                Botble.unblockUI($formBody);
                 Botble.initResources();
             });
         });
@@ -219,15 +219,15 @@ class OrderAdminManagement {
                         $('#update-shipping-address-modal').modal('hide');
                         $('.shipment-address-box-1').html(res.data.line);
                         $('.text-infor-subdued.shipping-address-info').html(res.data.detail);
-                        let $form_body = $('.shipment-create-wrap');
+                        let $formBody = $('.shipment-create-wrap');
                         Botble.blockUI({
-                            target: $form_body,
+                            target: $formBody,
                             iconOnly: true,
                             overlayColor: 'none'
                         });
 
                         $('#select-shipping-provider').load($('.btn-trigger-shipment').data('target') + '?view=true #select-shipping-provider > *', () => {
-                            Botble.unblockUI($form_body);
+                            Botble.unblockUI($formBody);
                             Botble.initResources();
                         });
                     } else {
@@ -320,7 +320,7 @@ class OrderAdminManagement {
                 success: res => {
                     if (!res.error) {
                         Botble.showSuccess(res.message);
-                        $('.page-content').load(window.location.href + ' .page-content > *');
+                        $('#main-order-content').load(window.location.href + ' #main-order-content > *');
                         $('#confirm-payment-modal').modal('hide');
                     } else {
                         Botble.showError(res.message);
@@ -379,7 +379,7 @@ class OrderAdminManagement {
                 data: _self.closest('.modal-dialog').find('form').serialize(),
                 success: res => {
                     if (!res.error) {
-                        $('.page-content').load(window.location.href + ' .page-content > *');
+                        $('#main-order-content').load(window.location.href + ' #main-order-content > *');
                         Botble.showSuccess(res.message);
                         _self.closest('.modal').modal('hide');
                     } else {

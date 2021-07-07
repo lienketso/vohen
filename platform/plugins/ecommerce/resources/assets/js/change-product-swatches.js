@@ -9,7 +9,7 @@ class ChangeProductSwatches {
         let _self = this;
         let $body = $('body');
 
-        $body.on('click', ' .visual-swatch label, .product-attributes .text-swatch label', event => {
+        $body.on('click', '.product-attributes .visual-swatch label, .product-attributes .text-swatch label', event => {
             event.preventDefault();
 
             let $radio = $(event.currentTarget).find('input[type=radio]');
@@ -44,9 +44,10 @@ class ChangeProductSwatches {
                     selectedAttributeSets++;
                 }
             });
-            if (selectedAttributeSets === $(event.currentTarget).closest('.product-attributes').find('.attribute-swatches-wrapper').length) {
-                _self.getProductVariation($(event.currentTarget).closest('.product-attributes'));
-            }
+            // if (selectedAttributeSets === $(event.currentTarget).closest('.product-attributes').find('.attribute-swatches-wrapper').length) {
+            //     _self.getProductVariation($(event.currentTarget).closest('.product-attributes'));
+            // }
+            _self.getProductVariation($(event.currentTarget).closest('.product-attributes'));
         });
     }
 

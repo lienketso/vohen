@@ -61,12 +61,108 @@ var EcommerceProduct = /*#__PURE__*/function () {
 
       _self.$body.on('change', '.is-variation-default input', function (event) {
         var $current = $(event.currentTarget);
-        var isChecked = $(event.currentTarget).is(':checked');
+        var isChecked = $current.is(':checked');
         $('.is-variation-default input').prop('checked', false);
 
         if (isChecked) {
           $current.prop('checked', true);
         }
+      });
+
+      $(document).on('change', '.table-check-all', function (event) {
+        var $current = $(event.currentTarget);
+        var set = $current.attr('data-set');
+        var checked = $current.prop('checked');
+        $(set).each(function (index, el) {
+          if (checked) {
+            $(el).prop('checked', true);
+            $('.btn-trigger-delete-selected-variations').show();
+          } else {
+            $(el).prop('checked', false);
+            $('.btn-trigger-delete-selected-variations').hide();
+          }
+        });
+      });
+      $(document).on('change', '.checkboxes', function (event) {
+        var $current = $(event.currentTarget);
+        var $table = $current.closest('.table-hover-variants');
+        var ids = [];
+        $table.find('.checkboxes:checked').each(function (i, el) {
+          ids[i] = $(el).val();
+        });
+
+        if (ids.length > 0) {
+          $('.btn-trigger-delete-selected-variations').show();
+        } else {
+          $('.btn-trigger-delete-selected-variations').hide();
+        }
+
+        if (ids.length !== $table.find('.checkboxes').length) {
+          $table.find('.table-check-all').prop('checked', false);
+        } else {
+          $table.find('.table-check-all').prop('checked', true);
+        }
+      });
+      $(document).on('click', '.btn-trigger-delete-selected-variations', function (event) {
+        event.preventDefault();
+        var $current = $(event.currentTarget);
+        var ids = [];
+        $('.table-hover-variants').find('.checkboxes:checked').each(function (i, el) {
+          ids[i] = $(el).val();
+        });
+
+        if (ids.length === 0) {
+          Botble.showError(BotbleVariables.languages.tables.please_select_record);
+          return false;
+        }
+
+        $('#delete-selected-variations-button').data('href', $current.data('target'));
+        $('#delete-variations-modal').modal('show');
+      });
+      $('#delete-selected-variations-button').on('click', function (event) {
+        event.preventDefault();
+        var $current = $(event.currentTarget);
+        $current.addClass('button-loading');
+        var $table = $('.table-hover-variants');
+        var ids = [];
+        $table.find('.checkboxes:checked').each(function (i, el) {
+          ids[i] = $(el).val();
+        });
+        $.ajax({
+          url: $current.data('href'),
+          type: 'DELETE',
+          data: {
+            ids: ids
+          },
+          success: function success(data) {
+            if (data.error) {
+              Botble.showError(data.message);
+            } else {
+              Botble.showSuccess(data.message);
+            }
+
+            $('.btn-trigger-delete-selected-variations').hide();
+            $table.find('.table-check-all').prop('checked', false);
+            $current.closest('.modal').modal('hide');
+            $current.removeClass('button-loading');
+
+            if ($table.find('tbody tr').length === ids.length) {
+              $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', function () {
+                _self.initElements();
+
+                _self.handleEvents();
+              });
+            } else {
+              ids.forEach(function (id) {
+                $table.find('#variation-id-' + id).fadeOut(400).remove();
+              });
+            }
+          },
+          error: function error(data) {
+            Botble.handleError(data);
+            $current.removeClass('button-loading');
+          }
+        });
       });
     }
   }, {
@@ -158,7 +254,7 @@ var EcommerceProduct = /*#__PURE__*/function () {
           url: $current.data('target'),
           type: 'POST',
           data: {
-            'attribute_sets': attributeSets
+            attribute_sets: attributeSets
           },
           beforeSend: function beforeSend() {
             $current.addClass('button-loading');
@@ -170,6 +266,8 @@ var EcommerceProduct = /*#__PURE__*/function () {
               Botble.showSuccess(res.message);
               $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', function () {
                 _self.initElements();
+
+                _self.handleEvents();
               });
               $('#select-attribute-sets-modal').modal('hide');
             }
@@ -208,6 +306,8 @@ var EcommerceProduct = /*#__PURE__*/function () {
               $current.closest('.modal.fade').modal('hide');
               $('#product-variations-wrapper').load(window.location.href + ' #product-variations-wrapper > *', function () {
                 _self.initElements();
+
+                _self.handleEvents();
               });
             }
 
@@ -250,6 +350,8 @@ var EcommerceProduct = /*#__PURE__*/function () {
               $('#generate-all-versions-modal').modal('hide');
               $('#product-variations-wrapper').load(window.location.href + ' #product-variations-wrapper > *', function () {
                 _self.initElements();
+
+                _self.handleEvents();
               });
             }
 
@@ -265,6 +367,49 @@ var EcommerceProduct = /*#__PURE__*/function () {
         });
       });
 
+      $(document).on('click', '.btn-trigger-add-new-product-variation', function (event) {
+        event.preventDefault();
+        var $current = $(event.currentTarget);
+        var buttonText = $current.text();
+        $.ajax({
+          url: $current.data('load-form'),
+          type: 'GET',
+          beforeSend: function beforeSend() {
+            $current.text($current.data('processing'));
+          },
+          success: function success(res) {
+            if (res.error) {
+              Botble.showError(res.message);
+            } else {
+              $('#add-new-product-variation-modal .modal-body').html(res.data);
+
+              _self.initElements();
+
+              Botble.initResources();
+              $('#add-new-product-variation-modal').modal('show');
+              $('#store-product-variation-button').data('target', $current.data('target'));
+              $('.list-gallery-media-images').each(function (index, item) {
+                var $current = $(item);
+
+                if ($current.data('ui-sortable')) {
+                  $current.sortable('destroy');
+                }
+
+                $current.sortable();
+              });
+            }
+
+            $current.text(buttonText);
+          },
+          complete: function complete() {
+            $current.text(buttonText);
+          },
+          error: function error(data) {
+            $current.text(buttonText);
+            Botble.handleError(data);
+          }
+        });
+      });
       $(document).on('click', '.btn-trigger-edit-product-version', function (event) {
         event.preventDefault();
         $('#update-product-variation-button').data('target', $(event.currentTarget).data('target'));
@@ -327,8 +472,8 @@ var EcommerceProduct = /*#__PURE__*/function () {
             url: $current.data('target'),
             type: 'POST',
             data: {
-              addedAttributes: addedAttributes,
-              addedAttributeSets: addedAttributeSets
+              added_attributes: addedAttributes,
+              added_attribute_sets: addedAttributeSets
             },
             beforeSend: function beforeSend() {
               $current.addClass('button-loading');
@@ -339,6 +484,8 @@ var EcommerceProduct = /*#__PURE__*/function () {
               } else {
                 $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', function () {
                   _self.initElements();
+
+                  _self.handleEvents();
                 });
                 $('#confirm-delete-version-modal').modal('hide');
                 Botble.showSuccess(res.message);
@@ -354,8 +501,6 @@ var EcommerceProduct = /*#__PURE__*/function () {
               Botble.handleError(data);
             }
           });
-        } else {
-          Botble.showError('Không có thuộc tính nào được chọn!');
         }
       });
     }
@@ -366,7 +511,7 @@ var EcommerceProduct = /*#__PURE__*/function () {
 
       $(document).on('click', '.btn-trigger-delete-version', function (event) {
         event.preventDefault();
-        $('#delete-version-button').data('target', $(event.currentTarget).data('target'));
+        $('#delete-version-button').data('target', $(event.currentTarget).data('target')).data('id', $(event.currentTarget).data('id'));
         $('#confirm-delete-version-modal').modal('show');
       });
 
@@ -383,9 +528,18 @@ var EcommerceProduct = /*#__PURE__*/function () {
             if (res.error) {
               Botble.showError(res.message);
             } else {
-              $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', function () {
-                _self.initElements();
-              });
+              var $table = $('.table-hover-variants');
+
+              if ($table.find('tbody tr').length === 1) {
+                $('#main-manage-product-type').load(window.location.href + ' #main-manage-product-type > *', function () {
+                  _self.initElements();
+
+                  _self.handleEvents();
+                });
+              } else {
+                $table.find('#variation-id-' + $current.data('id')).fadeOut(400).remove();
+              }
+
               $('#confirm-delete-version-modal').modal('hide');
               Botble.showSuccess(res.message);
             }
@@ -417,11 +571,6 @@ $(window).on('load', function () {
     event.preventDefault();
     $('#store-related-attributes-button').data('target', $(event.currentTarget).data('target'));
     $('#select-attribute-sets-modal').modal('show');
-  });
-  $(document).on('click', '.btn-trigger-add-new-product-variation', function (event) {
-    event.preventDefault();
-    $('#store-product-variation-button').data('target', $(event.currentTarget).data('target'));
-    $('#add-new-product-variation-modal').modal('show');
   });
   $(document).on('click', '.btn-trigger-generate-all-versions', function (event) {
     event.preventDefault();

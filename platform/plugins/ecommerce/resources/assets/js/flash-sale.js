@@ -144,7 +144,7 @@ $(document).ready(function () {
         });
         let index = existedValues.indexOf($(event.currentTarget).data('id'));
         if (index > -1) {
-           delete existedValues[index];
+            delete existedValues[index];
         }
 
         $input.val(existedValues.join(','));

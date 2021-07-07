@@ -258,6 +258,44 @@ class ShippingManagement {
             $('#add-shipping-rule-item-modal').modal('show');
         });
 
+        $(document).find('.select-country-search').select2({
+            width: '100%',
+            dropdownParent: $('#select-country-modal')
+        });
+
+        $(document).on('click', '.btn-select-country', event => {
+            event.preventDefault();
+            $('#select-country-modal').modal('show');
+        });
+
+        $(document).on('click', '#add-shipping-region-button', event => {
+            event.preventDefault();
+            let _self = $(event.currentTarget);
+            _self.addClass('button-loading');
+
+            let $form = _self.closest('.modal-content').find('form');
+
+            $.ajax({
+                type: 'POST',
+                url: $form.prop('action'),
+                data: $form.serialize(),
+                success: res => {
+                    if (!res.error) {
+                        Botble.showSuccess(res.message);
+                        $('.wrapper-content').load(window.location.href + ' .wrapper-content > *');
+                    } else {
+                        Botble.showError(res.message);
+                    }
+                    _self.removeClass('button-loading');
+                    $('#select-country-modal').modal('hide');
+                },
+                error: error => {
+                    Botble.handleError(error);
+                    _self.removeClass('button-loading');
+                }
+            });
+        });
+
         $(document).on('click', '#add-shipping-rule-item-button', event => {
             event.preventDefault();
             saveRuleItem($(event.currentTarget), $(event.currentTarget).closest('.modal-content').find('form'), 'POST', $(event.currentTarget).data('shipping-id'));

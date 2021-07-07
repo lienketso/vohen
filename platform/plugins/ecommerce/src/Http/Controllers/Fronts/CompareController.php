@@ -34,7 +34,7 @@ class CompareController extends Controller
     {
         SeoHelper::setTitle(__('Compare'));
 
-        Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Compare'), route('public.compare'));
+        Theme::breadcrumb()->add(__('Home'), route('public.index'))->add(__('Compare'), route('public.compare'));
 
         return Theme::scope('ecommerce.compare', [], 'plugins/ecommerce::themes.compare')->render();
     }

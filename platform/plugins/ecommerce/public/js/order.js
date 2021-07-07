@@ -88,12 +88,12 @@ var OrderAdminManagement = /*#__PURE__*/function () {
 
         var _self = $(event.currentTarget);
 
-        var $form_body = $('.shipment-create-wrap');
-        $form_body.toggleClass('hidden');
+        var $formBody = $('.shipment-create-wrap');
+        $formBody.toggleClass('hidden');
 
-        if (!$form_body.hasClass('shipment-data-loaded')) {
+        if (!$formBody.hasClass('shipment-data-loaded')) {
           Botble.blockUI({
-            target: $form_body,
+            target: $formBody,
             iconOnly: true,
             overlayColor: 'none'
           });
@@ -104,41 +104,41 @@ var OrderAdminManagement = /*#__PURE__*/function () {
               if (res.error) {
                 Botble.showError(res.message);
               } else {
-                $form_body.html(res.data);
-                $form_body.addClass('shipment-data-loaded');
+                $formBody.html(res.data);
+                $formBody.addClass('shipment-data-loaded');
                 Botble.initResources();
               }
 
-              Botble.unblockUI($form_body);
+              Botble.unblockUI($formBody);
             },
             error: function error(data) {
               Botble.handleError(data);
-              Botble.unblockUI($form_body);
+              Botble.unblockUI($formBody);
             }
           });
         }
       });
       $(document).on('change', '#store_id', function (event) {
-        var $form_body = $('.shipment-create-wrap');
+        var $formBody = $('.shipment-create-wrap');
         Botble.blockUI({
-          target: $form_body,
+          target: $formBody,
           iconOnly: true,
           overlayColor: 'none'
         });
         $('#select-shipping-provider').load($('.btn-trigger-shipment').data('target') + '?view=true&store_id=' + $(event.currentTarget).val() + ' #select-shipping-provider > *', function () {
-          Botble.unblockUI($form_body);
+          Botble.unblockUI($formBody);
           Botble.initResources();
         });
       });
       $(document).on('change', '.shipment-form-weight', function (event) {
-        var $form_body = $('.shipment-create-wrap');
+        var $formBody = $('.shipment-create-wrap');
         Botble.blockUI({
-          target: $form_body,
+          target: $formBody,
           iconOnly: true,
           overlayColor: 'none'
         });
         $('#select-shipping-provider').load($('.btn-trigger-shipment').data('target') + '?view=true&store_id=' + $('#store_id').val() + '&weight=' + $(event.currentTarget).val() + ' #select-shipping-provider > *', function () {
-          Botble.unblockUI($form_body);
+          Botble.unblockUI($formBody);
           Botble.initResources();
         });
       });
@@ -241,14 +241,14 @@ var OrderAdminManagement = /*#__PURE__*/function () {
               $('#update-shipping-address-modal').modal('hide');
               $('.shipment-address-box-1').html(res.data.line);
               $('.text-infor-subdued.shipping-address-info').html(res.data.detail);
-              var $form_body = $('.shipment-create-wrap');
+              var $formBody = $('.shipment-create-wrap');
               Botble.blockUI({
-                target: $form_body,
+                target: $formBody,
                 iconOnly: true,
                 overlayColor: 'none'
               });
               $('#select-shipping-provider').load($('.btn-trigger-shipment').data('target') + '?view=true #select-shipping-provider > *', function () {
-                Botble.unblockUI($form_body);
+                Botble.unblockUI($formBody);
                 Botble.initResources();
               });
             } else {
@@ -345,7 +345,7 @@ var OrderAdminManagement = /*#__PURE__*/function () {
           success: function success(res) {
             if (!res.error) {
               Botble.showSuccess(res.message);
-              $('.page-content').load(window.location.href + ' .page-content > *');
+              $('#main-order-content').load(window.location.href + ' #main-order-content > *');
               $('#confirm-payment-modal').modal('hide');
             } else {
               Botble.showError(res.message);
@@ -405,7 +405,7 @@ var OrderAdminManagement = /*#__PURE__*/function () {
           data: _self.closest('.modal-dialog').find('form').serialize(),
           success: function success(res) {
             if (!res.error) {
-              $('.page-content').load(window.location.href + ' .page-content > *');
+              $('#main-order-content').load(window.location.href + ' #main-order-content > *');
               Botble.showSuccess(res.message);
 
               _self.closest('.modal').modal('hide');

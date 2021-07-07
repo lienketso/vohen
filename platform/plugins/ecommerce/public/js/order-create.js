@@ -982,6 +982,15 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
+    handleSearchCustomer: function handleSearchCustomer(value) {
+      if (value !== this.customer_keyword) {
+        var context = this;
+        this.customer_keyword = value;
+        setTimeout(function () {
+          context.loadListCustomersForSearch(1, true);
+        }, 500);
+      }
+    },
     loadListProductsAndVariations: function loadListProductsAndVariations() {
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
       var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -8442,7 +8451,7 @@ var render = function() {
                               return _vm.loadListCustomersForSearch()
                             },
                             keyup: function($event) {
-                              return _vm.loadListCustomersForSearch(
+                              return _vm.handleSearchCustomer(
                                 $event.target.value
                               )
                             }

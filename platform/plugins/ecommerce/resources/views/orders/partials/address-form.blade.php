@@ -25,14 +25,14 @@
                         @if ($isAvailableAddress)
                             @foreach ($addresses as $address)
                                 <option
-                                    value="{{ $address->id }}"
-                                    @if (
-                                        ($address->is_default && !$sessionAddressId) ||
-                                        ($sessionAddressId == $address->id) ||
-                                        (!old('address.address_id', $sessionAddressId) && $loop->first)
-                                    )
+                                        value="{{ $address->id }}"
+                                        @if (
+                                            ($address->is_default && !$sessionAddressId) ||
+                                            ($sessionAddressId == $address->id) ||
+                                            (!old('address.address_id', $sessionAddressId) && $loop->first)
+                                        )
                                         selected="selected"
-                                    @endif
+                                        @endif
                                 >
                                     {{ $address->address }}, {{ $address->city }}, {{ $address->state }}@if (count(EcommerceHelper::getAvailableCountries()) > 1), {{ $address->country_name }} @endif @if (EcommerceHelper::isZipCodeEnabled() && $address->zip_code), {{ $address->zip_code }} @endif</option>
                             @endforeach

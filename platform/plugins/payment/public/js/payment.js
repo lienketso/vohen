@@ -32,7 +32,9 @@ BPayment.init = function () {
   $(document).on('change', '.js_payment_method', function () {
     $('.payment_collapse_wrap').removeClass('collapse').removeClass('show').removeClass('active');
   });
-  $(document).on('click', '.payment-checkout-btn', function () {
+  $(document).off('click', '.payment-checkout-btn').on('click', '.payment-checkout-btn', function (event) {
+    event.preventDefault();
+
     var _self = $(this);
 
     var form = _self.closest('form');

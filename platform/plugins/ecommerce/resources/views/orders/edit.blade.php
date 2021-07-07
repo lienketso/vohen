@@ -13,7 +13,7 @@
                                     </svg>
                                 </div>
                                 <div class="ui-banner__content">
-                                    <h2 class="ui-banner__title">{{ trans('plugins/ecommerce::order.cancel_order') }}</h2>
+                                    <h2 class="ui-banner__title">{{ trans('plugins/ecommerce::order.order_canceled') }}</h2>
                                     <div class="ws-nm">
                                         {{ trans('plugins/ecommerce::order.order_was_canceled_at') }} <strong>{{ BaseHelper::formatDate($order->updated_at, 'H:i d/m/Y') }}</strong>.
                                     </div>
@@ -79,23 +79,16 @@
                                                         </td>
                                                     @endif
                                                     <td class="pl5 p-r5 min-width-200-px">
-                                                        <a class="text-underline hover-underline pre-line" target="_blank" href="{{ route('products.edit', $orderProduct->product_id) }}" title="{{ $orderProduct->product_name }}">
+                                                        <a class="text-underline hover-underline pre-line" target="_blank" href="{{ route('products.edit', $product->original_product->id) }}" title="{{ $orderProduct->product_name }}">
                                                             {{ $orderProduct->product_name }}</a>
                                                         @if ($product)
                                                             &nbsp;
                                                             @if ($product->sku)
-                                                                ({{ trans('plugins/ecommerce::order.sku') }} : <strong>{{ $product->sku }}</strong>)
+                                                                ({{ trans('plugins/ecommerce::order.sku') }}: <strong>{{ $product->sku }}</strong>)
                                                             @endif
                                                             @if ($product->is_variation)
                                                                 <p class="mb-0">
-                                                                    <small>
-                                                                        @php $attributes = get_product_attributes($product->id) @endphp
-                                                                        @if (!empty($attributes))
-                                                                            @foreach ($attributes as $attribute)
-                                                                                {{ $attribute->attribute_set_title }}: {{ $attribute->title }}@if (!$loop->last), @endif
-                                                                            @endforeach
-                                                                        @endif
-                                                                    </small>
+                                                                    <small>{{ $product->variation_attributes }}</small>
                                                                 </p>
                                                             @endif
                                                         @endif
@@ -121,8 +114,13 @@
                                                                         </li>
                                                                         <li class="ws-nm">
                                                                             <span class="bull">↳</span>
-                                                                            <span class="black">{{ trans('plugins/ecommerce::order.warehouse') }}</span>
-                                                                            <span class="bold-light">{{ $order->shipment->store->name ?? $defaultStore->name }}</span>
+                                                                            @if (is_plugin_active('marketplace') && $order->store->name)
+                                                                                <span class="black">{{ trans('plugins/marketplace::store.store') }}</span>
+                                                                                <span class="bold-light">{{ $order->store->name }}</span>
+                                                                            @else
+                                                                                <span class="black">{{ trans('plugins/ecommerce::order.warehouse') }}</span>
+                                                                                <span class="bold-light">{{ $order->shipment->store->name ?? $defaultStore->name }}</span>
+                                                                            @endif
                                                                         </li>
                                                                     </ul>
                                                                 </li>
@@ -428,10 +426,12 @@
                                                                             <th>{{ trans('plugins/ecommerce::order.transaction_type') }}</th>
                                                                             <td>{{ trans('plugins/ecommerce::order.refund') }}</td>
                                                                         </tr>
-                                                                        <tr>
-                                                                            <th>{{ trans('plugins/ecommerce::order.staff') }}</th>
-                                                                            <td>{{ $order->payment->user->getFullName() ? $order->payment->user->getFullName() : trans('plugins/ecommerce::order.n_a') }}</td>
-                                                                        </tr>
+                                                                        @if ($order->payment->user->getFullName())
+                                                                            <tr>
+                                                                                <th>{{ trans('plugins/ecommerce::order.staff') }}</th>
+                                                                                <td>{{ $order->payment->user->getFullName() ? $order->payment->user->getFullName() : trans('plugins/ecommerce::order.n_a') }}</td>
+                                                                            </tr>
+                                                                        @endif
                                                                         <tr>
                                                                             <th>{{ trans('plugins/ecommerce::order.refund_date') }}</th>
                                                                             <td>{{ $history->created_at }}</td>
@@ -468,10 +468,12 @@
                                                                             <th>{{ trans('plugins/ecommerce::order.transaction_type') }}</th>
                                                                             <td>{{ trans('plugins/ecommerce::order.confirm') }}</td>
                                                                         </tr>
-                                                                        <tr>
-                                                                            <th>{{ trans('plugins/ecommerce::order.staff') }}</th>
-                                                                            <td>{{ $order->payment->user->getFullName() ? $order->payment->user->getFullName() : trans('plugins/ecommerce::order.n_a') }}</td>
-                                                                        </tr>
+                                                                        @if ($order->payment->user->getFullName())
+                                                                            <tr>
+                                                                                <th>{{ trans('plugins/ecommerce::order.staff') }}</th>
+                                                                                <td>{{ $order->payment->user->getFullName() ? $order->payment->user->getFullName() : trans('plugins/ecommerce::order.n_a') }}</td>
+                                                                            </tr>
+                                                                        @endif
                                                                         <tr>
                                                                             <th>{{ trans('plugins/ecommerce::order.payment_date') }}</th>
                                                                             <td>{{ $history->created_at }}</td>
@@ -515,13 +517,13 @@
                             </div>
                             <div class="next-card-section border-none-t">
                                 <div class="mb5">
-                                    <strong class="text-capitalize">{{ $order->user->name ? $order->user->name : $order->address->name }}</strong>
+                                    <strong class="text-capitalize">{{ $order->user->name ?: $order->address->name }}</strong>
                                 </div>
                                 @if ($order->user->id)
                                     <div><i class="fas fa-inbox mr5"></i><span>{{ $order->user->orders()->count() }}</span> {{ trans('plugins/ecommerce::order.orders') }}</div>
                                 @endif
                                 <ul class="ws-nm text-infor-subdued">
-                                    <li class="overflow-ellipsis"><a class="hover-underline" href="mailto:{{ $order->user->email ? $order->user->email : $order->address->email }}">{{ $order->user->email ? $order->user->email : $order->address->email }}</a></li>
+                                    <li class="overflow-ellipsis"><a class="hover-underline" href="mailto:{{ $order->user->email ?: $order->address->email }}">{{ $order->user->email ?: $order->address->email }}</a></li>
                                     @if ($order->user->id)
                                         <li><div>{{ trans('plugins/ecommerce::order.have_an_account_already') }}</div></li>
                                     @else
@@ -554,12 +556,21 @@
                         <div class="wrapper-content bg-gray-white mb20">
                             <div class="pd-all-20">
                                 <div class="p-b10">
-                                    <strong>{{ trans('plugins/ecommerce::order.warehouse') }}</strong>
-                                    <ul class="p-sm-r mb-0">
-                                        <li class="ws-nm">
-                                            <span class="ww-bw text-no-bold">{{ $defaultStore->name ?? trans('plugins/ecommerce::order.default_store') }}</span>
-                                        </li>
-                                    </ul>
+                                    @if (is_plugin_active('marketplace') && $order->store->name)
+                                        <strong>{{ trans('plugins/marketplace::store.store') }}</strong>
+                                        <ul class="p-sm-r mb-0">
+                                            <li class="ws-nm">
+                                                <span class="ww-bw text-no-bold">{{ $order->store->name }}</span>
+                                            </li>
+                                        </ul>
+                                    @else
+                                        <strong>{{ trans('plugins/ecommerce::order.warehouse') }}</strong>
+                                        <ul class="p-sm-r mb-0">
+                                            <li class="ws-nm">
+                                                <span class="ww-bw text-no-bold">{{ $defaultStore->name ?? trans('plugins/ecommerce::order.default_store') }}</span>
+                                            </li>
+                                        </ul>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -580,8 +591,8 @@
 
     {!! Form::modalAction('resend-order-confirmation-email-modal', trans('plugins/ecommerce::order.resend_order_confirmation'), 'info', trans('plugins/ecommerce::order.resend_order_confirmation_description', ['email' => $order->user->id ? $order->user->email : $order->address->email]), 'confirm-resend-confirmation-email-button', trans('plugins/ecommerce::order.send')) !!}
     {!! Form::modalAction('cancel-shipment-modal', trans('plugins/ecommerce::order.cancel_shipping_confirmation'), 'info', trans('plugins/ecommerce::order.cancel_shipping_confirmation_description'), 'confirm-cancel-shipment-button', trans('plugins/ecommerce::order.confirm')) !!}
-    {!! Form::modalAction('update-shipping-address-modal', trans('plugins/ecommerce::order.update_address'), 'info', view('plugins/ecommerce::orders.shipping-address.form', ['address' => $order->address, 'orderId' => $order->id])->render(), 'confirm-update-shipping-address-button', trans('plugins/ecommerce::order.update'), 'modal-md') !!}
+    {!! Form::modalAction('update-shipping-address-modal', trans('plugins/ecommerce::order.update_address'), 'info', view('plugins/ecommerce::orders.shipping-address.form', ['address' => $order->address, 'orderId' => $order->id, 'url' => route('orders.update-shipping-address', $address->id ?? 0)])->render(), 'confirm-update-shipping-address-button', trans('plugins/ecommerce::order.update'), 'modal-md') !!}
     {!! Form::modalAction('cancel-order-modal', trans('plugins/ecommerce::order.cancel_order_confirmation'), 'info', trans('plugins/ecommerce::order.cancel_order_confirmation_description'), 'confirm-cancel-order-button', trans('plugins/ecommerce::order.cancel_order')) !!}
     {!! Form::modalAction('confirm-payment-modal', trans('plugins/ecommerce::order.confirm_payment'), 'info', trans('plugins/ecommerce::order.confirm_payment_confirmation_description', ['method' => $order->payment->payment_channel->label()]), 'confirm-payment-order-button', trans('plugins/ecommerce::order.confirm_payment')) !!}
-    {!! Form::modalAction('confirm-refund-modal', trans('plugins/ecommerce::order.refund'), 'info', view('plugins/ecommerce::orders.refund.modal', compact('order'))->render(), 'confirm-refund-payment-button', trans('plugins/ecommerce::order.refund') . ' <span class="refund-amount-text">' . format_price($order->payment->amount - $order->payment->refunded_amount, true) . '</span>') !!}
+    {!! Form::modalAction('confirm-refund-modal', trans('plugins/ecommerce::order.refund'), 'info', view('plugins/ecommerce::orders.refund.modal', ['order' => $order, 'url' => route('orders.refund', $order->id)])->render(), 'confirm-refund-payment-button', trans('plugins/ecommerce::order.refund') . ' <span class="refund-amount-text">' . format_price($order->payment->amount - $order->payment->refunded_amount, true) . '</span>') !!}
 @stop

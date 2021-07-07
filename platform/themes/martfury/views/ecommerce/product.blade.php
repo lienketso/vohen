@@ -161,7 +161,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        @if($product->store_id!=NULL)
                         <div class="store_info_page">
                             <div class="bg_shop">
                             <div class="row">
@@ -188,6 +188,7 @@
                             </div>
                             </div>
                         </div>
+                        @endif
 
                         <div class="ps-product__content ps-tab-root">
                             <ul class="ps-tab-list">

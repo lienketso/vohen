@@ -24,7 +24,7 @@ class CreatePaymentTables extends Migration
             $table->string('status', 60)->default('pending')->nullable();
             $table->string('payment_type')->default('confirm')->nullable();
             $table->integer('customer_id')->unsigned()->nullable();
-            $table->decimal('refunded_amount', 15, 2)->unsigned()->nullable();
+            $table->decimal('refunded_amount', 15)->unsigned()->nullable();
             $table->string('refund_note', 255)->nullable();
             $table->timestamps();
         });

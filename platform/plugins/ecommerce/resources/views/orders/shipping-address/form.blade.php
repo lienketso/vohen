@@ -1,4 +1,4 @@
-{!! Form::open(['url' => route('orders.update-shipping-address', $address->id ?? 0)]) !!}
+{!! Form::open(['url' => $url]) !!}
     <input type="hidden" name="order_id" value="{{ $orderId }}">
     <div class="next-form-section">
         <div class="next-form-grid">

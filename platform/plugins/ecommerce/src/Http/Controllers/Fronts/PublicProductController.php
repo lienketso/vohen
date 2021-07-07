@@ -200,10 +200,15 @@ class PublicProductController
         if ($product->slugable->key !== $slug->key) {
             return redirect()->to($product->url);
         }
+        if($product->store_id!=NULL){
+            $countProduct = $this->productRepository->getModel()->where('store_id',$product->store_id)->count();
+            $startDate = $product->store->created_at;
+            $startStore = Carbon::createFromFormat('Y-m-d h:i:s',$startDate)->diffForHumans();
+        }else{
+            $startStore = Carbon::createFromFormat('Y-m-d h:i:s',Carbon::now())->diffForHumans();
+            $countProduct = 0;
+        }
 
-        $countProduct = $this->productRepository->getModel()->where('store_id',$product->store_id)->count();
-        $startDate = $product->store->created_at;
-        $startStore = Carbon::createFromFormat('Y-m-d h:i:s',$startDate)->diffForHumans();
 
 
         SeoHelper::setTitle($product->name)->setDescription($product->description);

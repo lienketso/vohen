@@ -2,7 +2,7 @@
 
 namespace Botble\Payment\Tables;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use BaseHelper;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Repositories\Interfaces\PaymentInterface;
@@ -10,7 +10,6 @@ use Botble\Table\Abstracts\TableAbstract;
 use Html;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Yajra\DataTables\DataTables;
-use Botble\Payment\Models\Payment;
 
 class PaymentTable extends TableAbstract
 {
@@ -33,9 +32,9 @@ class PaymentTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, PaymentInterface $paymentRepository)
     {
-        $this->repository = $paymentRepository;
-        $this->setOption('id', 'table-plugins-payment');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $paymentRepository;
 
         if (!Auth::user()->hasAnyPermission(['payment.show', 'payment.destroy'])) {
             $this->hasOperations = false;
@@ -67,14 +66,12 @@ class PaymentTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('payment.show', 'payment.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -135,14 +132,6 @@ class PaymentTable extends TableAbstract
                 'width' => '100px',
             ],
         ];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buttons()
-    {
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, [], Payment::class);
     }
 
     /**

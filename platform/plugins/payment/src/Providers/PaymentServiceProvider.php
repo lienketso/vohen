@@ -8,7 +8,7 @@ use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Models\Payment;
 use Botble\Payment\Services\Gateways\PayPalPaymentService;
 use Botble\Payment\Services\Gateways\StripePaymentService;
-use Event;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\ServiceProvider;
 use Botble\Payment\Repositories\Caches\PaymentCacheDecorator;

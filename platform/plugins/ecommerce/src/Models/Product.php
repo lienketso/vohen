@@ -205,6 +205,15 @@ class Product extends BaseModel
         return $this->belongsToMany(Product::class, 'ec_grouped_products', 'parent_product_id', 'product_id');
     }
 
+    public function productLabels()
+    {
+        return $this->belongsToMany(
+            ProductLabel::class,
+            'ec_product_label_products',
+            'product_id',
+            'product_label_id'
+        );
+    }
     /**
      * @return BelongsTo
      */
@@ -257,14 +266,22 @@ class Product extends BaseModel
      */
     public function variationAttributeSwatchesForProductList()
     {
-        return $this->hasMany(ProductVariation::class, 'configurable_product_id')
+        return $this
+            ->hasMany(ProductVariation::class, 'configurable_product_id')
             ->join('ec_product_variation_items', 'ec_product_variation_items.variation_id', '=',
                 'ec_product_variations.id')
             ->join('ec_product_attributes', 'ec_product_attributes.id', '=', 'ec_product_variation_items.attribute_id')
             ->join('ec_product_attribute_sets', 'ec_product_attribute_sets.id', '=',
                 'ec_product_attributes.attribute_set_id')
             ->where('ec_product_attribute_sets.status', BaseStatusEnum::PUBLISHED)
-            ->where('ec_product_attribute_sets.is_use_in_product_listing', 1);
+            ->where('ec_product_attribute_sets.is_use_in_product_listing', 1)
+            ->select([
+                'ec_product_attributes.*',
+                'ec_product_variations.*',
+                'ec_product_variation_items.*',
+                'ec_product_attribute_sets.*',
+                'ec_product_attributes.title as attribute_title',
+            ]);
     }
 
     /**
@@ -644,6 +661,36 @@ class Product extends BaseModel
 
     public function store(){
         return $this->belongsTo(Store::class,'store_id');
+    }
+
+    public function variationProductAttributes()
+    {
+        return $this
+            ->hasMany(ProductVariation::class, 'product_id')
+            ->join('ec_product_variation_items', 'ec_product_variation_items.variation_id', '=',
+                'ec_product_variations.id')
+            ->join('ec_product_attributes', 'ec_product_attributes.id', '=', 'ec_product_variation_items.attribute_id')
+            ->join('ec_product_attribute_sets', 'ec_product_attribute_sets.id', '=',
+                'ec_product_attributes.attribute_set_id')
+            ->distinct()
+            ->select([
+                'ec_product_variations.product_id',
+                'ec_product_variations.configurable_product_id',
+                'ec_product_attributes.*',
+                'ec_product_attribute_sets.title as attribute_set_title',
+                'ec_product_attribute_sets.slug as attribute_set_slug',
+            ]);
+    }
+
+    public function getVariationAttributesAttribute()
+    {
+        if (!$this->variationProductAttributes->count()) {
+            return '';
+        }
+
+        $attributes = $this->variationProductAttributes->pluck('title', 'attribute_set_title')->toArray();
+
+        return '(' . mapped_implode(', ', $attributes, ': ') . ')';
     }
 
 }

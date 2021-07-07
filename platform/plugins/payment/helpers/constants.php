@@ -23,3 +23,11 @@ if (!defined('PAYMENT_FILTER_AFTER_POST_CHECKOUT')) {
 if (!defined('PAYMENT_FILTER_PAYMENT_INFO_DETAIL')) {
     define('PAYMENT_FILTER_PAYMENT_INFO_DETAIL', 'payment-info-detail');
 }
+
+if (!defined('PAYMENT_ACTION_PAYMENT_PROCESSED')) {
+    define('PAYMENT_ACTION_PAYMENT_PROCESSED', 'payment-action-payment-processed');
+}
+
+if (!defined('PAYMENT_FILTER_REDIRECT_URL')) {
+    define('PAYMENT_FILTER_REDIRECT_URL', 'payment-filter-redirect-url');
+}

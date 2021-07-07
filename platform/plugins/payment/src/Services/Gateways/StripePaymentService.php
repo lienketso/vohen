@@ -5,7 +5,6 @@ namespace Botble\Payment\Services\Gateways;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Services\Abstracts\StripePaymentAbstract;
-use Botble\Payment\Services\Traits\PaymentTrait;
 use Botble\Payment\Supports\StripeHelper;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,8 +14,6 @@ use Stripe\Stripe;
 
 class StripePaymentService extends StripePaymentAbstract
 {
-    use PaymentTrait;
-
     /**
      * Make a payment
      *
@@ -76,17 +73,19 @@ class StripePaymentService extends StripePaymentAbstract
             $paymentStatus = PaymentStatusEnum::FAILED;
         }
 
-        $this->storeLocalPayment([
-            'amount'          => $this->amount,
-            'currency'        => $this->currency,
+        $orderIds = (array)$request->input('order_id', []);
+
+        do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
+            'amount'          => $request->input('amount'),
+            'currency'        => $request->input('currency'),
             'charge_id'       => $chargeId,
-            'order_id'        => $request->input('order_id'),
+            'order_id'        => $orderIds,
             'customer_id'     => $request->input('customer_id'),
             'customer_type'   => $request->input('customer_type'),
             'payment_channel' => PaymentMethodEnum::STRIPE,
             'status'          => $paymentStatus,
         ]);
 
-        return true;
+        return $chargeId;
     }
 }

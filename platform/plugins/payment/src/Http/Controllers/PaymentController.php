@@ -167,11 +167,11 @@ class PaymentController extends Controller
             case PaymentMethodEnum::STRIPE:
                 $result = $this->stripePaymentService->execute($request);
                 if ($this->stripePaymentService->getErrorMessage()) {
-                    $paymentData['error'] = true;
-                    $paymentData['message'] = $this->stripePaymentService->getErrorMessage();
+                    $data['error'] = true;
+                    $data['message'] = $this->stripePaymentService->getErrorMessage();
                 }
 
-                $paymentData['charge_id'] = $result;
+                $data['charge_id'] = $result;
 
                 break;
 
@@ -224,7 +224,7 @@ class PaymentController extends Controller
         $palPaymentService->afterMakePayment($request);
 
         return $response
-            ->setNextUrl(url('/'))
+            ->setNextUrl(route('public.index'))
             ->setMessage(__('Checkout successfully!'));
     }
 

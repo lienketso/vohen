@@ -2,7 +2,7 @@
 
 namespace Botble\Payment\Supports;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Request;
 
 class StripeHelper

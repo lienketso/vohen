@@ -10,6 +10,7 @@
         @php
             $addresses = get_customer_addresses();
             $isAvailableAddress = !$addresses->isEmpty() ? true : false;
+            $sessionAddressId = Arr::get($sessionCheckoutData, 'address_id');
         @endphp
         <div class="form-group">
 
@@ -20,17 +21,17 @@
             <div class="list-customer-address" @if (!$isAvailableAddress) style="display: none;" @endif>
                 <div class="select--arrow">
                     <select name="address[address_id]" class="form-control address-control-item" id="address_id">
-                        <option value="new" @if (old('address.address_id', Arr::get($sessionCheckoutData, 'address_id')) == 'new') selected @endif>{{ __('Add new address...') }}</option>
+                        <option value="new" @if (old('address.address_id', $sessionAddressId) == 'new') selected @endif>{{ __('Add new address...') }}</option>
                         @if ($isAvailableAddress)
                             @foreach ($addresses as $address)
                                 <option
                                     value="{{ $address->id }}"
                                     @if (
-                                    ($address->is_default && !Arr::get($sessionCheckoutData, 'address_id')) ||
-                                    (Arr::get($sessionCheckoutData, 'address_id') == $address->id) ||
-                                    (!old('address.address_id', Arr::get($sessionCheckoutData, 'address_id')) && $loop->first)
+                                        ($address->is_default && !$sessionAddressId) ||
+                                        ($sessionAddressId == $address->id) ||
+                                        (!old('address.address_id', $sessionAddressId) && $loop->first)
                                     )
-                                    selected="selected"
+                                        selected="selected"
                                     @endif
                                 >
                                     {{ $address->address }}, {{ $address->city }}, {{ $address->state }}@if (count(EcommerceHelper::getAvailableCountries()) > 1), {{ $address->country_name }} @endif @if (EcommerceHelper::isZipCodeEnabled() && $address->zip_code), {{ $address->zip_code }} @endif</option>
@@ -40,9 +41,11 @@
                     <i class="fas fa-angle-down"></i>
                 </div>
                 <br>
-                <div class="address-item-selected" @if (Arr::get($sessionCheckoutData, 'address_id') === 'new') style="display: none;" @endif>
+                <div class="address-item-selected" @if ($sessionAddressId == 'new') style="display: none;" @endif>
                     @if ($isAvailableAddress)
-                        @if ($defaultAddress = get_default_customer_address())
+                        @if ($sessionAddressId && $addresses->contains('id', $sessionAddressId))
+                            @include('plugins/ecommerce::orders.partials.address-item', ['address' => $addresses->firstWhere('id', $sessionAddressId)])
+                        @elseif ($defaultAddress = get_default_customer_address())
                             @include('plugins/ecommerce::orders.partials.address-item', ['address' => $defaultAddress])
                         @else
                             @include('plugins/ecommerce::orders.partials.address-item', ['address' => Arr::first($addresses)])
@@ -104,7 +107,7 @@
                     </div>
                 </div>
             @else
-                <input type="hidden" name="country" value="{{ Arr::first(array_keys(EcommerceHelper::getAvailableCountries())) }}">
+                <input type="hidden" name="address[country]" id="address_country" value="{{ Arr::first(array_keys(EcommerceHelper::getAvailableCountries())) }}">
             @endif
 
             <div class="col-sm-6 col-12">

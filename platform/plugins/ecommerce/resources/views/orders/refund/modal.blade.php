@@ -1,4 +1,4 @@
-{!! Form::open(['url' => route('orders.refund', $order->id)]) !!}
+{!! Form::open(['url' => $url]) !!}
 
 <div class="next-form-section">
     <div class="next-form-grid">

@@ -177,3 +177,24 @@ if (!function_exists('ecommerce_width_height_unit')) {
     }
 }
 
+if (!function_exists('mapped_implode')) {
+    /**
+     * @param string $glue
+     * @param array $array
+     * @param string $symbol
+     * @return string
+     */
+    function mapped_implode($glue, $array, $symbol = '=')
+    {
+        return implode($glue, array_map(
+                function ($k, $v) use ($symbol) {
+                    return $k . $symbol . $v;
+                },
+                array_keys($array),
+                array_values($array)
+            )
+        );
+    }
+}
+
+

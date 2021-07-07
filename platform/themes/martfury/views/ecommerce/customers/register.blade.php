@@ -5,6 +5,17 @@
             <div class="ps-form__content">
                 <h4>{{ __('Register An Account') }}</h4>
                 <div class="form-group">
+                    <div class="choice_vendor">
+                    <div class="item_radio">
+                        <input type="radio" name="is_vendor" checked value="0"><span>Là khách hàng</span>
+                    </div>
+                    <div class="item_radio">
+                        <input type="radio" name="is_vendor" value="1"><span>Người bán hàng</span>
+                    </div>
+                    </div>
+
+                </div>
+                <div class="form-group">
                     <input class="form-control" name="name" id="txt-name" type="text" value="{{ old('name') }}" placeholder="{{ __('Your Name') }}">
                     @if ($errors->has('name'))
                         <span class="text-danger">{{ $errors->first('name') }}</span>

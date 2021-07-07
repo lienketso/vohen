@@ -40,7 +40,11 @@
                     <div class="b__top-info">
                         <ul class="b__top--left b__top--ls">
                             <li><a href="tel:0979823452">Hotline: +84 9 12345678</a></li>
-                            <li><a href="#">Kênh Người Bán</a></li>
+                            @if(auth('customer')->check() && auth('customer')->user()->is_vendor==1)
+                                <li><a href="{{ route('marketplace.vendor.dashboard') }}">Kênh Người Bán</a></li>
+                            @else
+                                <li><a href="{{ route('customer.login') }}">Kênh Người Bán</a></li>
+                            @endif
                             <li><a href="mailto:hotro@topsell.vn">hotro@topsell.vn</a></li>
                         </ul>
                         <ul class="b__top--right b__top--ls">

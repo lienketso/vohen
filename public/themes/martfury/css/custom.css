@@ -1100,6 +1100,21 @@ form .navigation--mobile-product > * {
   border-radius: 50%;
 }
 
+.choice_vendor {
+  display: inline-flex;
+}
+
+.item_radio {
+  padding-right: 20px;
+}
+
+.item_radio span {
+  padding-left: 10px;
+  font-weight: bold;
+  position: relative;
+  top: -2px;
+}
+
 @media (max-width: 479px) {
   .ps-carousel--nav .owl-dots .owl-dot {
     margin: 0 3px !important;

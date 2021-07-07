@@ -85,6 +85,7 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return $this->customerRepository->create([
+            'is_vendor' => $data['is_vendor'],
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => bcrypt($data['password']),
@@ -116,7 +117,6 @@ class RegisterController extends Controller
     public function register(Request $request, BaseHttpResponse $response)
     {
         $this->validator($request->input())->validate();
-
         event(new Registered($customer = $this->create($request->input())));
 
         EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)

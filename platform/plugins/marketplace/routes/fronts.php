@@ -22,6 +22,12 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
                 'as'   => 'upload',
                 'uses' => 'DashboardController@upload',
             ]);
+            Route::group(['prefix' => 'chart', 'as' => 'chart.'], function () {
+                Route::get('month', [
+                    'as'   => 'month',
+                    'uses' => 'RevenueController@getMonthChart',
+                ]);
+            });
         });
 
         Route::get('dashboard', [

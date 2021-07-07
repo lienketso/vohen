@@ -6,6 +6,11 @@
             'name'  => __('Dashboard')
         ],
         [
+            'key'   => 'marketplace.vendor.store',
+            'icon'  => 'icon-cart',
+            'name'  => 'Gian hàng'
+        ],
+        [
             'key'   => 'marketplace.vendor.products.index',
             'icon'  => 'icon-database',
             'name'  => __('Products')

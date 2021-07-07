@@ -4,9 +4,11 @@ namespace Botble\Ecommerce\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
 use Botble\ACL\Traits\RegistersUsers;
+use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Repositories\Interfaces\CustomerInterface;
+use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use EmailHandler;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\StatefulGuard;
@@ -44,15 +46,17 @@ class RegisterController extends Controller
      */
     protected $customerRepository;
 
+    protected $storeRepository;
     /**
      * Create a new controller instance.
      *
      * @param CustomerInterface $customerRepository
      */
-    public function __construct(CustomerInterface $customerRepository)
+    public function __construct(CustomerInterface $customerRepository, StoreInterface $storeRepository)
     {
         $this->middleware('customer.guest');
         $this->customerRepository = $customerRepository;
+        $this->storeRepository = $storeRepository;
     }
 
     /**
@@ -133,8 +137,19 @@ class RegisterController extends Controller
         }
 
         $customer->confirmed_at = now();
-        $this->customerRepository->createOrUpdate($customer);
+        $create = $this->customerRepository->createOrUpdate($customer);
         $this->guard()->login($customer);
+
+        //create store
+        if($create->is_vendor==1) {
+            $input = [
+                'customer_id' => $create->id,
+                'name' => $create->name,
+                'email' => $create->email
+            ];
+            $store = $this->storeRepository->createOrUpdate($input);
+            event(new CreatedContentEvent(STORE_MODULE_SCREEN_NAME, $request, $store));
+        }
 
         return $response->setNextUrl($this->redirectPath())->setMessage(__('Registered successfully!'));
     }

@@ -38,6 +38,16 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
             'as'   => 'products',
             'uses' => 'ProductController@index',
         ]);
+        //vendor store edit
+        Route::get('store',[
+           'as'=>'store',
+           'uses'=>'StoreController@edit'
+        ]);
+        Route::post('store', [
+            'as'   => 'store',
+            'uses' => 'StoreController@update',
+        ]);
+        //end vendor store edit
 
         Route::get('settings', [
             'as'   => 'settings',

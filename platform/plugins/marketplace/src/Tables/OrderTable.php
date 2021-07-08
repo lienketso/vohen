@@ -77,7 +77,11 @@ class OrderTable extends TableAbstract
 
         return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
             ->addColumn('operations', function ($item) {
-                return $this->getOperations('orders.edit', 'orders.destroy', $item);
+                return view('plugins/marketplace::themes.dashboard.table.actions', [
+                    'edit'   => 'marketplace.vendor.orders.edit',
+                    'delete' => 'marketplace.vendor.orders.destroy',
+                    'item'   => $item,
+                ])->render();
             })
             ->escapeColumns([])
             ->make(true);
@@ -105,9 +109,7 @@ class OrderTable extends TableAbstract
             ->select($select)
             ->with(['user', 'payment'])
             ->where('ec_orders.is_finished', 1)
-            ->whereHas('products.product', function ($query) {
-                $query->where('ec_products.store_id', auth('customer')->user()->store->id);
-            });
+            ->where('ec_orders.store_id', auth('customer')->user()->store->id);
 
         return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
     }

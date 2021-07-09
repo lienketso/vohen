@@ -2,8 +2,8 @@
 
 namespace Botble\JsValidation\Javascript;
 
-use Botble\JsValidation\Support\RuleListTrait;
 use Botble\JsValidation\Support\DelegatedValidator;
+use Botble\JsValidation\Support\RuleListTrait;
 use Botble\JsValidation\Support\UseDelegatedValidatorTrait;
 
 class RuleParser
@@ -109,8 +109,7 @@ class RuleParser
      */
     protected function isConditionalRule($attribute, $rule)
     {
-        return isset($this->conditional[$attribute]) &&
-            in_array($rule, $this->conditional[$attribute]);
+        return isset($this->conditional[$attribute]) && in_array($rule, $this->conditional[$attribute]);
     }
 
     /**
@@ -118,7 +117,7 @@ class RuleParser
      *
      * @param string $attribute
      * @param string $rule
-     * @param $parameters
+     * @param array $parameters
      * @return array
      */
     protected function clientRule($attribute, $rule, $parameters)
@@ -143,6 +142,7 @@ class RuleParser
     protected function remoteRule($attribute, $forceRemote)
     {
         $attrHtmlName = $this->getAttributeName($attribute);
+
         $params = [
             $attrHtmlName,
             $this->remoteToken,
@@ -155,7 +155,7 @@ class RuleParser
     /**
      * Handles multidimensional attribute names.
      *
-     * @param mixed $attribute
+     * @param string $attribute
      * @return string
      */
     protected function getAttributeName($attribute)

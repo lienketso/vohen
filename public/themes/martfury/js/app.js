@@ -1988,6 +1988,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2043,6 +2058,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2216,6 +2247,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2290,6 +2322,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2490,6 +2536,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -3538,7 +3599,7 @@ var render = function() {
             attrs: {
               id: _vm.id,
               "data-owl-auto": "true",
-              "data-owl-loop": "true",
+              "data-owl-loop": "false",
               "data-owl-speed": "10000",
               "data-owl-gap": "0",
               "data-owl-nav": "false",
@@ -3763,73 +3824,67 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "ps-section__content" }, [
-      _c("div", { staticClass: "row" }, [
-        _vm._m(0),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-lg-9 bg-white" }, [
-          _vm.isLoading
-            ? _c("div", { staticClass: "half-circle-spinner" }, [
-                _c("div", { staticClass: "circle circle-1" }),
-                _vm._v(" "),
-                _c("div", { staticClass: "circle circle-2" })
-              ])
-            : _vm._e(),
-          _vm._v(" "),
-          !_vm.isLoading
-            ? _c(
+      _vm.isLoading
+        ? _c("div", { staticClass: "half-circle-spinner" }, [
+            _c("div", { staticClass: "circle circle-1" }),
+            _vm._v(" "),
+            _c("div", { staticClass: "circle circle-2" })
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      !_vm.isLoading
+        ? _c(
+            "div",
+            {
+              key: _vm.productCategory.id,
+              staticClass: "tab-pane fade show active",
+              attrs: {
+                id: _vm.productCategory.slug,
+                role: "tabpanel",
+                "aria-labelledby": _vm.productCategory.slug + "-tab"
+              }
+            },
+            [
+              _c(
                 "div",
                 {
-                  key: _vm.productCategory.id,
-                  staticClass: "tab-pane fade show active",
+                  directives: [{ name: "carousel", rawName: "v-carousel" }],
+                  staticClass: "ps-carousel--nav owl-slider",
                   attrs: {
-                    id: _vm.productCategory.slug,
-                    role: "tabpanel",
-                    "aria-labelledby": _vm.productCategory.slug + "-tab"
+                    "data-owl-auto": "false",
+                    "data-owl-loop": "false",
+                    "data-owl-speed": "10000",
+                    "data-owl-gap": "0",
+                    "data-owl-nav": "true",
+                    "data-owl-dots": "true",
+                    "data-owl-item": "7",
+                    "data-owl-item-xs": "2",
+                    "data-owl-item-sm": "2",
+                    "data-owl-item-md": "3",
+                    "data-owl-item-lg": "4",
+                    "data-owl-item-xl": "6",
+                    "data-owl-duration": "1000",
+                    "data-owl-mousedrag": "on"
                   }
                 },
-                [
-                  _c(
-                    "div",
-                    { staticClass: "row " },
-                    _vm._l(_vm.data, function(item) {
-                      return _vm.data.length
-                        ? _c("div", {
-                            key: item.id,
-                            staticClass:
-                              "col-lg-2 col-6 col-half-offset ps-product",
-                            domProps: { innerHTML: _vm._s(item) }
-                          })
-                        : _vm._e()
-                    }),
-                    0
-                  )
-                ]
+                _vm._l(_vm.data, function(item) {
+                  return _vm.data.length
+                    ? _c("div", {
+                        key: item.id,
+                        staticClass: "ps-product",
+                        domProps: { innerHTML: _vm._s(item) }
+                      })
+                    : _vm._e()
+                }),
+                0
               )
-            : _vm._e()
-        ])
-      ])
+            ]
+          )
+        : _vm._e()
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-lg-3" }, [
-      _c("div", { staticClass: "ads_category" }, [
-        _c("a", { attrs: { href: "#" } }, [
-          _c("img", {
-            attrs: {
-              src:
-                "https://image.voso.vn/users/vosoimage/images/a955076a1a61e910c08354b76b23d741?t%5B0%5D=maxSize%3Awidth%3D590%2Cheight%3D1240&t%5B1%5D=compress%3Alevel%3D100&accessToken=b4c86e427f554eb1ad01eae3ff7963a08946f3edd2f7596f903c7390fe55dbcb"
-            }
-          })
-        ])
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -4182,7 +4237,7 @@ var render = function() {
             staticClass: "ps-carousel--nav owl-slider",
             attrs: {
               "data-owl-auto": "true",
-              "data-owl-loop": "true",
+              "data-owl-loop": "false",
               "data-owl-speed": "10000",
               "data-owl-gap": "30",
               "data-owl-nav": "true",

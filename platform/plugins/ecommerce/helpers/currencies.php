@@ -56,12 +56,12 @@ if (!function_exists('human_price_text')) {
         if (config('plugins.ecommerce.general.display_big_money_in_million_billion')) {
             if ($price >= 1000000 && $price < 1000000000) {
                 $price = round($price / 1000000, 2);
-                $numberAfterDot = 2;
                 $priceUnit = __('million') . ' ' . $priceUnit;
+                $numberAfterDot = strlen(substr(strrchr($price, '.'), 1));
             } elseif ($price >= 1000000000) {
                 $price = round($price / 1000000000, 2);
-                $numberAfterDot = 2;
                 $priceUnit = __('billion') . ' ' . $priceUnit;
+                $numberAfterDot = strlen(substr(strrchr($price, '.'), 1));
             }
         }
 
@@ -69,9 +69,10 @@ if (!function_exists('human_price_text')) {
             $price = preg_replace('/[^0-9,.]/s', '', $price);
         }
 
-        $price = number_format($price, $numberAfterDot, get_ecommerce_setting('decimal_separator', '.'), get_ecommerce_setting('thousands_separator', ','));
+        $price = number_format($price, $numberAfterDot, get_ecommerce_setting('decimal_separator', '.'),
+            get_ecommerce_setting('thousands_separator', ','));
 
-        return $price . ($priceUnit ? $priceUnit : '');
+        return $price . ($priceUnit ?: '');
     }
 }
 

@@ -2,10 +2,10 @@
 
 namespace Botble\JsValidation\Javascript;
 
+use Botble\JsValidation\Exceptions\PropertyNotFoundException;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Facades\View;
-use Botble\JsValidation\Exceptions\PropertyNotFoundException;
+use Illuminate\Contracts\View\View;
 
 class JavascriptValidator implements Arrayable
 {
@@ -70,7 +70,7 @@ class JavascriptValidator implements Arrayable
     /**
      * Render the specified view with validator data.
      *
-     * @param null|\Illuminate\Contracts\View\View|string $view
+     * @param null|View|string $view
      * @param null|string $selector
      * @return string
      */
@@ -79,7 +79,7 @@ class JavascriptValidator implements Arrayable
         $this->view($view);
         $this->selector($selector);
 
-        return View::make($this->view, ['validator' => $this->getViewData()])
+        return view($this->view, ['validator' => $this->getViewData()])
             ->render();
     }
 
@@ -136,7 +136,7 @@ class JavascriptValidator implements Arrayable
         $data = $this->validator->validationData();
         $data['selector'] = $this->selector;
 
-        if (!is_null($this->ignore)) {
+        if (!empty($this->ignore)) {
             $data['ignore'] = $this->ignore;
         }
 
@@ -151,7 +151,7 @@ class JavascriptValidator implements Arrayable
      */
     public function selector($selector)
     {
-        $this->selector = is_null($selector) ? $this->selector : $selector;
+        $this->selector = empty($selector) ? $this->selector : $selector;
 
         return $this;
     }
@@ -172,12 +172,12 @@ class JavascriptValidator implements Arrayable
     /**
      * Set the view to render Javascript Validations.
      *
-     * @param null|\Illuminate\Contracts\View\View|string $view
+     * @param null|View|string $view
      * @return JavascriptValidator
      */
     public function view($view)
     {
-        $this->view = is_null($view) ? $this->view : $view;
+        $this->view = empty($view) ? $this->view : $view;
 
         return $this;
     }

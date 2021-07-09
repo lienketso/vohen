@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Ecommerce\Models\ProductCollection;
 use Botble\Ecommerce\Repositories\Interfaces\ProductCollectionInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -37,9 +36,9 @@ class ProductCollectionTable extends TableAbstract
         UrlGenerator $urlGenerator,
         ProductCollectionInterface $productCollectionRepository
     ) {
-        $this->repository = $productCollectionRepository;
-        $this->setOption('id', 'table-product-collections');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $productCollectionRepository;
 
         if (!Auth::user()->hasAnyPermission([
             'product-collections.edit',
@@ -76,18 +75,16 @@ class ProductCollectionTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations(
                     'product-collections.edit',
                     'product-collections.destroy',
                     $item
                 );
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -158,9 +155,7 @@ class ProductCollectionTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('product-collections.create'), 'product-collections.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, ProductCollection::class);
+        return $this->addCreateButton(route('product-collections.create'), 'product-collections.create');
     }
 
     /**

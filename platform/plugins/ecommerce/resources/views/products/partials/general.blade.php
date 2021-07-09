@@ -74,7 +74,6 @@
     </div>
 </div>
 <div class="storehouse-info @if (old('with_storehouse_management', $product ? $product->with_storehouse_management : ($originalProduct->with_storehouse_management ?? 0)) == 0) hidden @endif">
-
     <div class="form-group">
         <label class="text-title-field">{{ trans('plugins/ecommerce::products.form.storehouse.quantity') }}</label>
         <input type="text"
@@ -82,7 +81,6 @@
                value="{{ old('quantity', $product ? $product->quantity : ($originalProduct->quantity ?? 0)) }}"
                name="quantity">
     </div>
-
     <div class="form-group">
         <label class="text-title-field">
             <input type="hidden" name="allow_checkout_when_out_of_stock" value="0">
@@ -92,7 +90,6 @@
         </label>
     </div>
 </div>
-
 
 <div class="form-group stock-status-wrapper @if (old('with_storehouse_management', $product ? $product->with_storehouse_management : ($originalProduct->with_storehouse_management ?? 0)) == 1) hidden @endif">
     <label class="text-title-field">{{ trans('plugins/ecommerce::products.form.stock_status') }}</label>

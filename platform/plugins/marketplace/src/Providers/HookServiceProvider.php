@@ -203,7 +203,7 @@ class HookServiceProvider extends ServiceProvider
                 return $tabs . view('plugins/marketplace::customers.bank-info-tab')->render();
             }
         }
-
+        
         return $tabs;
     }
 

@@ -83,11 +83,17 @@ class EcommerceController extends BaseController
         StoreCurrenciesService $service,
         SettingStore $settingStore
     ) {
-        foreach ($request->except(['_token', 'currencies', 'deleted_currencies', 'available_countries']) as $settingKey => $settingValue) {
+        foreach ($request->except([
+            '_token',
+            'currencies',
+            'deleted_currencies',
+            'available_countries',
+        ]) as $settingKey => $settingValue) {
             $settingStore->set(config('plugins.ecommerce.general.prefix') . $settingKey, $settingValue);
         }
 
-        $settingStore->set(config('plugins.ecommerce.general.prefix') . 'available_countries', json_encode($request->input('available_countries')));
+        $settingStore->set(config('plugins.ecommerce.general.prefix') . 'available_countries',
+            json_encode($request->input('available_countries')));
 
         $settingStore->save();
 
@@ -99,7 +105,8 @@ class EcommerceController extends BaseController
             $primaryStore->is_shipping_location = true;
         }
 
-        $primaryStore->name = $primaryStore->name ?? $request->input('store_name', trans('plugins/ecommerce::store-locator.default_store'));
+        $primaryStore->name = $primaryStore->name ?? $request->input('store_name',
+                trans('plugins/ecommerce::store-locator.default_store'));
         $primaryStore->phone = $request->input('store_phone');
         $primaryStore->email = $primaryStore->email ?? $settingStore->get('admin_email');
         $primaryStore->address = $request->input('store_address');

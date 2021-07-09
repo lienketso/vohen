@@ -1,6 +1,7 @@
 <script>
-    RV_MEDIA_URL = {!! json_encode(RvMedia::getUrls()) !!};
-    RV_MEDIA_CONFIG = {!! json_encode([
+    "use strict";
+    var RV_MEDIA_URL = {!! json_encode(RvMedia::getUrls()) !!};
+    var RV_MEDIA_CONFIG = {!! json_encode([
         'permissions' => RvMedia::getPermissions(),
         'translations' => trans('core/media::media.javascript'),
         'pagination' => [

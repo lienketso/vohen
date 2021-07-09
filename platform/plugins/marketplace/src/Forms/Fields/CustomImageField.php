@@ -11,18 +11,18 @@ class CustomImageField extends FormField
     /**
      * {@inheritDoc}
      */
-    protected function getTemplate()
-    {
-        return 'plugins/marketplace::themes.dashboard.forms.fields.custom-image';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function render(array $options = [], $showLabel = true, $showField = true, $showError = true)
     {
         $options['attr'] = Arr::set($options['attr'], 'class', Arr::get($options['attr'], 'class') . 'form-control');
 
         return parent::render($options, $showLabel, $showField, $showError);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getTemplate()
+    {
+        return 'plugins/marketplace::themes.dashboard.forms.fields.custom-image';
     }
 }

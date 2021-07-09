@@ -62,6 +62,7 @@ class MediaFileController extends Controller
             }
             // We are in chunk mode, lets send the current progress
             $handler = $save->handler();
+
             return response()->json([
                 'done'   => $handler->getPercentageDone(),
                 'status' => true,

@@ -22,7 +22,7 @@ use Botble\Media\Repositories\Interfaces\MediaFileInterface;
 use Botble\Media\Repositories\Interfaces\MediaFolderInterface;
 use Botble\Media\Repositories\Interfaces\MediaSettingInterface;
 use Botble\Setting\Supports\SettingStore;
-use Event;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Routing\Events\RouteMatched;

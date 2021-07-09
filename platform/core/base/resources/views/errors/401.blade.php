@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div style="margin: 50px;">
+    <div class="m-50">
         <div class="col-md-10">
             <h3>{{ trans('core/base::errors.401_title') }}</h3>
             <p>{{ trans('core/base::errors.reasons') }}</p>

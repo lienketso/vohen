@@ -24,6 +24,9 @@
   display: inline-block;
   padding-left: 20px;
 }
+#product-variations-wrapper .table-hover-variants tr th {
+  padding: 8px 12px;
+}
 #product-variations-wrapper .table-hover-variants tr:hover td {
   background: #eff9fd !important;
 }

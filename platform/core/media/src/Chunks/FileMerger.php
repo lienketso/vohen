@@ -19,7 +19,7 @@ class FileMerger
      */
     public function __construct($targetFile)
     {
-        // open the target file
+        // Open the target file
         if (!$this->destinationFile = @fopen($targetFile, 'ab')) {
             throw new ChunkSaveException('Failed to open output stream.', 102);
         }

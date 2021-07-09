@@ -43,11 +43,8 @@ class InstallCommand extends Command
             $this->call('db:seed');
         }
 
-        $this->info('Publishing core assets...');
-        $this->call('vendor:publish', ['--tag' => 'cms-public']);
-
-        $this->info('Publishing theme assets...');
-        $this->call('cms:theme:assets:publish');
+        $this->info('Publishing assets...');
+        $this->call('cms:publish:assets');
 
         $this->info('Publishing lang...');
         $this->call('vendor:publish', ['--tag' => 'cms-lang']);

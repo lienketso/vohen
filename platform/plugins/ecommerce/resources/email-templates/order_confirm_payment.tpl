@@ -4,14 +4,6 @@
 <p>Hi {{ customer_name }},</p>
 <p>Thank you for purchasing our product.</p>
 
-<a href="{{ site_url }}/orders/tracking?order_id={{ order_id }}&email={{ customer_email }}" class="button button-blue">View order</a> or <a href="{{ site_url }}">Go to our shop</a>
-
-<br />
-
-<h3>Order information: </h3>
-
-<p>Order number: <strong>#{{ order_id }}</strong></p>
-
 {{ product_list }}
 
 <h3>Customer information</h3>

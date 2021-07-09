@@ -1,6 +1,6 @@
 <div id="{{ $box['id'] }}" class="widget meta-boxes">
      <div class="widget-title">
-          <h4><span>{{ $box['title'] }}</span></h4>
+          <h4><span>{!! clean($box['title']) !!}</span></h4>
      </div>
      <div class="widget-body">
           {!! $callback !!}

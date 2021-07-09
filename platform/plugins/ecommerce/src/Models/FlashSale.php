@@ -6,6 +6,7 @@ use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\EnumCastable;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class FlashSale extends BaseModel
@@ -67,8 +68,8 @@ class FlashSale extends BaseModel
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeNotExpired($query)
     {
@@ -76,8 +77,8 @@ class FlashSale extends BaseModel
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param Builder $query
+     * @return Builder
      */
     public function scopeExpired($query)
     {

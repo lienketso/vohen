@@ -2,8 +2,8 @@
 
 namespace Botble\Ecommerce\Repositories\Eloquent;
 
-use Botble\Support\Repositories\Eloquent\RepositoriesAbstract;
 use Botble\Ecommerce\Repositories\Interfaces\FlashSaleInterface;
+use Botble\Support\Repositories\Eloquent\RepositoriesAbstract;
 
 class FlashSaleRepository extends RepositoriesAbstract implements FlashSaleInterface
 {

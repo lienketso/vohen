@@ -4,9 +4,9 @@ class TableFilter {
             type: 'GET',
             url: $('.filter-data-url').val(),
             data: {
-                'class': $('.filter-data-class').val(),
-                'key': $element.val(),
-                'value': $element.closest('.filter-item').find('.filter-column-value').val(),
+                class: $('.filter-data-class').val(),
+                key: $element.val(),
+                value: $element.closest('.filter-item').find('.filter-column-value').val(),
             },
             success: res => {
                 let data = $.map(res.data, (value, key) => {

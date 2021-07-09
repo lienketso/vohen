@@ -7,8 +7,11 @@ use Botble\Base\Forms\FormBuilder;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Http\Requests\ProductRequest;
+use Botble\Ecommerce\Http\Requests\ProductVersionRequest;
+use Botble\Ecommerce\Repositories\Eloquent\ProductVariationRepository;
 use Botble\Ecommerce\Repositories\Interfaces\GroupedProductInterface;
-use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
+use Botble\Ecommerce\Repositories\Interfaces\ProductAttributeInterface;
+use Botble\Ecommerce\Repositories\Interfaces\ProductAttributeSetInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
 use Botble\Ecommerce\Services\Products\StoreAttributesOfProductService;
@@ -16,26 +19,23 @@ use Botble\Ecommerce\Services\Products\StoreProductService;
 use Botble\Ecommerce\Services\StoreProductTagService;
 use Botble\Ecommerce\Traits\ProductActionsTrait;
 use Botble\Marketplace\Forms\ProductForm;
-use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use Botble\Marketplace\Tables\ProductTable;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Throwable;
 
 class ProductController extends BaseController
 {
-    use ProductActionsTrait;
-    protected $productRepository;
-    protected $warehouseRepository;
-
-    public function __construct(ProductInterface $productRepository, WarehouseInterface $warehouseRepository){
-        $this->productRepository = $productRepository;
-        $this->warehouseRepository = $warehouseRepository;
+    use ProductActionsTrait {
+        ProductActionsTrait::postAddVersion as basePostAddVersion;
+        ProductActionsTrait::postUpdateVersion as basePostUpdateVersion;
     }
+
     /**
      * @param ProductTable $dataTable
      * @return Factory|View
@@ -97,7 +97,10 @@ class ProductController extends BaseController
     ) {
         $product = $this->productRepository->getModel();
 
-        $request->merge(['store_id' => auth('customer')->user()->store->id]);
+        $request->merge([
+            'store_id' => auth('customer')->user()->store->id,
+            'images'   => json_decode($request->input('images')),
+        ]);
 
         $product = $service->execute($request, $product);
         $storeProductTagService->execute($request, $product);
@@ -141,14 +144,10 @@ class ProductController extends BaseController
                 ];
             }, array_filter(explode(',', $request->input('grouped_products', '')))));
         }
-        //warehouse
-        if($request->has('warehouse_id')){
-            $product->warehouse()->sync($request->input('warehouse_id'));
-        }
 
         return $response
-            ->setPreviousUrl(route('products.index'))
-            ->setNextUrl(route('products.edit', $product->id))
+            ->setPreviousUrl(route('marketplace.vendor.products.index'))
+            ->setNextUrl(route('marketplace.vendor.products.edit', $product->id))
             ->setMessage(trans('core/base::notices.create_success_message'));
     }
 
@@ -161,7 +160,7 @@ class ProductController extends BaseController
     {
         $product = $this->productRepository->findOrFail($id);
 
-        if ($product->is_variation) {
+        if ($product->is_variation || $product->store_id != auth('customer')->user()->store->id) {
             abort(404);
         }
 
@@ -208,6 +207,15 @@ class ProductController extends BaseController
         StoreProductTagService $storeProductTagService
     ) {
         $product = $this->productRepository->findOrFail($id);
+
+        if ($product->is_variation || $product->store_id != auth('customer')->user()->store->id) {
+            abort(404);
+        }
+
+        $request->merge([
+            'store_id' => auth('customer')->user()->store->id,
+            'images'   => json_decode($request->input('images')),
+        ]);
 
         $product = $service->execute($request, $product);
         $storeProductTagService->execute($request, $product);
@@ -269,13 +277,14 @@ class ProductController extends BaseController
         }
 
         return $response
-            ->setPreviousUrl(route('products.index'))
+            ->setPreviousUrl(route('marketplace.vendor.products.index'))
             ->setMessage(trans('core/base::notices.update_success_message'));
     }
 
     /**
      * @param int $id
      * @param BaseHttpResponse $response
+     * @return BaseHttpResponse
      * @return BaseHttpResponse
      * @throws Throwable
      */
@@ -286,8 +295,89 @@ class ProductController extends BaseController
             $product = $this->productRepository->findById($id);
         }
 
-        $dataUrl = route('marketplace.vendor.products.get-list-product-for-search', $product ? $product->id : 0);
+        $dataUrl = route('marketplace.vendor.products.get-list-product-for-search', ['product_id' => $product ? $product->id : 0]);
 
-        return $response->setData(view('plugins/ecommerce::products.partials.extras', compact('product', 'dataUrl'))->render());
+        return $response->setData(view('plugins/ecommerce::products.partials.extras',
+            compact('product', 'dataUrl'))->render());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function postAddVersion(
+        ProductVersionRequest $request,
+        ProductVariationInterface $productVariation,
+        $id,
+        BaseHttpResponse $response
+    ) {
+        $request->merge([
+            'images' => json_decode($request->input('images', '[]')),
+        ]);
+
+        return $this->basePostAddVersion($request, $productVariation, $id, $response);
+    }
+
+    /**
+     * @param Request $request
+     * @param ProductVariationRepository|ProductVariationInterface $productVariation
+     * @param int $id
+     * @param BaseHttpResponse $response
+     * @return BaseHttpResponse
+     * @throws Exception
+     */
+    public function postUpdateVersion(
+        ProductVersionRequest $request,
+        ProductVariationInterface $productVariation,
+        $id,
+        BaseHttpResponse $response
+    ) {
+        $request->merge([
+            'images' => json_decode($request->input('images', '[]')),
+        ]);
+
+        return $this->basePostUpdateVersion($request, $productVariation, $id, $response);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getVersionForm(
+        $id,
+        Request $request,
+        ProductVariationInterface $productVariation,
+        BaseHttpResponse $response,
+        ProductAttributeSetInterface $productAttributeSetRepository,
+        ProductAttributeInterface $productAttributeRepository,
+        ProductVariationItemInterface $productVariationItemRepository
+    ) {
+        $product = null;
+        $variation = null;
+        $productVariationsInfo = [];
+
+        if ($id) {
+            $variation = $productVariation->findOrFail($id);
+            $product = $this->productRepository->findOrFail($variation->product_id);
+            $productVariationsInfo = $productVariationItemRepository->getVariationsInfo([$id]);
+        }
+
+        $productId = $variation ? $variation->configurable_product_id : $request->input('product_id');
+
+        if ($productId) {
+            $productAttributeSets = $productAttributeSetRepository->getByProductId($productId);
+        } else {
+            $productAttributeSets = $productAttributeSetRepository->getAllWithSelected($productId);
+        }
+
+        $originalProduct = $product;
+
+        return $response
+            ->setData(
+                view('plugins/marketplace::themes.dashboard.products.product-variation-form', compact(
+                    'productAttributeSets',
+                    'product',
+                    'productVariationsInfo',
+                    'originalProduct'
+                ))->render()
+            );
     }
 }

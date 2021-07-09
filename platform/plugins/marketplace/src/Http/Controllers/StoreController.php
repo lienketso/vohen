@@ -3,18 +3,18 @@
 namespace Botble\Marketplace\Http\Controllers;
 
 use Botble\Base\Events\BeforeEditContentEvent;
-use Botble\Marketplace\Http\Requests\StoreRequest;
-use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
-use Botble\Base\Http\Controllers\BaseController;
-use Illuminate\Http\Request;
-use Exception;
-use Botble\Marketplace\Tables\StoreTable;
 use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Events\UpdatedContentEvent;
+use Botble\Base\Forms\FormBuilder;
+use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Marketplace\Forms\StoreForm;
-use Botble\Base\Forms\FormBuilder;
+use Botble\Marketplace\Http\Requests\StoreRequest;
+use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
+use Botble\Marketplace\Tables\StoreTable;
+use Exception;
+use Illuminate\Http\Request;
 
 class StoreController extends BaseController
 {
@@ -101,6 +101,13 @@ class StoreController extends BaseController
         $store->fill($request->input());
 
         $this->storeRepository->createOrUpdate($store);
+
+        $customer = $store->customer;
+        if ($customer && $customer->id) {
+            $vendorInfo = $customer->vendorInfo;
+            $vendorInfo->bank_info = $request->input('bank_info');
+            $vendorInfo->save();
+        }
 
         event(new UpdatedContentEvent(STORE_MODULE_SCREEN_NAME, $request, $store));
 

@@ -1,4 +1,8 @@
 @charset "UTF-8";
+a {
+  color: #337ab7;
+}
+
 .ps-main {
   margin-bottom: 0;
 }
@@ -25,4 +29,61 @@
 
 .icon-cog:before {
   content: "" !important;
+}
+
+@-webkit-keyframes button-loading-spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.shop-url-wrapper.content-loading {
+  position: relative;
+}
+.shop-url-wrapper.content-loading:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border-width: 1px;
+  border-style: solid;
+  margin-top: -9px;
+  margin-left: -9px;
+  width: 18px;
+  height: 18px;
+  -webkit-animation: button-loading-spinner 0.7s linear infinite;
+  animation: button-loading-spinner 1s linear infinite;
+  border-color: #fcb800;
+  border-bottom-color: transparent;
+}
+.shop-url-wrapper.content-loading:after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  left: -10px;
+  bottom: -10px;
+  background: rgba(0, 0, 0, 0.02);
+}
+.shop-url-wrapper.content-loading .d-inline-block span {
+  color: #1d9977;
+}
+
+.ps-main .form-control {
+  background-color: #fff;
+}
+
+#toast-container > div {
+  font-size: 14px;
 }

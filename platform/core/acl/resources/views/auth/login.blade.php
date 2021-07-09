@@ -6,12 +6,12 @@
     {!! Form::open(['route' => 'access.login', 'class' => 'login-form']) !!}
         <div class="form-group" id="emailGroup">
             <label>{{ trans('core/acl::auth.login.username') }}</label>
-            {!! Form::text('username', old('username', app()->environment('demo') ? 'botble' : null), ['class' => 'form-control', 'placeholder' => trans('core/acl::auth.login.username')]) !!}
+            {!! Form::text('username', request()->input('email', old('username', app()->environment('demo') ? config('core.base.general.demo.account.username', 'botble') : null)), ['class' => 'form-control', 'placeholder' => trans('core/acl::auth.login.username')]) !!}
         </div>
 
         <div class="form-group" id="passwordGroup">
             <label>{{ trans('core/acl::auth.login.password') }}</label>
-            {!! Form::input('password', 'password', (app()->environment('demo') ? '159357' : null), ['class' => 'form-control', 'placeholder' => trans('core/acl::auth.login.password')]) !!}
+            {!! Form::input('password', 'password', request()->input('email') ? null : (app()->environment('demo') ? config('core.base.general.demo.account.password', '159357') : null), ['class' => 'form-control', 'placeholder' => trans('core/acl::auth.login.password')]) !!}
         </div>
 
         <div>
@@ -33,26 +33,3 @@
 
     {!! Form::close() !!}
 @stop
-@push('footer')
-    <script>
-        var username = document.querySelector('[name="username"]');
-        var password = document.querySelector('[name="password"]');
-        username.focus();
-        document.getElementById('emailGroup').classList.add('focused');
-
-        // Focus events for email and password fields
-        username.addEventListener('focusin', function(){
-            document.getElementById('emailGroup').classList.add('focused');
-        });
-        username.addEventListener('focusout', function(){
-            document.getElementById('emailGroup').classList.remove('focused');
-        });
-
-        password.addEventListener('focusin', function(){
-            document.getElementById('passwordGroup').classList.add('focused');
-        });
-        password.addEventListener('focusout', function(){
-            document.getElementById('passwordGroup').classList.remove('focused');
-        });
-    </script>
-@endpush

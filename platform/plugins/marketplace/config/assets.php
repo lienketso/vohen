@@ -12,6 +12,7 @@ return [
         'toastr',
         'select2',
         'form-validation',
+        'blockui',
     ],
     'styles'         => [
         'fontawesome',
@@ -44,6 +45,13 @@ return [
                         '/vendor/core/core/base/libraries/jquery-validation/jquery.validate.min.js',
                         '/vendor/core/core/base/libraries/jquery-validation/additional-methods.min.js',
                     ],
+                ],
+            ],
+            'blockui'            => [
+                'use_cdn'  => false,
+                'location' => 'footer',
+                'src'      => [
+                    'local' => '/vendor/core/core/base/libraries/jquery.blockui.min.js',
                 ],
             ],
             'jquery-ui'         => [

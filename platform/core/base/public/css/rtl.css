@@ -1,3 +1,4 @@
+@charset "UTF-8";
 body[dir=rtl] {
   direction: rtl;
   text-align: right;
@@ -182,6 +183,11 @@ body[dir=rtl] {
   margin-left: 0;
 }
 
+div.dataTables_wrapper div.dataTables_filter {
+  left: auto;
+  right: 150px;
+}
+
 .table-has-actions.table-has-filter .dataTables_filter {
   left: auto;
   right: 250px;
@@ -325,6 +331,84 @@ body[dir=rtl] {
   margin: 8px 0 0 15px !important;
 }
 
+.dropdown-menu[x-placement^=top], .dropdown-menu[x-placement^=right], .dropdown-menu[x-placement^=bottom], .dropdown-menu[x-placement^=left] {
+  left: auto;
+  right: 0;
+}
+
+.dropdown-hover a {
+  text-align: right;
+}
+
+.dropdown-hover a > i {
+  right: auto;
+  left: 5px;
+}
+.dropdown-hover a > i:before {
+  content: "";
+}
+
+.dropdown-hover .dropdown-content {
+  left: auto;
+  right: 100%;
+  text-align: right;
+}
+
+.btn-group > .btn:not(:first-child), .btn-group > .btn-group:not(:first-child) > .btn {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btn-group > .btn:not(:last-child):not(.dropdown-toggle), .btn-group > .btn-group:not(:last-child) > .btn {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.page-content .dataTables_wrapper .btn {
+  margin: 0 0 10px 10px;
+}
+
+.tagify__tag {
+  margin: 5px 5px 5px 0;
+}
+
+.tagify__tag__removeBtn {
+  margin-left: 4.66667px;
+  margin-right: -4.66667px;
+}
+
+.form-actions.form-actions-fixed-top {
+  left: 0;
+  right: 235px;
+  text-align: left;
+}
+
+.form-actions.form-actions-fixed-top .btn {
+  margin-right: 0;
+  margin-left: 5px;
+}
+
+small.charcounter {
+  right: auto;
+  left: 0;
+}
+
+.widget-title > h4 span, .widget-title > h4 label {
+  margin-left: 0;
+  margin-right: 10px;
+}
+
+.note {
+  border-left: none;
+  border-right: 5px solid #eeeeee;
+  padding: 15px 15px 15px 30px;
+  border-radius: 4px 0 0 4px;
+}
+
 @media (min-width: 992px) {
   .page-sidebar {
     float: right;
@@ -349,4 +433,18 @@ body[dir=rtl] {
     right: auto;
     left: 20px;
   }
+}
+.toast-bottom-right {
+  right: auto;
+  left: 0;
+}
+.toast-bottom-right .toast-close-button {
+  right: auto;
+  left: -0.3em;
+  float: left;
+}
+
+#toast-container > div {
+  padding: 15px 50px 15px 15px;
+  background-position: right 15px center;
 }

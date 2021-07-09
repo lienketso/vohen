@@ -5,7 +5,7 @@ namespace Botble\Ecommerce\Repositories\Eloquent;
 use Botble\Ecommerce\Repositories\Interfaces\OrderInterface;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Support\Repositories\Eloquent\RepositoriesAbstract;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class OrderRepository extends RepositoriesAbstract implements OrderInterface
 {

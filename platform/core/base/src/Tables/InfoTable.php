@@ -27,31 +27,18 @@ class InfoTable extends TableAbstract
     protected $hasOperations = false;
 
     /**
-     * InfoTable constructor.
-     * @param DataTables $table
-     * @param UrlGenerator $urlGenerator
-     */
-    public function __construct(DataTables $table, UrlGenerator $urlGenerator)
-    {
-        $this->setOption('id', 'system_management');
-        parent::__construct($table, $urlGenerator);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function ajax()
     {
-        return $this->table
+        return $this->toJson($this->table
             ->of($this->query())
             ->editColumn('name', function ($item) {
                 return view('core/base::system.partials.info-package-line', compact('item'))->render();
             })
             ->editColumn('dependencies', function ($item) {
                 return view('core/base::system.partials.info-dependencies-line', compact('item'))->render();
-            })
-            ->escapeColumns([])
-            ->make(true);
+            }));
     }
 
     /**

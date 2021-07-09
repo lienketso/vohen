@@ -113,10 +113,8 @@ class UploadsManager
     {
         $folder = $this->cleanFolder($folder);
 
-        $filesFolders = array_merge(
-            Storage::directories($folder),
-            Storage::files($folder)
-        );
+        $filesFolders = array_merge(Storage::directories($folder), Storage::files($folder));
+
         if (!empty($filesFolders)) {
             return trans('core/media::media.directory_must_empty');
         }
@@ -154,6 +152,7 @@ class UploadsManager
 
         try {
             $stream = $disk->getDriver()->readStream($currentChunksPath);
+
             if ($result = Storage::writeStream($path, $stream, ['visibility' => 'public'])) {
                 $disk->delete($currentChunksPath);
             }

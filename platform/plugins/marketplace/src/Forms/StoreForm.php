@@ -10,6 +10,10 @@ use Botble\Marketplace\Models\Store;
 
 class StoreForm extends FormAbstract
 {
+    /**
+     * @var string
+     */
+    protected $template = 'core/base::forms.form-tabs';
 
     /**
      * @var CustomerInterface

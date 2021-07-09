@@ -39,7 +39,7 @@ if (!function_exists('check_if_reviewed_product')) {
     function check_if_reviewed_product($productId, $customerId = null)
     {
         if ($customerId == null && auth('customer')->check()) {
-            $customerId = auth('customer')->user()->getAuthIdentifier();
+            $customerId = auth('customer')->id();
         }
 
         $existed = app(ReviewInterface::class)->count([
@@ -60,7 +60,7 @@ if (!function_exists('get_customer_reviewed_value')) {
     function get_customer_reviewed_value($productId, $customerId = null)
     {
         if ($customerId == null && auth('customer')->check()) {
-            $customerId = auth('customer')->user()->getAuthIdentifier();
+            $customerId = auth('customer')->id();
         }
 
         $review = app(ReviewInterface::class)->getFirstBy([

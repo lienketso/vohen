@@ -14,9 +14,11 @@ use Botble\Base\Forms\Fields\MediaFileField;
 use Botble\Base\Forms\Fields\MediaImageField;
 use Botble\Base\Forms\Fields\MediaImagesField;
 use Botble\Base\Forms\Fields\OnOffField;
+use Botble\Base\Forms\Fields\RepeaterField;
 use Botble\Base\Forms\Fields\TimeField;
 use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use JsValidator;
 use Kris\LaravelFormBuilder\Fields\FormField;
 use Kris\LaravelFormBuilder\Form;
@@ -76,7 +78,7 @@ abstract class FormAbstract extends Form
     {
         $this->setMethod('POST');
         $this->setFormOption('template', $this->template);
-        $this->setFormOption('id', 'form_' . md5(get_class($this)));
+        $this->setFormOption('id', strtolower(Str::slug(Str::snake(get_class($this)))));
     }
 
     /**
@@ -94,6 +96,7 @@ abstract class FormAbstract extends Form
     public function setOptions(array $options): self
     {
         $this->options = $options;
+
         return $this;
     }
 
@@ -203,6 +206,7 @@ abstract class FormAbstract extends Form
     public function removeActionButtons(): self
     {
         $this->actionButtons = '';
+
         return $this;
     }
 
@@ -278,6 +282,7 @@ abstract class FormAbstract extends Form
             'date'         => DateField::class,
             'autocomplete' => AutocompleteField::class,
             'html'         => HtmlField::class,
+            'repeater'     => RepeaterField::class,
         ];
 
         foreach ($customFields as $key => $field) {
@@ -393,6 +398,7 @@ abstract class FormAbstract extends Form
     public function setValidatorClass($validatorClass): self
     {
         $this->validatorClass = $validatorClass;
+
         return $this;
     }
 

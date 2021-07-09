@@ -21,7 +21,7 @@ class ComposerServiceProvider extends ServiceProvider
         $view->composer(['core/base::layouts.partials.top-header', 'core/acl::auth.master'], function (View $view) {
             $themes = Assets::getThemes();
 
-            $defaultTheme = config('core.base.general.default-theme');
+            $defaultTheme = setting('default_admin_theme', config('core.base.general.default-theme'));
 
             if (Auth::check() && !session()->has('admin-theme') && !app()->environment('demo')) {
                 $activeTheme = UserMeta::getMeta('admin-theme', $defaultTheme);

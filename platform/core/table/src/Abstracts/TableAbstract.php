@@ -15,10 +15,13 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Request;
+use RvMedia;
 use Throwable;
 use Yajra\DataTables\DataTables;
+use Yajra\DataTables\QueryDataTable;
 use Yajra\DataTables\Services\DataTable;
 
 abstract class TableAbstract extends DataTable
@@ -128,7 +131,7 @@ abstract class TableAbstract extends DataTable
         }
 
         if (!$this->getOption('id')) {
-            $this->setOption('id', 'table_' . md5(get_class($this)));
+            $this->setOption('id', strtolower(Str::slug(Str::snake(get_class($this)))));
         }
 
         if (!$this->getOption('class')) {
@@ -174,6 +177,7 @@ abstract class TableAbstract extends DataTable
     public function setHasFilter(bool $hasFilter): self
     {
         $this->hasFilter = $hasFilter;
+
         return $this;
     }
 
@@ -200,6 +204,7 @@ abstract class TableAbstract extends DataTable
     public function setType(string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -257,7 +262,7 @@ abstract class TableAbstract extends DataTable
 
         return $this->builder()
             ->columns($this->getColumns())
-            ->ajax(['url' => $this->getAjaxUrl()])
+            ->ajax(['url' => $this->getAjaxUrl(), 'method' => 'POST'])
             ->parameters([
                 'dom'          => $this->getDom(),
                 'buttons'      => $this->getBuilderParameters(),
@@ -269,8 +274,8 @@ abstract class TableAbstract extends DataTable
                 'searchDelay'  => 350,
                 'bStateSave'   => $this->bStateSave,
                 'lengthMenu'   => Arr::sortRecursive([
-                    array_values(array_unique(array_merge([10, 30, 50], [$this->pageLength, -1]))),
-                    array_values(array_unique(array_merge([10, 30, 50],
+                    array_values(array_unique(array_merge([10, 30, 50, 100, 500], [$this->pageLength, -1]))),
+                    array_values(array_unique(array_merge([10, 30, 50, 100, 500],
                         [$this->pageLength, trans('core/base::tables.all')]))),
                 ]),
                 'pageLength'   => $this->pageLength,
@@ -427,6 +432,7 @@ abstract class TableAbstract extends DataTable
     public function setAjaxUrl(string $ajaxUrl): self
     {
         $this->ajaxUrl = $ajaxUrl;
+
         return $this;
     }
 
@@ -480,15 +486,19 @@ abstract class TableAbstract extends DataTable
      */
     public function getButtons(): array
     {
-        $buttons = [];
-        if (!$this->buttons()) {
-            return $buttons;
+        $buttons = apply_filters(BASE_FILTER_TABLE_BUTTONS, $this->buttons(), get_class($this->repository->getModel()));
+
+        if (!$buttons) {
+            return [];
         }
-        foreach ($this->buttons() as $key => $button) {
+
+        $data = [];
+
+        foreach ($buttons as $key => $button) {
             if (Arr::get($button, 'extend') == 'collection') {
-                $buttons[] = $button;
+                $data[] = $button;
             } else {
-                $buttons[] = [
+                $data[] = [
                     'className' => 'action-item',
                     'text'      => Html::tag('span', $button['text'], [
                         'data-action' => $key,
@@ -497,7 +507,8 @@ abstract class TableAbstract extends DataTable
                 ];
             }
         }
-        return $buttons;
+
+        return $data;
     }
 
     /**
@@ -702,6 +713,7 @@ abstract class TableAbstract extends DataTable
     public function bulkActions(): array
     {
         $actions = [];
+
         if ($this->getBulkChanges()) {
             $actions['bulk-change'] = view('core/table::bulk-changes', [
                 'bulk_changes' => $this->getBulkChanges(),
@@ -744,8 +756,12 @@ abstract class TableAbstract extends DataTable
 
         foreach ($requestFilters as $requestFilter) {
             if (isset($requestFilter['column']) && !empty($requestFilter['column'])) {
-                $query = $this->applyFilterCondition($query, $requestFilter['column'], $requestFilter['operator'],
-                    $requestFilter['value']);
+                $query = $this->applyFilterCondition(
+                    $query,
+                    $requestFilter['column'],
+                    $requestFilter['operator'],
+                    $requestFilter['value']
+                );
             }
         }
 
@@ -885,6 +901,7 @@ abstract class TableAbstract extends DataTable
         if (strpos($key, '.') !== -1) {
             $key = Arr::last(explode('.', $key));
         }
+
         switch ($key) {
             case 'created_at':
             case 'updated_at':
@@ -948,9 +965,11 @@ abstract class TableAbstract extends DataTable
     {
         if (!$permission || Auth::user()->hasPermission($permission)) {
             $queryString = http_build_query(Request::query());
+
             if ($queryString) {
                 $url .= '?' . $queryString;
             }
+
             $buttons['create'] = [
                 'link' => $url,
                 'text' => view('core/table::partials.create')->render(),
@@ -976,5 +995,44 @@ abstract class TableAbstract extends DataTable
         }
 
         return $actions;
+    }
+
+    /**
+     * @param QueryDataTable $data
+     * @param array $escapeColumn
+     * @param bool $mDataSupport
+     * @return mixed
+     */
+    public function toJson($data, $escapeColumn = [], $mDataSupport = true)
+    {
+        if ($this->repository && $this->repository->getModel()) {
+            $data = apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel());
+        }
+
+        return $data
+            ->escapeColumns($escapeColumn)
+            ->make($mDataSupport);
+    }
+
+    /**
+     * @param string $image
+     * @param array $attributes
+     * @return \Illuminate\Contracts\Foundation\Application|UrlGenerator|\Illuminate\Support\HtmlString|string|string[]|null
+     */
+    protected function displayThumbnail($image, array $attributes = ['width' => 50])
+    {
+        if ($this->request()->input('action') == 'csv') {
+            return RvMedia::getImageUrl($image, null, false, RvMedia::getDefaultImage());
+        }
+
+        if ($this->request()->input('action') == 'excel') {
+            return RvMedia::getImageUrl($image, 'thumb', false, RvMedia::getDefaultImage());
+        }
+
+        return Html::image(
+            RvMedia::getImageUrl($image, 'thumb', false, RvMedia::getDefaultImage()),
+            trans('core/base::tables.image'),
+            $attributes
+        );
     }
 }

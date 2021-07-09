@@ -47,6 +47,7 @@ class SortItemsWithChildrenHelper
             $this->items = $items;
             return $this;
         }
+
         throw new Exception('Items must be array or collection');
     }
 
@@ -57,6 +58,7 @@ class SortItemsWithChildrenHelper
     public function setParentField(string $string): self
     {
         $this->parentField = $string;
+
         return $this;
     }
 
@@ -67,6 +69,7 @@ class SortItemsWithChildrenHelper
     public function setCompareKey(string $key): self
     {
         $this->compareKey = $key;
+
         return $this;
     }
 
@@ -77,6 +80,7 @@ class SortItemsWithChildrenHelper
     public function setChildrenProperty(string $string): self
     {
         $this->childrenProperty = $string;
+
         return $this;
     }
 

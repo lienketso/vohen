@@ -157,6 +157,8 @@ class ProductController extends BaseController
                 }
             }
 
+            $variation['images'] = $request->input('images', []);
+
             $this->postSaveAllVersions([$variation['id'] => $variation], $variationRepository, $product->id, $response);
         }
 
@@ -256,6 +258,10 @@ class ProductController extends BaseController
                 ];
             }, array_filter(explode(',', $request->input('grouped_products', '')))));
         }
+
+        $relatedProductIds = $product->variations()->pluck('product_id')->all();
+
+        $this->productRepository->update([['id', 'IN', $relatedProductIds]], ['status' => $product->status]);
 
         return $response
             ->setPreviousUrl(route('products.index'))

@@ -783,19 +783,19 @@ var Botble = /*#__PURE__*/function () {
             container = $(settings.container).insertAfter(el).addClass(settings.classname);
           }
 
-          $(el).unbind('.charCounter').bind('keydown.charCounter', function () {
+          $(el).off('.charCounter').on('keydown.charCounter', function () {
             count(el, container);
-          }).bind('keypress.charCounter', function () {
+          }).on('keypress.charCounter', function () {
             count(el, container);
-          }).bind('keyup.charCounter', function () {
+          }).on('keyup.charCounter', function () {
             count(el, container);
-          }).bind('focus.charCounter', function () {
+          }).on('focus.charCounter', function () {
             count(el, container);
-          }).bind('mouseover.charCounter', function () {
+          }).on('mouseover.charCounter', function () {
             count(el, container);
-          }).bind('mouseout.charCounter', function () {
+          }).on('mouseout.charCounter', function () {
             count(el, container);
-          }).bind('paste.charCounter', function () {
+          }).on('paste.charCounter', function () {
             setTimeout(function () {
               count(el, container);
             }, 10);
@@ -1198,7 +1198,8 @@ var Botble = /*#__PURE__*/function () {
 
       if (jQuery().tooltip) {
         $('[data-toggle="tooltip"]').tooltip({
-          placement: 'top'
+          placement: 'top',
+          boundary: 'window'
         });
       }
 
@@ -1215,6 +1216,20 @@ var Botble = /*#__PURE__*/function () {
       if (jQuery().textareaAutoSize) {
         $('textarea.textarea-auto-height').textareaAutoSize();
       }
+
+      $('.select2_google_fonts_picker').each(function (i, obj) {
+        if (!$(obj).hasClass('select2-hidden-accessible')) {
+          $(obj).select2({
+            templateResult: function templateResult(opt) {
+              if (!opt.id) {
+                return opt.text;
+              }
+
+              return $('<span style="font-family:\'' + opt.id + '\';"> ' + opt.text + '</span>');
+            }
+          });
+        }
+      });
     }
   }, {
     key: "numberFormat",

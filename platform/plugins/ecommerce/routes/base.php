@@ -133,7 +133,7 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'middleware' =
                 'permission' => 'ecommerce.report.index',
             ]);
 
-            Route::get('top-selling-products', [
+            Route::post('top-selling-products', [
                 'as'         => 'ecommerce.report.top-selling-products',
                 'uses'       => 'ReportController@getTopSellingProducts',
                 'permission' => 'ecommerce.report.index',
@@ -155,6 +155,16 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'middleware' =
             ]);
         });
 
+        Route::group(['prefix' => 'product-labels', 'as' => 'product-label.'], function () {
+            Route::resource('', 'ProductLabelController')->parameters(['' => 'product-label']);
+            Route::delete('items/destroy', [
+                'as'         => 'deletes',
+                'uses'       => 'ProductLabelController@deletes',
+                'permission' => 'product-label.destroy',
+            ]);
+        });
+
+
     });
 });
 
@@ -162,24 +172,28 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers\Fronts', 'middle
     Route::group(apply_filters(BASE_FILTER_GROUP_PUBLIC_ROUTE, []), function () {
 
         Route::get(SlugHelper::getPrefix(Product::class, 'products'), [
-            'as'   => 'public.products',
             'uses' => 'PublicProductController@getProducts',
+            'as'   => 'public.products',
         ]);
 
         Route::get(SlugHelper::getPrefix(Brand::class, 'brands') . '/{slug}', [
             'uses' => 'PublicProductController@getBrand',
+            'as'   => 'public.brand',
         ]);
 
         Route::get(SlugHelper::getPrefix(Product::class, 'products') . '/{slug}', [
             'uses' => 'PublicProductController@getProduct',
+            'as'   => 'public.product',
         ]);
 
         Route::get(SlugHelper::getPrefix(ProductCategory::class, 'product-categories') . '/{slug}', [
             'uses' => 'PublicProductController@getProductCategory',
+            'as'   => 'public.product-category',
         ]);
 
         Route::get(SlugHelper::getPrefix(ProductTag::class, 'product-tags') . '/{slug}', [
             'uses' => 'PublicProductController@getProductTag',
+            'as'   => 'public.product-tag',
         ]);
 
         Route::get('currency/switch/{code?}', [

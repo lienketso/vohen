@@ -18,19 +18,3 @@
         <p><a class="lost-pass-link" href="{{ route('access.login') }}">{{ trans('core/acl::auth.back_to_login') }}</a></p>
     {!! Form::close() !!}
 @stop
-@push('footer')
-    <script>
-        var email = document.querySelector('[name="email"]');
-        email.focus();
-        document.getElementById('emailGroup').classList.add('focused');
-
-        // Focus events for email and password fields
-        email.addEventListener('focusin', function(){
-            document.getElementById('emailGroup').classList.add('focused');
-        });
-        email.addEventListener('focusout', function(){
-            document.getElementById('emailGroup').classList.remove('focused');
-        });
-    </script>
-@endpush
-

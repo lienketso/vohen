@@ -5,42 +5,34 @@ namespace Botble\Marketplace\Providers;
 use Botble\Base\Supports\Helper;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Ecommerce\Models\Customer;
+use Botble\Ecommerce\Models\Order;
+use Botble\Ecommerce\Models\Product;
 use Botble\Marketplace\Http\Middleware\RedirectIfNotVendor;
 use Botble\Marketplace\Models\Revenue;
 use Botble\Marketplace\Models\Store;
-use Botble\Marketplace\Models\VendorInfo;
-use Botble\Marketplace\Models\Warehouse;
-use Botble\Marketplace\Models\WarehouseImport;
 use Botble\Marketplace\Models\Withdrawal;
+use Botble\Marketplace\Models\VendorInfo;
 use Botble\Marketplace\Repositories\Caches\RevenueCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\StoreCacheDecorator;
-use Botble\Marketplace\Repositories\Caches\VendorInfoCacheDecorator;
-use Botble\Marketplace\Repositories\Caches\WarehouseCacheDecorator;
-use Botble\Marketplace\Repositories\Caches\WarehouseImportCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\WithdrawalCacheDecorator;
+use Botble\Marketplace\Repositories\Caches\VendorInfoCacheDecorator;
 use Botble\Marketplace\Repositories\Eloquent\RevenueRepository;
 use Botble\Marketplace\Repositories\Eloquent\StoreRepository;
-use Botble\Marketplace\Repositories\Eloquent\VendorInfoRepository;
-use Botble\Marketplace\Repositories\Eloquent\WarehouseImportRepository;
-use Botble\Marketplace\Repositories\Eloquent\WarehouseRepository;
 use Botble\Marketplace\Repositories\Eloquent\WithdrawalRepository;
+use Botble\Marketplace\Repositories\Eloquent\VendorInfoRepository;
 use Botble\Marketplace\Repositories\Interfaces\RevenueInterface;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
-use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
-use Botble\Marketplace\Repositories\Interfaces\WarehouseImportInterface;
-use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use Botble\Marketplace\Repositories\Interfaces\WithdrawalInterface;
+use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
+use EmailHandler;
 use Event;
+use Form;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use SeoHelper;
 use SlugHelper;
-use EmailHandler;
-use Botble\Ecommerce\Models\Order;
-use Botble\Ecommerce\Models\Product;
 use MacroableModels;
-use Form;
 
 class MarketplaceServiceProvider extends ServiceProvider
 {
@@ -52,18 +44,6 @@ class MarketplaceServiceProvider extends ServiceProvider
             $this->app->bind(StoreInterface::class, function () {
                 return new StoreCacheDecorator(
                     new StoreRepository(new Store)
-                );
-            });
-
-            $this->app->bind(WarehouseInterface::class, function () {
-                return new WarehouseCacheDecorator(
-                    new WarehouseRepository(new Warehouse)
-                );
-            });
-
-            $this->app->bind(WarehouseImportInterface::class, function () {
-                return new WarehouseImportCacheDecorator(
-                    new WarehouseImportRepository(new WarehouseImport)
                 );
             });
 
@@ -84,6 +64,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                     new VendorInfoRepository(new VendorInfo)
                 );
             });
+
             Helper::autoload(__DIR__ . '/../../helpers');
 
             /**
@@ -130,7 +111,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                         'id'          => 'cms-plugins-withdrawal',
                         'priority'    => 2,
                         'parent_id'   => 'cms-plugins-marketplace',
-                        'name'        => 'Withdrawal',
+                        'name'        => 'plugins/marketplace::withdrawal.name',
                         'icon'        => null,
                         'url'         => route('marketplace.withdrawal.index'),
                         'permissions' => ['marketplace.withdrawal.index'],
@@ -139,7 +120,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                         'id'          => 'cms-plugins-marketplace-settings',
                         'priority'    => 3,
                         'parent_id'   => 'cms-plugins-marketplace',
-                        'name'        => 'Setting',
+                        'name'        => 'plugins/marketplace::marketplace.settings.name',
                         'icon'        => null,
                         'url'         => route('marketplace.settings'),
                         'permissions' => ['marketplace.settings'],

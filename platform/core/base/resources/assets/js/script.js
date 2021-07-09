@@ -227,26 +227,26 @@ class Botble {
                         .addClass(settings.classname);
                 }
                 $(el)
-                    .unbind('.charCounter')
-                    .bind('keydown.charCounter', () => {
+                    .off('.charCounter')
+                    .on('keydown.charCounter', () => {
                         count(el, container);
                     })
-                    .bind('keypress.charCounter', () => {
+                    .on('keypress.charCounter', () => {
                         count(el, container);
                     })
-                    .bind('keyup.charCounter', () => {
+                    .on('keyup.charCounter', () => {
                         count(el, container);
                     })
-                    .bind('focus.charCounter', () => {
+                    .on('focus.charCounter', () => {
                         count(el, container);
                     })
-                    .bind('mouseover.charCounter', () => {
+                    .on('mouseover.charCounter', () => {
                         count(el, container);
                     })
-                    .bind('mouseout.charCounter', () => {
+                    .on('mouseout.charCounter', () => {
                         count(el, container);
                     })
-                    .bind('paste.charCounter', () => {
+                    .on('paste.charCounter', () => {
                         setTimeout(() => {
                             count(el, container);
                         }, 10);
@@ -321,9 +321,11 @@ class Botble {
                 width: '100%',
                 allowClear: true,
             });
+
             $(document).find('.select-search-full').select2({
                 width: '100%'
             });
+
             $(document).find('.select-full').select2({
                 width: '100%',
                 minimumResultsForSearch: -1
@@ -423,7 +425,7 @@ class Botble {
         }
 
         if (jQuery().tooltip) {
-            $('[data-toggle="tooltip"]').tooltip({placement: 'top'});
+            $('[data-toggle="tooltip"]').tooltip({placement: 'top', boundary: 'window'});
         }
 
         if (jQuery().areYouSure) {
@@ -438,6 +440,19 @@ class Botble {
         if (jQuery().textareaAutoSize) {
             $('textarea.textarea-auto-height').textareaAutoSize();
         }
+
+        $('.select2_google_fonts_picker').each(function (i, obj) {
+            if (!$(obj).hasClass('select2-hidden-accessible')){
+                $(obj).select2({
+                    templateResult: function (opt) {
+                        if (!opt.id) {
+                            return opt.text;
+                        }
+                        return $('<span style="font-family:\'' + opt.id + '\';"> ' + opt.text + '</span>');
+                    },
+                })
+            }
+        });
     }
 
     static numberFormat(number, decimals, dec_point, thousands_sep) {

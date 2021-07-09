@@ -25,6 +25,9 @@
 <div class="container">
     <h1>{{ __('Maintenance mode') }}</h1>
     <p>{{ __('Sorry, we are doing some maintenance. Please check back soon.') }}</p>
+    @if (setting('admin_email'))
+        <p>{!! clean(__('If you need help, contact us at :mail.', ['mail' => Html::link('mailto:' . setting('admin_email'), setting('admin_email'))])) !!}</p>
+    @endif
 </div>
 </body>
 </html>

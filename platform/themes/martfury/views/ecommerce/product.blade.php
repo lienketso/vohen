@@ -1,4 +1,5 @@
 @php
+    $countRating = 0;
     if (EcommerceHelper::isReviewEnabled()) {
         $reviews = $product->reviews->where('status', \Botble\Base\Enums\BaseStatusEnum::PUBLISHED);
         $countRating = $reviews->count();
@@ -42,8 +43,14 @@
                             <div class="ps-product__info">
                                 <h1>{{ $product->name }}</h1>
                                 <div class="ps-product__meta">
-                                    @if ($product->brand_id)
-                                        <p>{{ __('Brand') }}: <a href="{{ $product->brand->url }}">{{ $product->brand->name }}</a></p>
+                                    @if (is_plugin_active('marketplace'))
+                                        @if ($product->store_id)
+                                            <p>{{ __('Sold by') }}: <a href="{{ $product->store->url }}">{{ $product->store->name }}</a></p>
+                                        @endif
+                                    @else
+                                        @if ($product->brand_id)
+                                            <p>{{ __('Brand') }}: <a href="{{ $product->brand->url }}">{{ $product->brand->name }}</a></p>
+                                        @endif
                                     @endif
                                     @if (EcommerceHelper::isReviewEnabled())
                                         @if ($countRating > 0)
@@ -102,7 +109,29 @@
                                             'view'     => Theme::getThemeNamespace() . '::views.ecommerce.attributes.swatches-renderer'
                                         ]) !!}
                                     </div>
-                                    <div class="number-items-available" style="display: none; margin-bottom: 10px;"></div>
+                                    <div class="number-items-available mb-3">
+                                        @if ($product->isOutOfStock())
+                                            <span class="text-danger">({{ __('Out of stock') }})</span>
+                                        @else
+                                            @if (!$productVariation)
+                                                <span class="text-danger">({{ __('Not available') }})</span>
+                                            @else
+                                                @if ($productVariation->isOutOfStock())
+                                                    <span class="text-danger">({{ __('Out of stock') }})</span>
+                                                @elseif  (!$productVariation->with_storehouse_management || $productVariation->quantity < 1)
+                                                    <span class="text-success">({{ __('Available') }})</span>
+                                                @elseif ($productVariation->quantity)
+                                                    <span class="text-success">
+                                                        @if ($productVariation->quantity != 1)
+                                                            ({{ __(':number products available', ['number' => $productVariation->quantity]) }})
+                                                        @else
+                                                            ({{ __(':number product available', ['number' => $productVariation->quantity]) }})
+                                                        @endif
+                                                    </span>
+                                                @endif
+                                            @endif
+                                        @endif
+                                    </div>
                                 @endif
                                 <form class="add-to-cart-form" method="POST" action="{{ route('public.cart.add-to-cart') }}">
                                     @csrf
@@ -118,26 +147,22 @@
                                         </figure>
                                         <input type="hidden" name="id" class="hidden-product-id" value="{{ ($product->is_variation || !$product->defaultVariation->product_id) ? $product->id : $product->defaultVariation->product_id }}"/>
 
-
+                                        @if (EcommerceHelper::isCartEnabled())
+                                            <button class="ps-btn ps-btn--black @if ($product->isOutOfStock()) btn-disabled @endif" type="submit" @if ($product->isOutOfStock()) disabled @endif>{{ __('Add to cart') }}</button>
+                                            @if (EcommerceHelper::isQuickBuyButtonEnabled())
+                                                <button class="ps-btn @if ($product->isOutOfStock()) btn-disabled @endif" type="submit" name="checkout" @if ($product->isOutOfStock()) disabled @endif>{{ __('Buy Now') }}</button>
+                                            @endif
+                                        @endif
                                         <div class="ps-product__actions">
                                             <a class="js-add-to-wishlist-button" href="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i></a>
                                             <a class="js-add-to-compare-button" href="{{ route('public.compare.add', $product->id) }}" title="{{ __('Compare') }}"><i class="icon-chart-bars"></i></a>
                                         </div>
-                                    </div>
-                                    <div class="button_add">
-                                        @if (EcommerceHelper::isCartEnabled())
-                                            <button class="ps-btn ps-btn--black" type="submit">{{ __('Add to cart') }}</button>
-                                            @if (EcommerceHelper::isQuickBuyButtonEnabled())
-                                                <button class="ps-btn" type="submit" name="checkout">{{ __('Buy Now') }}</button>
-                                            @endif
-                                        @endif
                                     </div>
                                 </form>
                                 <div class="ps-product__specification">
                                     @if ($product->sku)
                                         <p><strong>{{ __('SKU') }}:</strong> <span id="product-sku">{{ $product->sku }}</span></p>
                                     @endif
-
                                     @if ($product->categories->count())
                                         <p class="categories"><strong> {{ __('Categories') }}:</strong>
                                             @foreach($product->categories as $category)
@@ -161,33 +186,34 @@
                                 </div>
                             </div>
                         </div>
+
                         @if($product->store_id!=NULL)
-                        <div class="store_info_page">
-                            <div class="bg_shop">
-                            <div class="row">
-                                <div class="col-lg-7">
-                                    <div class="left_store_info">
-                                        <div class="logo_store_info">
-                                            <a target="_blank" href="{{$product->store->url}}"><img
-                                                        src="{{ RvMedia::getImageUrl($product->store->logo, 'small', false, RvMedia::getDefaultImage()) }}"
-                                                             alt="{{$product->store->name}}"></a>
+                            <div class="store_info_page">
+                                <div class="bg_shop">
+                                    <div class="row">
+                                        <div class="col-lg-7">
+                                            <div class="left_store_info">
+                                                <div class="logo_store_info">
+                                                    <a target="_blank" href="{{$product->store->url}}"><img
+                                                                src="{{ RvMedia::getImageUrl($product->store->logo, 'small', false, RvMedia::getDefaultImage()) }}"
+                                                                alt="{{$product->store->name}}"></a>
+                                                </div>
+                                                <div class="desc_store_info">
+                                                    <h4>{{$product->store->name}} </h4>
+                                                    <a href="#" class="chat_now"><i class="icon-chat"></i> Chat ngay</a>
+                                                    <a target="_blank" href="{{$product->store->url}}" class="view_shop"><i class="icon-chat"></i> Xem shop</a>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="desc_store_info">
-                                            <h4>{{$product->store->name}} </h4>
-                                            <a href="#" class="chat_now"><i class="icon-chat"></i> Chat ngay</a>
-                                            <a target="_blank" href="{{$product->store->url}}" class="view_shop"><i class="icon-chat"></i> Xem shop</a>
+                                        <div class="col-lg-5">
+                                            <div class="item_number">
+                                                <span>Tham gia : <strong>{{$startStore}}</strong></span>
+                                                <span>Sản phẩm : <strong>{{$countProduct}}</strong></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-5">
-                                    <div class="item_number">
-                                        <span>Tham gia : <strong>{{$startStore}}</strong></span>
-                                        <span>Sản phẩm : <strong>{{$countProduct}}</strong></span>
-                                    </div>
-                                </div>
                             </div>
-                            </div>
-                        </div>
                         @endif
 
                         <div class="ps-product__content ps-tab-root">
@@ -340,22 +366,7 @@
                 $crossSellProducts = get_cross_sale_products($product, 7);
             @endphp
             @if (count($crossSellProducts) > 0)
-                <div class="ps-section--default ps-customer-bought">
-                    <div class="ps-section__header">
-                        <h3>{{ __('Customers who bought this item also bought') }}</h3>
-                    </div>
-                    <div class="ps-section__content">
-                        <div class="row">
-                            @foreach($crossSellProducts as $crossProduct)
-                                <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6 col-6">
-                                    <div class="ps-product">
-                                        {!! Theme::partial('product-item', ['product' => $crossProduct]) !!}
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+                {!! Theme::partial('cross-sell-products', compact('crossSellProducts')) !!}
             @endif
 
             <div class="ps-section--default" id="products">

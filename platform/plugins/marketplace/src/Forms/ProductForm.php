@@ -16,8 +16,8 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
 use Botble\Ecommerce\Repositories\Interfaces\TaxInterface;
 use Botble\Marketplace\Forms\Fields\CustomEditorField;
+use Botble\Marketplace\Forms\Fields\CustomImagesField;
 use Botble\Marketplace\Http\Requests\ProductRequest;
-use Botble\Marketplace\Repositories\Interfaces\WarehouseInterface;
 use EcommerceHelper;
 
 class ProductForm extends BaseProductForm
@@ -28,10 +28,6 @@ class ProductForm extends BaseProductForm
      */
     public function buildForm()
     {
-        if (!$this->formHelper->hasCustomField('customEditor')) {
-            $this->formHelper->addCustomField('customEditor', CustomEditorField::class);
-        }
-
         $selectedCategories = [];
         if ($this->getModel()) {
             $selectedCategories = $this->getModel()->categories()->pluck('category_id')->all();
@@ -43,38 +39,22 @@ class ProductForm extends BaseProductForm
 
         $productCollections = app(ProductCollectionInterface::class)->pluck('name', 'id');
 
-        //warehouse list
-        $warehouseList = app(WarehouseInterface::class)->pluck('name','id');
-        $selectedWarehouse = [];
-
         $selectedProductCollections = [];
         if ($this->getModel()) {
             $selectedProductCollections = $this->getModel()->productCollections()->pluck('product_collection_id')
                 ->all();
-
-            $selectedWarehouse = $this->getModel()->warehouse()->pluck('warehouse_id')->all();
         }
-
-
 
         $productId = $this->getModel() ? $this->getModel()->id : null;
 
         $productAttributeSets = app(ProductAttributeSetInterface::class)->getAllWithSelected($productId);
-        $productAttributes = app(ProductAttributeInterface::class)->getAllWithSelected($productId);
 
         $productVariations = [];
-        $productVariationsInfo = [];
-        $productsRelatedToVariation = [];
 
         if ($this->getModel()) {
             $productVariations = app(ProductVariationInterface::class)->allBy([
                 'configurable_product_id' => $this->getModel()->id,
             ]);
-
-            $productVariationsInfo = app(ProductVariationItemInterface::class)
-                ->getVariationsInfo($productVariations->pluck('id')->toArray());
-
-            $productsRelatedToVariation = app(ProductInterface::class)->getProductVariations($productId);
         }
 
         $tags = null;
@@ -87,6 +67,8 @@ class ProductForm extends BaseProductForm
         $this
             ->setupModel(new Product)
             ->withCustomFields()
+            ->addCustomField('customEditor', CustomEditorField::class)
+            ->addCustomField('customImages', CustomImagesField::class)
             ->addCustomField('categoryMulti', CategoryMultiField::class)
             ->addCustomField('multiCheckList', MultiCheckListField::class)
             ->addCustomField('tags', TagField::class)
@@ -118,11 +100,16 @@ class ProductForm extends BaseProductForm
                     'rows' => 4,
                 ],
             ])
+            ->add('images', 'customImages', [
+                'label'      => trans('plugins/ecommerce::products.form.image'),
+                'label_attr' => ['class' => 'control-label'],
+                'values'     => $productId ? $this->getModel()->images : [],
+            ])
             ->addMetaBoxes([
                 'with_related' => [
                     'title'    => null,
                     'content'  => '<div class="wrap-relation-product" data-target="' . route('marketplace.vendor.products.get-relations-boxes',
-                            $productId ? $productId : 0) . '"></div>',
+                            $productId ?: 0) . '"></div>',
                     'wrap'     => false,
                     'priority' => 9999,
                 ],
@@ -139,7 +126,7 @@ class ProductForm extends BaseProductForm
                 'choices'    => $brands,
             ])
             ->add('product_collections[]', 'multiCheckList', [
-                'label'      => trans('plugins/ecommerce::products.form.label'),
+                'label'      => trans('plugins/ecommerce::products.form.collections'),
                 'label_attr' => ['class' => 'control-label'],
                 'choices'    => $productCollections,
                 'value'      => old('product_collections', $selectedProductCollections),
@@ -170,22 +157,14 @@ class ProductForm extends BaseProductForm
             ->setBreakFieldPoint('categories[]');
 
         if (empty($productVariations) || $productVariations->isEmpty()) {
+            $attributeSetId = $productAttributeSets->first() ? $productAttributeSets->first()->id : 0;
             $this
                 ->removeMetaBox('variations')
-                ->addAfter('content', 'images[]', 'mediaImages', [
-                    'label'      => trans('plugins/ecommerce::products.form.image'),
-                    'label_attr' => ['class' => 'control-label'],
-                    'values'     => $productId ? $this->getModel()->images : [],
-                ])
                 ->addMetaBoxes([
                     'general'    => [
                         'title'          => trans('plugins/ecommerce::products.overview'),
-                        'content'        => view('plugins/marketplace::themes.dashboard.products.general',
-                            ['product' => $productId ? $this->getModel() : null,
-                                'warehouseList'=>$warehouseList,
-                                'selectedWarehouse'=>$selectedWarehouse
-                            ]
-                        )->render(),
+                        'content'        => view('plugins/ecommerce::products.partials.general',
+                            ['product' => $productId ? $this->getModel() : null])->render(),
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'priority'       => 2,
                     ],
@@ -193,14 +172,24 @@ class ProductForm extends BaseProductForm
                         'title'         => trans('plugins/ecommerce::products.attributes'),
                         'content'       => view('plugins/ecommerce::products.partials.add-product-attributes', [
                             'productAttributeSets' => $productAttributeSets,
-                            'productAttributes'    => $productAttributes,
+                            'productAttributes'    => $this->getProductAttributes($attributeSetId),
                             'product'              => $productId,
+                            'attributeSetId'       => $attributeSetId,
                         ])->render(),
                         'after_wrapper' => '</div>',
                         'priority'      => 3,
                     ],
                 ]);
         } elseif ($productId) {
+            $productVariationsInfo = [];
+            $productsRelatedToVariation = [];
+
+            if ($this->getModel()) {
+                $productVariationsInfo = app(ProductVariationItemInterface::class)
+                    ->getVariationsInfo($productVariations->pluck('id')->toArray());
+
+                $productsRelatedToVariation = app(ProductInterface::class)->getProductVariations($productId);
+            }
             $this
                 ->removeMetaBox('general')
                 ->removeMetaBox('attributes')
@@ -209,12 +198,10 @@ class ProductForm extends BaseProductForm
                         'title'          => trans('plugins/ecommerce::products.product_has_variations'),
                         'content'        => view('plugins/marketplace::themes.dashboard.products.configurable', [
                             'productAttributeSets'       => $productAttributeSets,
-                            'productAttributes'          => $productAttributes,
                             'productVariations'          => $productVariations,
                             'productVariationsInfo'      => $productVariationsInfo,
                             'productsRelatedToVariation' => $productsRelatedToVariation,
                             'product'                    => $this->getModel(),
-                            'warehouseList'              => $warehouseList
                         ])->render(),
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'after_wrapper'  => '</div>',
@@ -222,5 +209,17 @@ class ProductForm extends BaseProductForm
                     ],
                 ]);
         }
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getProductAttributes($attributeSetId)
+    {
+        $params = ['order_by' => ['ec_product_attributes.order' => 'ASC']];
+        if ($attributeSetId) {
+            $params['condition'] = [['attribute_set_id', '=', $attributeSetId]];
+        }
+        return app(ProductAttributeInterface::class)->advancedGet($params);
     }
 }

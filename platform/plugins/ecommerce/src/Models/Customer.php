@@ -4,6 +4,8 @@ namespace Botble\Ecommerce\Models;
 
 use Botble\Base\Supports\Avatar;
 use Botble\Ecommerce\Notifications\ResetPasswordNotification;
+use Eloquent;
+use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +15,7 @@ use MacroableModels;
 use Illuminate\Support\Str;
 
 /**
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Customer extends Authenticatable
 {
@@ -30,7 +32,6 @@ class Customer extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'is_vendor',
         'name',
         'email',
         'password',
@@ -65,7 +66,15 @@ class Customer extends Authenticatable
      */
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar ? RvMedia::getImageUrl($this->avatar, 'thumb') : (string)(new Avatar)->create($this->name)->toBase64();
+        if ($this->avatar) {
+            return RvMedia::getImageUrl($this->avatar, 'thumb');
+        }
+
+        try {
+            return (new Avatar)->create($this->name)->toBase64();
+        } catch (Exception $exception) {
+            return RvMedia::getDefaultImage();
+        }
     }
 
     /**

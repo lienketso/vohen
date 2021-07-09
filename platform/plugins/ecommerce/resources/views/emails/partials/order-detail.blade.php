@@ -1,3 +1,17 @@
+@if (!$order->dont_show_order_info_in_product_list)
+    @php
+        $orderId = get_order_code($order->id);
+    @endphp
+    <a href="{{ route('public.orders.tracking', ['order_id' => str_replace('#', '', $orderId), 'email' => $order->user->email ?: $order->address->email]) }}"
+        class="button button-blue">{{ trans('plugins/ecommerce::email.view_order') }}</a>
+        {!! trans('plugins/ecommerce::email.link_go_to_our_shop', ['link' => route('public.index')]) !!}
+
+    <br />
+
+    <h3>{{ trans('plugins/ecommerce::email.order_information') }}</h3>
+
+    <p>{!! trans('plugins/ecommerce::email.order_number', ['order_id' => $orderId]) !!}</p>
+@endif
 <div class="table">
     <table>
         <tr>
@@ -39,14 +53,7 @@
                 <td>
                     {{ $orderProduct->product_name }}
                     @if ($product)
-                        @php $attributes = get_product_attributes($product->id) @endphp
-                        @if (!empty($attributes))
-                            (<small>
-                                @foreach ($attributes as $attribute)
-                                    {{ $attribute->attribute_set_title }}: {{ $attribute->title }}@if (!$loop->last), @endif
-                                @endforeach
-                            </small>)
-                        @endif
+                        <small>{{ $product->variation_attributes }}</small>
                     @endif
 
                     @if (!empty($orderProduct->options) && is_array($orderProduct->options))

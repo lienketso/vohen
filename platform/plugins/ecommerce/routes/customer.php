@@ -1,56 +1,57 @@
 <?php
 
-Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers\Customers', 'middleware' => ['web', 'core']], function () {
-    Route::group(['prefix' => BaseHelper::getAdminPrefix(), 'middleware' => 'auth'], function () {
-        Route::group(['prefix' => 'customers', 'as' => 'customer.'], function () {
-            Route::resource('', 'CustomerController')->parameters(['' => 'customer']);
+Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers\Customers', 'middleware' => ['web', 'core']],
+    function () {
+        Route::group(['prefix' => BaseHelper::getAdminPrefix(), 'middleware' => 'auth'], function () {
+            Route::group(['prefix' => 'customers', 'as' => 'customer.'], function () {
+                Route::resource('', 'CustomerController')->parameters(['' => 'customer']);
 
-            Route::delete('items/destroy', [
-                'as'         => 'deletes',
-                'uses'       => 'CustomerController@deletes',
-                'permission' => 'customer.destroy',
-            ]);
-        });
+                Route::delete('items/destroy', [
+                    'as'         => 'deletes',
+                    'uses'       => 'CustomerController@deletes',
+                    'permission' => 'customer.destroy',
+                ]);
+            });
 
-        Route::group(['prefix' => 'customers', 'as' => 'customers.'], function () {
-            Route::get('get-list-customers-for-select', [
-                'as'         => 'get-list-customers-for-select',
-                'uses'       => 'CustomerController@getListCustomerForSelect',
-                'permission' => 'customers.index',
-            ]);
+            Route::group(['prefix' => 'customers', 'as' => 'customers.'], function () {
+                Route::get('get-list-customers-for-select', [
+                    'as'         => 'get-list-customers-for-select',
+                    'uses'       => 'CustomerController@getListCustomerForSelect',
+                    'permission' => 'customers.index',
+                ]);
 
-            Route::get('get-list-customers-for-search', [
-                'as'         => 'get-list-customers-for-search',
-                'uses'       => 'CustomerController@getListCustomerForSearch',
-                'permission' => ['customers.index', 'orders.index'],
-            ]);
+                Route::get('get-list-customers-for-search', [
+                    'as'         => 'get-list-customers-for-search',
+                    'uses'       => 'CustomerController@getListCustomerForSearch',
+                    'permission' => ['customers.index', 'orders.index'],
+                ]);
 
-            Route::post('update-email/{id}', [
-                'as'         => 'update-email',
-                'uses'       => 'CustomerController@postUpdateEmail',
-                'permission' => 'customer.edit',
-            ]);
+                Route::post('update-email/{id}', [
+                    'as'         => 'update-email',
+                    'uses'       => 'CustomerController@postUpdateEmail',
+                    'permission' => 'customer.edit',
+                ]);
 
-            Route::get('get-customer-addresses/{id}', [
-                'as'         => 'get-customer-addresses',
-                'uses'       => 'CustomerController@getCustomerAddresses',
-                'permission' => ['customers.index', 'orders.index'],
-            ]);
+                Route::get('get-customer-addresses/{id}', [
+                    'as'         => 'get-customer-addresses',
+                    'uses'       => 'CustomerController@getCustomerAddresses',
+                    'permission' => ['customers.index', 'orders.index'],
+                ]);
 
-            Route::get('get-customer-order-numbers/{id}', [
-                'as'         => 'get-customer-order-numbers',
-                'uses'       => 'CustomerController@getCustomerOrderNumbers',
-                'permission' => ['customers.index', 'orders.index'],
-            ]);
+                Route::get('get-customer-order-numbers/{id}', [
+                    'as'         => 'get-customer-order-numbers',
+                    'uses'       => 'CustomerController@getCustomerOrderNumbers',
+                    'permission' => ['customers.index', 'orders.index'],
+                ]);
 
-            Route::post('create-customer-when-creating-order', [
-                'as'         => 'create-customer-when-creating-order',
-                'uses'       => 'CustomerController@postCreateCustomerWhenCreatingOrder',
-                'permission' => ['customers.index', 'orders.index'],
-            ]);
+                Route::post('create-customer-when-creating-order', [
+                    'as'         => 'create-customer-when-creating-order',
+                    'uses'       => 'CustomerController@postCreateCustomerWhenCreatingOrder',
+                    'permission' => ['customers.index', 'orders.index'],
+                ]);
+            });
         });
     });
-});
 
 Route::group([
     'namespace'  => 'Botble\Ecommerce\Http\Controllers\Customers',
@@ -64,7 +65,7 @@ Route::group([
     Route::post('register', 'RegisterController@register')->name('register.post');
 
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.request');
-    Route::post('password/reset', 'ResetPasswordController@reset')->name('password.email');
+    Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.post');
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.reset');
     Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset.update');
 
@@ -74,12 +75,16 @@ Route::group([
 
 Route::group([
     'namespace'  => 'Botble\Ecommerce\Http\Controllers\Customers',
-    'middleware' => ['web', 'core', get_ecommerce_setting('verify_customer_email', 0) == 1 ? 'customer' : 'customer.guest'],
+    'middleware' => [
+        'web',
+        'core',
+        get_ecommerce_setting('verify_customer_email', 0) == 1 ? 'customer' : 'customer.guest',
+    ],
     'as'         => 'customer.',
 ], function () {
     Route::get('register/confirm/resend', 'RegisterController@resendConfirmation')
         ->name('resend_confirmation');
-    Route::get('register/confirm/{email}', 'RegisterController@confirm')
+    Route::get('register/confirm/{user}', 'RegisterController@confirm')
         ->name('confirm');
 });
 

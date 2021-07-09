@@ -20,7 +20,13 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'middleware' =
 
             Route::post('delete-version/{id}', [
                 'as'         => 'delete-version',
-                'uses'       => 'ProductController@postDeleteVersion',
+                'uses'       => 'ProductController@deleteVersion',
+                'permission' => 'products.edit',
+            ]);
+
+            Route::delete('items/delete-versions', [
+                'as'         => 'delete-versions',
+                'uses'       => 'ProductController@deleteVersions',
                 'permission' => 'products.edit',
             ]);
 
@@ -30,7 +36,7 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'middleware' =
                 'permission' => 'products.edit',
             ]);
 
-            Route::get('get-version-form/{id}', [
+            Route::get('get-version-form/{id?}', [
                 'as'         => 'get-version-form',
                 'uses'       => 'ProductController@getVersionForm',
                 'permission' => 'products.edit',
@@ -60,7 +66,7 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'middleware' =
                 'permission' => 'products.edit',
             ]);
 
-            Route::get('get-list-product-for-search/{id?}', [
+            Route::get('get-list-product-for-search', [
                 'as'         => 'get-list-product-for-search',
                 'uses'       => 'ProductController@getListProductForSearch',
                 'permission' => 'products.edit',

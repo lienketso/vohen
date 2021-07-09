@@ -79,11 +79,13 @@
                                                                 @endif
                                                             </td>
                                                             <td class="product-price" data-title="{{ __('Unit Price') }}">
-                                                                <span class="product-price-amount amount"><span class="currency-sign">
-                                                                    {{ format_price($cartItem->price) }}
-                                                                    </span>
-                                                                        <input type="hidden" name="items[{{ $key }}][rowId]" value="{{ $cartItem->rowId }}">
-                                                                </span>
+                                                                <div class="product__price @if ($product->front_sale_price != $product->price) sale @endif">
+                                                                    <span>{{ format_price($cartItem->price) }}</span>
+                                                                    @if ($product->front_sale_price != $product->price)
+                                                                        <small><del>{{ format_price($product->price_with_taxes) }}</del></small>
+                                                                    @endif
+                                                                </div>
+                                                                <input type="hidden" name="items[{{ $key }}][rowId]" value="{{ $cartItem->rowId }}">
                                                             </td>
                                                             <td class="product-quantity" data-title="{{ __('Qty') }}">
                                                                 <div class="product-quantity">

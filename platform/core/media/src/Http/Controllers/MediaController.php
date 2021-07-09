@@ -143,6 +143,8 @@ class MediaController extends Controller
             ];
         }
 
+        $folderId = $request->input('folder_id');
+
         switch ($request->input('view_in')) {
             case 'all_media':
                 $breadcrumbs = [
@@ -153,8 +155,7 @@ class MediaController extends Controller
                     ],
                 ];
 
-                $queried = $this->fileRepository->getFilesByFolderId($request->input('folder_id'), $paramsFile, true,
-                    $paramsFolder);
+                $queried = $this->fileRepository->getFilesByFolderId($folderId, $paramsFile, true, $paramsFolder);
 
                 $folders = FolderResource::collection($queried->where('is_folder', 1));
 
@@ -171,7 +172,7 @@ class MediaController extends Controller
                     ],
                 ];
 
-                $queried = $this->fileRepository->getTrashed($request->input('folder_id'), $paramsFile, true,
+                $queried = $this->fileRepository->getTrashed($folderId, $paramsFile, true,
                     $paramsFolder);
 
                 $folders = FolderResource::collection($queried->where('is_folder', 1));
@@ -239,7 +240,7 @@ class MediaController extends Controller
                         ],
                     ]);
 
-                    $queried = $this->fileRepository->getFilesByFolderId($request->input('folder_id'), $paramsFile,
+                    $queried = $this->fileRepository->getFilesByFolderId($folderId, $paramsFile,
                         true, $paramsFolder);
 
                     $folders = FolderResource::collection($queried->where('is_folder', 1));
@@ -281,14 +282,17 @@ class MediaController extends Controller
      */
     protected function getBreadcrumbs(Request $request)
     {
-        if (!$request->input('folder_id')) {
+
+        $folderId = $request->input('folder_id');
+
+        if (!$folderId) {
             return [];
         }
 
         if ($request->input('view_in') == 'trash') {
-            $folder = $this->folderRepository->getFirstByWithTrash(['id' => $request->input('folder_id')]);
+            $folder = $this->folderRepository->getFirstByWithTrash(['id' => $folderId]);
         } else {
-            $folder = $this->folderRepository->getFirstBy(['id' => $request->input('folder_id')]);
+            $folder = $this->folderRepository->getFirstBy(['id' => $folderId]);
         }
 
         if (empty($folder)) {

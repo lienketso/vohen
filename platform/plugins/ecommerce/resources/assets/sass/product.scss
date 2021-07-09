@@ -28,8 +28,18 @@
         }
     }
 
-    .table-hover-variants tr:hover td {
-        background: #eff9fd !important;
+    .table-hover-variants {
+        tr {
+            th {
+                padding: 8px 12px;
+            }
+
+            &:hover {
+                td {
+                    background: #eff9fd !important;
+                }
+            }
+        }
     }
 
     .wrap-img-product {

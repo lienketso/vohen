@@ -2,19 +2,19 @@
 
 namespace Botble\JsValidation;
 
+use Botble\JsValidation\Remote\Resolver;
+use Botble\JsValidation\Remote\Validator as RemoteValidator;
 use Closure;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Http\Request;
-use Botble\JsValidation\Remote\Resolver;
-use Botble\JsValidation\Remote\Validator as RemoteValidator;
 
 class RemoteValidationMiddleware
 {
     /**
      * Validator factory instance to wrap.
      *
-     * @var \Illuminate\Contracts\Validation\Factory
+     * @var ValidationFactory
      */
     protected $factory;
 
@@ -35,21 +35,21 @@ class RemoteValidationMiddleware
     /**
      * RemoteValidationMiddleware constructor.
      *
-     * @param \Illuminate\Contracts\Validation\Factory $validator
-     * @param \Illuminate\Contracts\Config\Repository $config
+     * @param ValidationFactory $validator
+     * @param Config $config
      */
     public function __construct(ValidationFactory $validator, Config $config)
     {
         $this->factory = $validator;
         $this->field = $config->get('core.js-validation.js-validation.remote_validation_field');
-        $this->escape = (bool) $config->get('core.js-validation.js-validation.escape', false);
+        $this->escape = (bool)$config->get('core.js-validation.js-validation.escape', false);
     }
 
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
+     * @param Request $request
+     * @param Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)

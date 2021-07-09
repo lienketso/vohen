@@ -42,7 +42,9 @@ class ForgotPasswordController extends Controller
     {
         SeoHelper::setTitle(__('Forgot Password'));
 
-        Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Login'), route('customer.password.reset'));
+        Theme::breadcrumb()
+            ->add(__('Home'), route('public.index'))
+            ->add(__('Login'), route('customer.password.reset'));
 
         return Theme::scope('ecommerce.customers.passwords.email', [],
             'plugins/ecommerce::themes.customers.passwords.email')

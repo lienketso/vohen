@@ -36,12 +36,32 @@
 
         $(document).off('click', '.payment-checkout-btn').on('click', '.payment-checkout-btn', function (event) {
             event.preventDefault();
+
             var _self = $(this);
+            var form = _self.closest('form');
             _self.attr('disabled', 'disabled');
-            if ($('input[name=payment_method]:checked').val() === 'razorpay') {
+            var submitInitialText = _self.html();
+            _self.html('<i class="fa fa-gear fa-spin"></i> ' + _self.data('processing-text'));
+            if ($('input[name=payment_method]:checked').val() === 'stripe') {
+                Stripe.setPublishableKey($('#payment-stripe-key').data('value'));
+                Stripe.card.createToken(form, function (status, response) {
+                    if (response.error) {
+                        if (typeof Botble != 'undefined') {
+                            Botble.showError(response.error.message, _self.data('error-header'));
+                        } else {
+                            alert(response.error.message);
+                        }
+                        _self.removeAttr('disabled');
+                        _self.html(submitInitialText);
+                    } else {
+                        form.append($('<input type="hidden" name="stripeToken">').val(response.id));
+                        form.submit();
+                    }
+                });
+            } else if ($('input[name=payment_method]:checked').val() === 'razorpay') {
                 razorpay.open();
             } else {
-                $('.payment-checkout-form').submit();
+                form.submit();
             }
         });
     </script>

@@ -3,7 +3,6 @@
 namespace Botble\ACL\Tables;
 
 use BaseHelper;
-use Botble\ACL\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Botble\ACL\Enums\UserStatusEnum;
 use Botble\ACL\Repositories\Interfaces\ActivationInterface;
@@ -48,10 +47,10 @@ class UserTable extends TableAbstract
         UserInterface $userRepository,
         ActivateUserService $service
     ) {
+        parent::__construct($table, $urlGenerator);
+
         $this->repository = $userRepository;
         $this->service = $service;
-        $this->setOption('id', 'table-users');
-        parent::__construct($table, $urlGenerator);
 
         if (!Auth::user()->hasAnyPermission(['users.edit', 'users.destroy'])) {
             $this->hasOperations = false;
@@ -96,9 +95,7 @@ class UserTable extends TableAbstract
 
                 return UserStatusEnum::DEACTIVATED()->toHtml();
             })
-            ->removeColumn('role_id');
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            ->removeColumn('role_id')
             ->addColumn('operations', function ($item) {
 
                 $action = null;
@@ -114,9 +111,9 @@ class UserTable extends TableAbstract
 
                 return apply_filters(ACL_FILTER_USER_TABLE_ACTIONS,
                     $action . view('core/acl::users.partials.actions', ['item' => $item])->render(), $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -188,9 +185,7 @@ class UserTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('users.create'), 'users.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, User::class);
+        return $this->addCreateButton(route('users.create'), 'users.create');
     }
 
     /**

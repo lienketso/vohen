@@ -4,10 +4,8 @@ namespace Botble\Ecommerce\Http\Controllers;
 
 use Assets;
 use Botble\Base\Events\DeletedContentEvent;
-use Botble\Base\Forms\FormBuilder;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
-use Botble\Ecommerce\Forms\AddShippingRegionForm;
 use Botble\Ecommerce\Http\Requests\AddShippingRegionRequest;
 use Botble\Ecommerce\Http\Requests\ShippingRuleRequest;
 use Botble\Ecommerce\Repositories\Interfaces\OrderInterface;
@@ -15,7 +13,6 @@ use Botble\Ecommerce\Repositories\Interfaces\ShippingInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ShippingRuleInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ShippingRuleItemInterface;
 use Botble\Setting\Supports\SettingStore;
-use EcommerceHelper;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
@@ -83,33 +80,6 @@ class ShippingMethodController extends BaseController
     }
 
     /**
-     * @param FormBuilder $formBuilder
-     * @return string
-     */
-    public function getCreateRegion(FormBuilder $formBuilder)
-    {
-        $form = $formBuilder->create(AddShippingRegionForm::class,
-            ['url' => route('shipping_methods.region.create.post')]);
-
-        $existedCountries = $this->shippingRepository->pluck('country');
-
-        foreach ($existedCountries as &$existedCountry) {
-            if (empty($existedCountry)) {
-                $existedCountry = '';
-            }
-        }
-
-        $countries = ['' => trans('plugins/ecommerce::shipping.all')] + EcommerceHelper::getAvailableCountries();
-
-        $countries = array_diff_key($countries, array_flip($existedCountries));
-
-        $form->getField('region')
-            ->setOption('choices', $countries);
-
-        return $form->setUseInlineJs(true)->renderForm();
-    }
-
-    /**
      * @param AddShippingRegionRequest $request
      * @param BaseHttpResponse $response
      * @return BaseHttpResponse
@@ -117,9 +87,10 @@ class ShippingMethodController extends BaseController
     public function postCreateRegion(AddShippingRegionRequest $request, BaseHttpResponse $response)
     {
         $country = $request->input('region');
+
         $shipping = $this->shippingRepository->createOrUpdate([
-            'title'       => $country ? $country : trans('plugins/ecommerce::shipping.all'),
-            'country'     => $request->input('region') ?? null,
+            'title'       => $country ?: trans('plugins/ecommerce::shipping.all'),
+            'country'     => $country,
             'currency_id' => get_application_currency_id(),
         ]);
 
@@ -166,8 +137,10 @@ class ShippingMethodController extends BaseController
     public function deleteRegion(Request $request, BaseHttpResponse $response)
     {
         $shipping = $this->shippingRepository->findOrFail($request->input('id'));
+
         $this->shippingRepository->delete($shipping);
         $this->shippingRuleRepository->deleteBy(['shipping_id' => $shipping->id]);
+
         event(new DeletedContentEvent(SHIPPING_MODULE_SCREEN_NAME, $request, $shipping));
 
         return $response->setMessage(trans('core/base::notices.delete_success_message'));
@@ -207,7 +180,11 @@ class ShippingMethodController extends BaseController
      */
     public function putUpdateRule($id, ShippingRuleRequest $request, BaseHttpResponse $response)
     {
-        $this->shippingRuleRepository->createOrUpdate($request->input(), compact('id'));
+        $rule = $this->shippingRuleRepository->findOrFail($id);
+
+        $rule->fill($request->input());
+
+        $this->shippingRuleRepository->createOrUpdate($rule);
 
         $this->shippingRuleItemRepository->deleteBy(['shipping_rule_id' => $id]);
 

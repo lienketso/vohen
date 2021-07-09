@@ -1,6 +1,6 @@
 <script>
     jQuery(document).ready(function () {
-
+        'use strict';
         $("{{ $validator['selector'] }}").each(function () {
             $(this).validate({
                 errorElement: 'span',

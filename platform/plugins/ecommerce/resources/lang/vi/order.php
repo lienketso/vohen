@@ -28,4 +28,5 @@ return [
     'create_new_order'                    => 'Tạo đơn hàng',
     'manage_incomplete_orders'            => 'Quản lý đơn hàng chưa hoàn tất',
     'incomplete_orders_intro_description' => 'Đơn hàng chưa hoàn tất là đơn hàng được tạo khi khách hàng thêm sản phẩm vào giỏ hàng, tiến hành điền thông tin mua hàng nhưng không hoàn tất quá trình thanh toán.',
+    'cannot_send_order_recover_to_mail'   => 'Không tìm thấy email nên không thể gửi email khôi phục cho khách hàng.',
 ];

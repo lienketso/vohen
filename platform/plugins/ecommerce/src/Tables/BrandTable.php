@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Ecommerce\Models\Brand;
 use Botble\Ecommerce\Repositories\Interfaces\BrandInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -32,9 +31,9 @@ class BrandTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, BrandInterface $brandRepository)
     {
-        $this->repository = $brandRepository;
-        $this->setOption('id', 'table-brands');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $brandRepository;
 
         if (!Auth::user()->hasAnyPermission(['brands.edit', 'brands.destroy'])) {
             $this->hasOperations = false;
@@ -60,21 +59,22 @@ class BrandTable extends TableAbstract
                 return $this->getCheckbox($item->id);
             })
             ->editColumn('logo', function ($item) {
-                return view('plugins/ecommerce::brands.partials.thumbnail', compact('item'))->render();
+                return $this->displayThumbnail($item->logo);
             })
             ->editColumn('created_at', function ($item) {
                 return BaseHelper::formatDate($item->created_at);
             })
+            ->editColumn('is_featured', function ($item) {
+                return $item->is_featured ? trans('core/base::base.yes') : trans('core/base::base.no');
+            })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('brands.edit', 'brands.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -138,9 +138,7 @@ class BrandTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('brands.create'), 'brands.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, Brand::class);
+        return $this->addCreateButton(route('brands.create'), 'brands.create');
     }
 
     /**

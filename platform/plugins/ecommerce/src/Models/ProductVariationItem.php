@@ -40,4 +40,12 @@ class ProductVariationItem extends BaseModel
     {
         return $this->belongsTo(ProductAttribute::class, 'attribute_id')->withDefault();
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function attributeSet()
+    {
+        return $this->hasMany(ProductAttributeSet::class, 'attribute_set_id');
+    }
 }

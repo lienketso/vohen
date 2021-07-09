@@ -34,7 +34,13 @@
                                                                     <img src="{{ $cartItem->options['image'] }}" alt="{{ $product->name }}" />
                                                                 </a>
                                                             </div>
-                                                            <div class="ps-product__content"><a href="{{ $product->original_product->url }}">{{ $product->name }}</a>
+                                                            <div class="ps-product__content">
+                                                                <a href="{{ $product->original_product->url }}">{{ $product->name }}</a>
+                                                                @if (is_plugin_active('marketplace') && $product->original_product->store->id)
+                                                                    <p class="d-block mb-0 sold-by"><small>{{ __('Sold by') }}: <a
+                                                                                href="{{ $product->original_product->store->url }}">{{ $product->original_product->store->name }}</a></small></p>
+                                                                @endif
+
                                                                 <p class="mb-0"><small>{{ $cartItem->options['attributes'] ?? '' }}</small></p>
                                                                 @if (!empty($cartItem->options['extras']) && is_array($cartItem->options['extras']))
                                                                     @foreach($cartItem->options['extras'] as $option)
@@ -46,15 +52,22 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td class="price">{{ format_price($cartItem->price) }}</td>
-                                                    <td>
+                                                    <td class="price text-center">
+                                                        <div class="product__price @if ($product->front_sale_price != $product->price) sale @endif">
+                                                            <span>{{ format_price($cartItem->price) }}</span>
+                                                            @if ($product->front_sale_price != $product->price)
+                                                                <small><del>{{ format_price($product->price_with_taxes) }}</del></small>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
                                                         <div class="form-group--number product__qty">
                                                             <button class="up">+</button>
                                                             <button class="down">-</button>
                                                             <input type="text" class="form-control qty-input" value="{{ $cartItem->qty }}" title="{{ __('Qty') }}" name="items[{{ $key }}][values][qty]" readonly>
                                                         </div>
                                                     </td>
-                                                    <td>{{ format_price($cartItem->price * $cartItem->qty) }}</td>
+                                                    <td class="text-center">{{ format_price($cartItem->price * $cartItem->qty) }}</td>
                                                     <td><a href="{{ route('public.cart.remove', $cartItem->rowId) }}" class="remove-cart-button"><i class="icon-cross"></i></a></td>
                                                 </tr>
                                                 @endif
@@ -113,23 +126,6 @@
             </div>
         @endif
 
-        @if (count($crossSellProducts) > 0)
-            <div class="ps-section--default ps-customer-bought mt-60">
-                <div class="ps-section__header text-left pb-0" style="margin-bottom: 20px">
-                    <h3 style="margin-bottom: 10px">{{ __('Customers who bought this item also bought') }}</h3>
-                </div>
-                <div class="ps-section__content">
-                    <div class="row">
-                        @foreach($crossSellProducts as $crossSellProduct)
-                            <div class="col-xl-3 col-lg-3 col-md-4 col-sm-6">
-                                <div class="ps-product">
-                                    {!! Theme::partial('product-item', ['product' => $crossSellProduct]) !!}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        @endif
+        {!! Theme::partial('cross-sell-products', compact('crossSellProducts')) !!}
     </div>
 </div>

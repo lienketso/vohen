@@ -19,7 +19,7 @@ class SettingRequest extends Request
         return [
             'admin_email'         => 'nullable|email',
             'default_admin_theme' => Rule::in(array_keys(Assets::getThemes())),
-            'time_zone'           => Rule::in(DateTimeZone::listIdentifiers(DateTimeZone::ALL)),
+            'time_zone'           => Rule::in(DateTimeZone::listIdentifiers()),
         ];
     }
 }

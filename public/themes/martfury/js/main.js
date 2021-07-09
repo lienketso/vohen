@@ -731,9 +731,7 @@ var __webpack_exports__ = {};
       if ($(e.target).closest('.ps-form--search-header') || e.target.className === '.ps-form--search-header') {
         $('.ps-panel--search-result').removeClass('active');
       }
-    }); // $('#input-search').on('keypress', function() {
-    //     $('.ps-panel--search-result').addClass('active');
-    // })
+    });
   }
 
   $(function () {
@@ -768,7 +766,7 @@ var __webpack_exports__ = {};
     $('.ps-product--quickview .ps-product__images').slick('setPosition');
   });
   $(window).on('load', function () {
-    $('body').addClass('loaded'); // subscribePopup();
+    $('body').addClass('loaded');
   });
 })(jQuery);
 /******/ })()

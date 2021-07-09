@@ -2,22 +2,23 @@
 
 namespace Botble\JsValidation\Remote;
 
+use Botble\JsValidation\Support\AccessProtectedTrait;
+use Closure;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Validator as BaseValidator;
-use Botble\JsValidation\Support\AccessProtectedTrait;
 
 class Resolver
 {
     use AccessProtectedTrait;
 
     /**
-     * @var \Closure
+     * @var Closure
      */
     protected $resolver;
 
     /**
-     * @var \Illuminate\Contracts\Validation\Factory
+     * @var ValidationFactory
      */
     protected $factory;
 
@@ -31,7 +32,7 @@ class Resolver
     /**
      * RemoteValidator constructor.
      *
-     * @param \Illuminate\Contracts\Validation\Factory $factory
+     * @param ValidationFactory $factory
      * @param bool $escape
      */
     public function __construct(ValidationFactory $factory, $escape = false)
@@ -45,7 +46,7 @@ class Resolver
      * Closure used to resolve Validator instance.
      *
      * @param $field
-     * @return \Closure
+     * @return Closure
      */
     public function resolver($field)
     {
@@ -58,18 +59,19 @@ class Resolver
      * Resolves Validator instance.
      *
      * @param $translator
-     * @param $data
-     * @param $rules
-     * @param $messages
-     * @param $customAttributes
-     * @param $field
-     * @return \Illuminate\Validation\Validator
+     * @param array $data
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @param string $field
+     * @return BaseValidator
      */
     protected function resolve($translator, $data, $rules, $messages, $customAttributes, $field)
     {
         $validateAll = Arr::get($data, $field . '_validate_all', false);
         $validationRule = 'bail|' . Validator::EXTENSION_NAME . ':' . $validateAll;
         $rules = [$field => $validationRule] + $rules;
+
         $validator = $this->createValidator($translator, $data, $rules, $messages, $customAttributes);
 
         return $validator;
@@ -79,15 +81,15 @@ class Resolver
      * Create new validator instance.
      *
      * @param $translator
-     * @param $data
-     * @param $rules
-     * @param $messages
-     * @param $customAttributes
-     * @return \Illuminate\Validation\Validator
+     * @param array $data
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     * @return BaseValidator
      */
     protected function createValidator($translator, $data, $rules, $messages, $customAttributes)
     {
-        if (is_null($this->resolver)) {
+        if (empty($this->resolver)) {
             return new BaseValidator($translator, $data, $rules, $messages, $customAttributes);
         }
 
@@ -97,7 +99,7 @@ class Resolver
     /**
      * Closure used to trigger JsValidations.
      *
-     * @return \Closure
+     * @return Closure
      */
     public function validatorClosure()
     {

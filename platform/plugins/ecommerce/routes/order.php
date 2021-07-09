@@ -98,7 +98,7 @@ Route::group(['namespace' => 'Botble\Ecommerce\Http\Controllers', 'middleware' =
         });
 
         Route::group(['prefix' => 'incomplete-orders', 'as' => 'orders.'], function () {
-            Route::get('', [
+            Route::match(['GET', 'POST'], '', [
                 'as'         => 'incomplete-list',
                 'uses'       => 'OrderController@getIncompleteList',
                 'permission' => 'orders.index',

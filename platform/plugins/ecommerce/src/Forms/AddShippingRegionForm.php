@@ -5,6 +5,8 @@ namespace Botble\Ecommerce\Forms;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Ecommerce\Http\Requests\AddShippingRegionRequest;
 use Botble\Ecommerce\Models\Shipping;
+use Botble\Ecommerce\Repositories\Interfaces\ShippingInterface;
+use EcommerceHelper;
 
 class AddShippingRegionForm extends FormAbstract
 {
@@ -13,31 +15,36 @@ class AddShippingRegionForm extends FormAbstract
      */
     public function buildForm()
     {
+        $existedCountries = app(ShippingInterface::class)->pluck('country');
+
+        foreach ($existedCountries as &$existedCountry) {
+            if (empty($existedCountry)) {
+                $existedCountry = '';
+            }
+        }
+
+        $countries = ['' => trans('plugins/ecommerce::shipping.all')] + EcommerceHelper::getAvailableCountries();
+
+        $countries = array_diff_key($countries, array_flip($existedCountries));
+
         $this
             ->setupModel(new Shipping)
-            ->setFormOption('template', 'core/base::forms.form-modal')
-            ->setFormOption('class', 'form-sm')
+            ->setFormOptions([
+                'template' => 'core/base::forms.form-content-only',
+                'url'      => route('shipping_methods.region.create'),
+            ])
             ->setTitle(trans('plugins/ecommerce::shipping.add_shipping_region'))
             ->setValidatorClass(AddShippingRegionRequest::class)
-            ->add('region', 'select', [
+            ->withCustomFields()
+            ->add('region', 'customSelect', [
                 'label'      => trans('plugins/ecommerce::shipping.country'),
                 'label_attr' => [
                     'class' => 'control-label required',
                 ],
-                'choices'    => [],
-            ])
-            ->add('close', 'button', [
-                'label' => trans('core/base::forms.cancel'),
-                'attr'  => [
-                    'class'               => 'btn btn-warning',
-                    'data-fancybox-close' => true,
+                'attr'       => [
+                    'class' => 'select-country-search',
                 ],
-            ])
-            ->add('submit', 'submit', [
-                'label' => trans('core/base::forms.save'),
-                'attr'  => [
-                    'class' => 'btn btn-info float-right',
-                ],
+                'choices'    => $countries,
             ]);
     }
 }

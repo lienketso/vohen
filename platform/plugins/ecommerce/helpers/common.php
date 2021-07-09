@@ -196,5 +196,3 @@ if (!function_exists('mapped_implode')) {
         );
     }
 }
-
-

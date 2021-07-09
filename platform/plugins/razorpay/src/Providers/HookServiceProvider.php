@@ -4,7 +4,6 @@ namespace Botble\Razorpay\Providers;
 
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
-use Botble\Payment\Repositories\Interfaces\PaymentInterface;
 use Exception;
 use Html;
 use Illuminate\Http\Request;
@@ -68,9 +67,15 @@ class HookServiceProvider extends ServiceProvider
      */
     public function registerRazorpayMethod($html, $data)
     {
+        $apiKey = get_payment_setting('key', RAZORPAY_PAYMENT_METHOD_NAME);
+        $apiSecret = get_payment_setting('secret', RAZORPAY_PAYMENT_METHOD_NAME);
+
+        if (!$apiKey || !$apiSecret) {
+            return $html;
+        }
+
         try {
-            $api = new Api(get_payment_setting('key', RAZORPAY_PAYMENT_METHOD_NAME),
-                get_payment_setting('secret', RAZORPAY_PAYMENT_METHOD_NAME));
+            $api = new Api($apiKey, $apiSecret);
 
             $receiptId = Str::random(20);
 
@@ -85,7 +90,7 @@ class HookServiceProvider extends ServiceProvider
             return $html . view('plugins/razorpay::methods', $data)->render();
         } catch (Exception $exception) {
             info($exception->getMessage());
-            return null;
+            return $html;
         }
     }
 
@@ -118,14 +123,14 @@ class HookServiceProvider extends ServiceProvider
                 $data['charge_id'] = Str::upper(Str::random(10));
             }
 
-            app(PaymentInterface::class)->create([
+            do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
                 'account_id'      => Arr::get($data, 'account_id'),
-                'amount'          => $data['amount'],
+                'amount'          => $request->input('amount'),
                 'currency'        => $data['currency'],
                 'charge_id'       => $data['charge_id'],
                 'payment_channel' => RAZORPAY_PAYMENT_METHOD_NAME,
                 'status'          => $status,
-                'order_id'        => $request->input('order_id'),
+                'order_id'        => (array) $request->input('order_id', []),
             ]);
         }
 

@@ -4,7 +4,7 @@ namespace Botble\ACL\Events;
 
 use Botble\ACL\Models\Role;
 use Botble\ACL\Models\User;
-use Event;
+use Botble\Base\Events\Event;
 use Illuminate\Queue\SerializesModels;
 
 class RoleAssignmentEvent extends Event

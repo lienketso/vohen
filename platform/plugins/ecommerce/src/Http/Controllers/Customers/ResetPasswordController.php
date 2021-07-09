@@ -58,7 +58,8 @@ class ResetPasswordController extends Controller
     {
         SeoHelper::setTitle(__('Reset Password'));
 
-        Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Reset Password'), route('customer.password.reset'));
+        Theme::breadcrumb()->add(__('Home'), route('public.index'))
+            ->add(__('Reset Password'), route('customer.password.reset'));
 
         return Theme::scope(
             'ecommerce.customers.passwords.reset',

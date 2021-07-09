@@ -129,15 +129,8 @@
                                     <td>
                                         {{ $orderProduct->product_name }} @if ($product && $product->sku) ({{ $product->sku }}) @endif
                                         @if ($product && $product->is_variation)
-                                            <p>
-                                                <small>
-                                                    @php $attributes = get_product_attributes($product->id) @endphp
-                                                    @if (!empty($attributes))
-                                                        @foreach ($attributes as $attribute)
-                                                            {{ $attribute->attribute_set_title }}: {{ $attribute->title }}@if (!$loop->last), @endif
-                                                        @endforeach
-                                                    @endif
-                                                </small>
+                                            <p class="mb-0">
+                                                <small>{{ $product->variation_attributes }}</small>
                                             </p>
                                         @endif
 
@@ -147,6 +140,13 @@
                                                     <p class="mb-0"><small>{{ $option['key'] }}: <strong> {{ $option['value'] }}</strong></small></p>
                                                 @endif
                                             @endforeach
+                                        @endif
+
+                                        @if (is_plugin_active('marketplace') && $product->original_product->store->id)
+                                            <p class="d-block mb-0 sold-by">
+                                                <small>{{ __('Sold by') }}: <a href="{{ $product->original_product->store->url }}">{{ $product->original_product->store->name }}</a>
+                                                </small>
+                                            </p>
                                         @endif
                                     </td>
                                     <td>{{ format_price($orderProduct->price) }}</td>

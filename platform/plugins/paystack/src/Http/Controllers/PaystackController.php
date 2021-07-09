@@ -5,16 +5,13 @@ namespace Botble\Paystack\Http\Controllers;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
-use Botble\Payment\Services\Traits\PaymentTrait;
-use OrderHelper;
+use Botble\Payment\Supports\PaymentHelper;
 use Illuminate\Http\Request;
 use Paystack;
 use Throwable;
 
 class PaystackController extends BaseController
 {
-    use PaymentTrait;
-
     /**
      * @param Request $request
      * @param BaseHttpResponse $response
@@ -25,8 +22,8 @@ class PaystackController extends BaseController
     {
         $result = Paystack::getPaymentData();
 
-        $this->storeLocalPayment([
-            'amount'          => $result['data']['amount'] / 100,
+        do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
+            'amount'          => $request->input('amount'),
             'currency'        => $result['data']['currency'],
             'charge_id'       => $request->input('reference'),
             'payment_channel' => PAYSTACK_PAYMENT_METHOD_NAME,
@@ -34,20 +31,20 @@ class PaystackController extends BaseController
             'customer_id'     => $request->input('customer_id'),
             'customer_type'   => $request->input('customer_type'),
             'payment_type'    => 'direct',
-            'order_id'        => $result['data']['metadata']['order_id'],
-        ]);
+            'order_id'        => (array) $result['data']['metadata']['order_id'],
+        ], $request);
 
-        OrderHelper::processOrder($result['data']['metadata']['order_id'], $request->input('reference'));
+        $redirectURL = PaymentHelper::getRedirectURL();
 
         if (!$result['status']) {
             return $response
                 ->setError()
-                ->setNextUrl(route('public.checkout.success', session('tracked_start_checkout')))
+                ->setNextUrl($redirectURL)
                 ->setMessage($result['message']);
         }
 
         return $response
-            ->setNextUrl(route('public.checkout.success', session('tracked_start_checkout')))
+            ->setNextUrl($redirectURL)
             ->setMessage(__('Checkout successfully!'));
     }
 }

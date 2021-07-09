@@ -29,6 +29,8 @@ class Plugin extends PluginOperationAbstract
     public static function remove()
     {
         Schema::disableForeignKeyConstraints();
+        Schema::dropIfExists('ec_product_label_products');
+        Schema::dropIfExists('ec_product_labels');
         Schema::dropIfExists('ec_product_tag_product');
         Schema::dropIfExists('ec_product_collection_products');
         Schema::dropIfExists('ec_product_category_product');

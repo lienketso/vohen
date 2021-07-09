@@ -29,7 +29,7 @@ Route::group([
                 'uses' => 'ProductController@postAddVersion',
             ]);
 
-            Route::get('get-version-form/{id}', [
+            Route::get('get-version-form/{id?}', [
                 'as'   => 'get-version-form',
                 'uses' => 'ProductController@getVersionForm',
             ]);
@@ -54,7 +54,7 @@ Route::group([
                 'uses' => 'ProductController@postSaveAllVersions',
             ]);
 
-            Route::get('get-list-product-for-search/{id?}', [
+            Route::get('get-list-product-for-search', [
                 'as'   => 'get-list-product-for-search',
                 'uses' => 'ProductController@getListProductForSearch',
             ]);

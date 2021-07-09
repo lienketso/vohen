@@ -2,15 +2,14 @@
 
 namespace Botble\Ecommerce\Tables;
 
-use Auth;
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Ecommerce\Repositories\Interfaces\FlashSaleInterface;
 use Botble\Table\Abstracts\TableAbstract;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Yajra\DataTables\DataTables;
-use Botble\Ecommerce\Models\FlashSale;
 use Html;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
 
 class FlashSaleTable extends TableAbstract
 {
@@ -33,9 +32,9 @@ class FlashSaleTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, FlashSaleInterface $flashSaleRepository)
     {
-        $this->repository = $flashSaleRepository;
-        $this->setOption('id', 'plugins-flash-sale-table');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $flashSaleRepository;
 
         if (!Auth::user()->hasAnyPermission(['flash-sale.edit', 'flash-sale.destroy'])) {
             $this->hasOperations = false;
@@ -64,14 +63,12 @@ class FlashSaleTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('flash-sale.edit', 'flash-sale.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -98,12 +95,12 @@ class FlashSaleTable extends TableAbstract
     public function columns()
     {
         return [
-            'id' => [
+            'id'         => [
                 'name'  => 'ec_flash_sales.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
             ],
-            'name' => [
+            'name'       => [
                 'name'  => 'ec_flash_sales.name',
                 'title' => trans('core/base::tables.name'),
                 'class' => 'text-left',
@@ -113,7 +110,7 @@ class FlashSaleTable extends TableAbstract
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
             ],
-            'status' => [
+            'status'     => [
                 'name'  => 'ec_flash_sales.status',
                 'title' => trans('core/base::tables.status'),
                 'width' => '100px',
@@ -126,9 +123,7 @@ class FlashSaleTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('flash-sale.create'), 'flash-sale.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, FlashSale::class);
+        return $this->addCreateButton(route('flash-sale.create'), 'flash-sale.create');
     }
 
     /**
@@ -145,12 +140,12 @@ class FlashSaleTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_flash_sales.name' => [
+            'ec_flash_sales.name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_flash_sales.status' => [
+            'ec_flash_sales.status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),

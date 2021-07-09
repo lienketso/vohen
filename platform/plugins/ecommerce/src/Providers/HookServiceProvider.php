@@ -12,6 +12,7 @@ use Botble\Ecommerce\Repositories\Interfaces\CustomerInterface;
 use Botble\Ecommerce\Repositories\Interfaces\OrderInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ReviewInterface;
+use Botble\Payment\Supports\PaymentHelper;
 use Form;
 use Html;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -20,6 +21,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Menu;
+use OrderHelper;
 use Throwable;
 
 class HookServiceProvider extends ServiceProvider
@@ -46,6 +48,8 @@ class HookServiceProvider extends ServiceProvider
 
         add_filter(BASE_FILTER_TOP_HEADER_LAYOUT, [$this, 'registerTopHeaderNotification'], 121);
         add_filter(BASE_FILTER_APPEND_MENU_NAME, [$this, 'getPendingOrders'], 130, 2);
+
+        add_filter(RENDER_PRODUCTS_IN_CHECKOUT_PAGE, [$this, 'renderProductsInCheckoutPage'], 1000, 1);
 
         $this->app->booted(function () {
             add_filter(DASHBOARD_FILTER_ADMIN_LIST, function ($widgets) {
@@ -78,7 +82,9 @@ class HookServiceProvider extends ServiceProvider
             }, 2, 2);
 
             add_filter(DASHBOARD_FILTER_ADMIN_LIST, function ($widgets, $widgetSettings) {
-                $items = app(ProductInterface::class)->count(['status' => BaseStatusEnum::PUBLISHED, 'is_variation' => 0]);
+                $items = app(ProductInterface::class)->count(['status'       => BaseStatusEnum::PUBLISHED,
+                                                              'is_variation' => 0,
+                ]);
                 return (new DashboardWidgetInstance)
                     ->setType('stats')
                     ->setPermission('products.index')
@@ -125,7 +131,32 @@ class HookServiceProvider extends ServiceProvider
                         return $html;
                     }
 
-                    return $html . Form::hidden('customer_id', auth('customer')->id())->toHtml() . Form::hidden('customer_type', Customer::class)->toHtml();
+                    return $html . Form::hidden('customer_id', auth('customer')->id())
+                            ->toHtml() . Form::hidden('customer_type', Customer::class)->toHtml();
+                }, 123);
+            }
+
+            if (defined('PAYMENT_FILTER_REDIRECT_URL')) {
+                add_filter(PAYMENT_FILTER_REDIRECT_URL, function ($checkoutToken) {
+                    return route('public.checkout.success', $checkoutToken ?: OrderHelper::getOrderSessionToken());
+                }, 123);
+            }
+
+            if (defined('PAYMENT_ACTION_PAYMENT_PROCESSED')) {
+                add_action(PAYMENT_ACTION_PAYMENT_PROCESSED, function ($data) {
+
+                    $orderIds = (array)$data['order_id'];
+
+                    if ($orderIds) {
+                        $orders = $this->app->make(OrderInterface::class)->allBy([['id', 'IN', $orderIds]]);
+                        foreach ($orders as $order) {
+                            $data['amount'] = $order->amount;
+                            $data['order_id'] = $order->id;
+                            PaymentHelper::storeLocalPayment($data);
+                        }
+                    }
+
+                    return OrderHelper::processOrderMulti($orderIds, $data['charge_id']);
                 }, 123);
             }
         });
@@ -270,5 +301,18 @@ class HookServiceProvider extends ServiceProvider
         }
 
         return $this->pendingOrders;
+    }
+
+    /**
+     * @param Collection|string $products
+     * @return string
+     */
+    public function renderProductsInCheckoutPage($products)
+    {
+        if ($products instanceof Collection) {
+            return view('plugins/ecommerce::orders.checkout.products', compact('products'))->render();
+        }
+
+        return $products;
     }
 }

@@ -3,7 +3,7 @@
 namespace Botble\ACL\Events;
 
 use Botble\ACL\Models\Role;
-use Event;
+use Botble\Base\Events\Event;
 use Illuminate\Queue\SerializesModels;
 
 class RoleUpdateEvent extends Event

@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
-use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Repositories\Interfaces\OrderInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use EcommerceHelper;
@@ -33,9 +32,9 @@ class OrderTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, OrderInterface $orderRepository)
     {
-        $this->repository = $orderRepository;
-        $this->setOption('id', 'table-orders');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $orderRepository;
 
         if (!Auth::user()->hasPermission('orders.edit')) {
             $this->hasOperations = false;
@@ -81,12 +80,12 @@ class OrderTable extends TableAbstract
             });
         }
 
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+        $data = $data
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('orders.edit', 'orders.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -121,18 +120,18 @@ class OrderTable extends TableAbstract
     public function columns()
     {
         $columns = [
-            'id'              => [
+            'id'      => [
                 'name'  => 'ec_orders.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
                 'class' => 'text-left',
             ],
-            'user_id'         => [
+            'user_id' => [
                 'name'  => 'ec_orders.user_id',
                 'title' => trans('plugins/ecommerce::order.customer_label'),
                 'class' => 'text-left',
             ],
-            'amount'          => [
+            'amount'  => [
                 'name'  => 'ec_orders.amount',
                 'title' => trans('plugins/ecommerce::order.amount'),
                 'class' => 'text-center',
@@ -184,9 +183,7 @@ class OrderTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('orders.create'), 'orders.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, Order::class);
+        return $this->addCreateButton(route('orders.create'), 'orders.create');
     }
 
     /**

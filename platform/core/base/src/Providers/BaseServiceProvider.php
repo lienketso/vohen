@@ -19,7 +19,7 @@ use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Setting\Providers\SettingServiceProvider;
 use Botble\Setting\Supports\SettingStore;
 use DateTimeZone;
-use Event;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\AliasLoader;

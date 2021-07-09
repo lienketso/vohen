@@ -10,29 +10,30 @@
                 </ul>
             </div>
             <div class="ps-section__content">
-                <div class="row">
-                <div class="col-lg-3">
-                    <div class="ads_category">
-                        <a href="#"><img src="https://image.voso.vn/users/vosoimage/images/a955076a1a61e910c08354b76b23d741?t%5B0%5D=maxSize%3Awidth%3D590%2Cheight%3D1240&t%5B1%5D=compress%3Alevel%3D100&accessToken=b4c86e427f554eb1ad01eae3ff7963a08946f3edd2f7596f903c7390fe55dbcb"></a>
-                    </div>
-                </div>
-
-                <div class="col-lg-9 bg-white">
                 <div class="half-circle-spinner" v-if="isLoading">
                     <div class="circle circle-1"></div>
                     <div class="circle circle-2"></div>
                 </div>
-                <div class="tab-pane fade show active" v-if="!isLoading" :id="productCategory.slug"
-                     role="tabpanel" :aria-labelledby="productCategory.slug + '-tab'" :key="productCategory.id">
-                    <div class="row ">
-
-                        <div class="col-lg-2 col-6 col-half-offset ps-product" v-for="item in data" :key="item.id" v-if="data.length" v-html="item"></div>
-
+                <div class="tab-pane fade show active" v-if="!isLoading" :id="productCategory.slug" role="tabpanel" :aria-labelledby="productCategory.slug + '-tab'" :key="productCategory.id">
+                    <div v-carousel class="ps-carousel--nav owl-slider"
+                         data-owl-auto="false"
+                         data-owl-loop="false"
+                         data-owl-speed="10000"
+                         data-owl-gap="0"
+                         data-owl-nav="true"
+                         data-owl-dots="true"
+                         data-owl-item="7"
+                         data-owl-item-xs="2"
+                         data-owl-item-sm="2"
+                         data-owl-item-md="3"
+                         data-owl-item-lg="4"
+                         data-owl-item-xl="6"
+                         data-owl-duration="1000"
+                         data-owl-mousedrag="on"
+                    >
+                        <div class="ps-product" v-for="item in data" :key="item.id" v-if="data.length" v-html="item"></div>
                     </div>
                 </div>
-                </div>
-                </div>
-
             </div>
         </div>
 </template>

@@ -18,23 +18,6 @@
 @once
     @push('footer')
         <link href="https://fonts.googleapis.com/css?family={{ implode('|', array_map('urlencode', $field['options'])) }}" rel="stylesheet" type="text/css">
-        <script>
-            'use strict';
-            jQuery(document).ready(function($) {
-                $('.select2_google_fonts_picker').each(function (i, obj) {
-                    if (!$(obj).hasClass('select2-hidden-accessible')){
-                        $(obj).select2({
-                            templateResult: function (opt) {
-                                if (!opt.id) {
-                                    return opt.text;
-                                }
-                                return $('<span style="font-family:\'' + opt.id + '\';"> ' + opt.text + '</span>');
-                            },
-                        })
-                    }
-                });
-            });
-        </script>
     @endpush
 @endonce
 

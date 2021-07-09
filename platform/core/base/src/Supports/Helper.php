@@ -5,7 +5,7 @@ namespace Botble\Base\Supports;
 use Artisan;
 use Cache;
 use Eloquent;
-use Event;
+use Illuminate\Support\Facades\Event;
 use Exception;
 use File;
 use Illuminate\Database\Eloquent\Model;

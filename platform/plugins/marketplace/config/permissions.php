@@ -26,5 +26,19 @@ return [
         'parent_flag' => 'marketplace.store.index',
     ],
 
+    [
+        'name' => 'Withdrawals',
+        'flag' => 'marketplace.withdrawal.index',
+    ],
+    [
+        'name'        => 'Edit',
+        'flag'        => 'marketplace.withdrawal.edit',
+        'parent_flag' => 'marketplace.withdrawal.index',
+    ],
+    [
+        'name'        => 'Delete',
+        'flag'        => 'marketplace.withdrawal.destroy',
+        'parent_flag' => 'marketplace.withdrawal.index',
+    ],
 
 ];

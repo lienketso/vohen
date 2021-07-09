@@ -50,6 +50,7 @@ class ForgotPasswordController extends BaseController
 
         Assets::addScripts(['jquery-validation'])
             ->addScriptsDirectly('vendor/core/core/acl/js/login.js')
+            ->addStylesDirectly('vendor/core/core/acl/css/animate.min.css')
             ->addStylesDirectly('vendor/core/core/acl/css/login.css')
             ->removeStyles([
                 'select2',

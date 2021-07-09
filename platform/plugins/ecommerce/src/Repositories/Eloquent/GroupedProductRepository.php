@@ -4,7 +4,7 @@ namespace Botble\Ecommerce\Repositories\Eloquent;
 
 use Botble\Ecommerce\Repositories\Interfaces\GroupedProductInterface;
 use Botble\Support\Repositories\Eloquent\RepositoriesAbstract;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class GroupedProductRepository extends RepositoriesAbstract implements GroupedProductInterface
 {

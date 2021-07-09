@@ -1,6 +1,16 @@
 <div class="ps-product__thumbnail"><a href="{{ $product->url }}"><img src="{{ RvMedia::getImageUrl($product->image, 'small', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}"></a>
-    @if ($product->front_sale_price !== $product->price)
-        <div class="ps-product__badge">{{ get_sale_percentage($product->price, $product->front_sale_price) }}</div>
+    @if ($product->isOutOfStock())
+        <span class="ps-product__badge out-stock">{{ __('Out Of Stock') }}</span>
+    @else
+        @if ($product->productLabels->count())
+            @foreach ($product->productLabels as $label)
+                <span class="ps-product__badge" @if ($label->color) style="background-color: {{ $label->color }}" @endif>{{ $label->name }}</span>
+            @endforeach
+        @else
+            @if ($product->front_sale_price !== $product->price)
+                <div class="ps-product__badge">{{ get_sale_percentage($product->price, $product->front_sale_price) }}</div>
+            @endif
+        @endif
     @endif
     <ul class="ps-product__actions">
         @if (EcommerceHelper::isCartEnabled())

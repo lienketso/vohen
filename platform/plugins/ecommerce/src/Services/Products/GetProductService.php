@@ -100,6 +100,30 @@ class GetProductService
                     'ec_products.name' => 'desc',
                 ];
                 break;
+            case 'rating_asc':
+                $withCount = array_merge($withCount, [
+                    'reviews',
+                    'reviews as reviews_avg' => function ($query) {
+                        $query->select(DB::raw('avg(star)'));
+                    },
+                ]);
+
+                $orderBy = [
+                    'reviews_avg' => 'asc',
+                ];
+                break;
+            case 'rating_desc':
+                $withCount = array_merge($withCount, [
+                    'reviews',
+                    'reviews as reviews_avg' => function ($query) {
+                        $query->select(DB::raw('avg(star)'));
+                    },
+                ]);
+
+                $orderBy = [
+                    'reviews_avg' => 'desc',
+                ];
+                break;
             default:
                 $orderBy = [
                     'ec_products.order'      => 'ASC',

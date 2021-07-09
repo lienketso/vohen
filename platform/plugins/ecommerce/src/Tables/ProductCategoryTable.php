@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Repositories\Interfaces\ProductCategoryInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -37,9 +36,9 @@ class ProductCategoryTable extends TableAbstract
         UrlGenerator $urlGenerator,
         ProductCategoryInterface $productCategoryRepository
     ) {
-        $this->repository = $productCategoryRepository;
-        $this->setOption('id', 'table-product-categories');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $productCategoryRepository;
 
         if (!Auth::user()->hasAnyPermission([
             'product-categories.edit',
@@ -56,13 +55,14 @@ class ProductCategoryTable extends TableAbstract
     public function ajax()
     {
         $data = $this->table
-            ->eloquent($this->query())
+            ->of($this->query())
             ->editColumn('name', function ($item) {
                 if (!Auth::user()->hasPermission('product-categories.edit')) {
                     return $item->name;
                 }
 
-                return Html::link(route('product-categories.edit', $item->id), $item->name);
+                return str_repeat('&nbsp;', $item->depth) . Html::link(route('product-categories.edit', $item->id),
+                        $item->indent_text . ' ' . $item->name);
             })
             ->editColumn('image', function ($item) {
                 return Html::image(RvMedia::getImageUrl($item->image, 'thumb', false, RvMedia::getDefaultImage()),
@@ -76,14 +76,12 @@ class ProductCategoryTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return view('plugins/ecommerce::product-categories.partials.actions', compact('item'))->render();
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -91,23 +89,20 @@ class ProductCategoryTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_product_categories.id',
-            'ec_product_categories.name',
-            'ec_product_categories.status',
-            'ec_product_categories.order',
-            'ec_product_categories.image',
-            'ec_product_categories.created_at',
-            'ec_product_categories.parent_id',
-        ];
+        $categories = get_product_categories();
 
-        $query = $model
-            ->orderBy('ec_product_categories.parent_id', 'asc')
-            ->orderBy('ec_product_categories.order', 'asc')
-            ->select($select);
+        $indent = '↳';
 
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        foreach ($categories as $category) {
+            $indentText = '';
+            $depth = (int)$category->depth;
+            for ($index = 0; $index < $depth; $index++) {
+                $indentText .= $indent;
+            }
+            $category->indent_text = $indentText;
+        }
+
+        return collect($categories);
     }
 
     /**
@@ -153,9 +148,7 @@ class ProductCategoryTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('product-categories.create'), 'product-categories.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, ProductCategory::class);
+        return $this->addCreateButton(route('product-categories.create'), 'product-categories.create');
     }
 
     /**

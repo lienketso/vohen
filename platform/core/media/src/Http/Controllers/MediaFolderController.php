@@ -54,6 +54,7 @@ class MediaFolderController extends Controller
             $folder->slug = $this->folderRepository->createSlug($name, $parentId);
             $folder->parent_id = $parentId;
             $this->folderRepository->createOrUpdate($folder);
+
             return RvMedia::responseSuccess([], trans('core/media::media.folder_created'));
         } catch (Exception $exception) {
             return RvMedia::responseError($exception->getMessage());

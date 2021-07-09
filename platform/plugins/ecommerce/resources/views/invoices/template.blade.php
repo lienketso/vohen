@@ -101,16 +101,8 @@
                     <tr class="item">
                         <td>{{ $product->name }}</td>
                         <td>
-                            @php $attributes = get_product_attributes($product->id); @endphp
-                            @if (!empty($attributes))
-                                @foreach ($attributes as $attribute)
-                                    @if (!$loop->last)
-                                        {{ $attribute->attribute_set_title }}: {{ $attribute->title }} <br>
-                                    @else
-                                        {{ $attribute->attribute_set_title }}: {{ $attribute->title }}
-                                    @endif
-                                @endforeach
-                            @endif
+                            <small>{{ $product->variation_attributes }}</small>
+
                             @if (!empty($orderProduct->options) && is_array($orderProduct->options))
                                 @foreach($orderProduct->options as $option)
                                     @if (!empty($option['key']) && !empty($option['value']))

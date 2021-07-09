@@ -211,7 +211,7 @@ class DashboardController
                 'customer_id'   => $customer->id,
             ]);
         }
-
+        
         $this->customerRepository->createOrUpdate($customer);
 
         return $response->setNextUrl(route('marketplace.vendor.dashboard'))->setMessage(__('Registered successfully!'));

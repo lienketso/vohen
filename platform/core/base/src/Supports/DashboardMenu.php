@@ -148,13 +148,23 @@ class DashboardMenu
             $links = $this->links;
         }
 
+        if (request()->isSecure()) {
+            $protocol = 'https://';
+        } else {
+            $protocol = 'http://';
+        }
+        $protocol .= BaseHelper::getAdminPrefix();
+
         foreach ($links as $key => &$link) {
             if ($link['permissions'] && !Auth::user()->hasAnyPermission($link['permissions'])) {
                 Arr::forget($links, $key);
                 continue;
             }
 
-            $link['active'] = $currentUrl == $link['url'] || (Str::contains($link['url'], $routePrefix) && !in_array($routePrefix, ['//', '/' . BaseHelper::getAdminPrefix()]));
+            $link['active'] = $currentUrl == $link['url'] ||
+                            (Str::contains($link['url'], $routePrefix) &&
+                                !in_array($routePrefix, ['//', '/' . BaseHelper::getAdminPrefix()]) &&
+                                !Str::startsWith($link['url'], $protocol));
             if (!count($link['children'])) {
                 continue;
             }

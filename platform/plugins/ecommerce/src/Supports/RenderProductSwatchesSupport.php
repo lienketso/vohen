@@ -5,6 +5,8 @@ namespace Botble\Ecommerce\Supports;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Repositories\Eloquent\ProductRepository;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
+use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
+use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Exception;
 use Throwable;
 
@@ -53,14 +55,21 @@ class RenderProductSwatchesSupport
             'view'     => 'plugins/ecommerce::themes.attributes.swatches-renderer',
         ], $params);
 
+        $product = $this->product;
+
         $attributeSets = $this->productRepository->getRelatedProductAttributeSets($this->product);
 
         $attributes = $this->productRepository->getRelatedProductAttributes($this->product)->sortBy('order');
 
-        $product = $this->product;
+        $productVariations = app(ProductVariationInterface::class)->allBy([
+            'configurable_product_id' => $product->id,
+        ]);
+
+        $productVariationsInfo = app(ProductVariationItemInterface::class)
+                    ->getVariationsInfo($productVariations->pluck('id')->toArray());
 
         $selected = $params['selected'];
 
-        return view($params['view'], compact('attributeSets', 'attributes', 'product', 'selected'))->render();
+        return view($params['view'], compact('attributeSets', 'attributes', 'product', 'selected', 'productVariationsInfo', 'productVariations'))->render();
     }
 }

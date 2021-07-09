@@ -31,7 +31,6 @@ class UpdateDefaultProductService
         $parent = $product->original_product;
 
         $data = [
-            'images',
             'sku',
             'quantity',
             'allow_checkout_when_out_of_stock',
@@ -56,8 +55,6 @@ class UpdateDefaultProductService
         foreach ($data as $item) {
             $parent->{$item} = $product->{$item};
         }
-
-        $parent->images = $product->images;
 
         if ($parent->sale_price > $parent->price) {
             $parent->sale_price = null;

@@ -50,7 +50,7 @@
                                 </span>
                             </p>
 
-                            @if (auth('customer')->check() && auth('customer')->user()->getAuthIdentifier() == $review->customer_id)
+                            @if (auth('customer')->check() && auth('customer')->id() == $review->customer_id)
                                 <span class="delete-review-btn"><a href="{{ route('public.reviews.destroy', $review->id) }}" title="{{ trans('plugins/ecommerce::review.delete_review') }}"><i class="glyphicon glyphicon-remove"></i></a></span>
                             @endif
                         </li>

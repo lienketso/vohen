@@ -36,7 +36,8 @@ class ShippingRuleRequest extends Request
     {
         $attributes = [];
         foreach ($this->input('shipping_rule_items', []) as $key => $item) {
-            $attributes['shipping_rule_items.' . $key . '.adjustment_price'] = trans('plugins/ecommerce::shipping.adjustment_price_of', $key);
+            $attributes['shipping_rule_items.' . $key . '.adjustment_price'] = trans('plugins/ecommerce::shipping.adjustment_price_of',
+                $key);
         }
 
         return $attributes;

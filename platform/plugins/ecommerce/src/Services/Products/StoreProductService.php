@@ -40,7 +40,6 @@ class StoreProductService
 
         if ($hasVariation && !$forceUpdateAll) {
             $data = $request->except([
-                'images',
                 'sku',
                 'quantity',
                 'allow_checkout_when_out_of_stock',
@@ -65,9 +64,9 @@ class StoreProductService
 
         $product->fill($data);
 
-        if (!$hasVariation || $forceUpdateAll) {
-            $product->images = json_encode(array_values(array_filter($request->input('images', []))));
+        $product->images = json_encode(array_values(array_filter($request->input('images', []))));
 
+        if (!$hasVariation || $forceUpdateAll) {
             if ($product->sale_price > $product->price) {
                 $product->sale_price = null;
             }
@@ -90,14 +89,11 @@ class StoreProductService
         }
 
         if ($product) {
-            if ($request->has('categories')) {
-                $product->categories()->sync($request->input('categories', []));
-            }
+            $product->categories()->sync($request->input('categories', []));
 
-            if ($request->has('product_collections')) {
-                $product->productCollections()->detach();
-                $product->productCollections()->attach($request->input('product_collections', []));
-            }
+            $product->productCollections()->sync($request->input('product_collections', []));
+
+            $product->productLabels()->sync($request->input('product_labels', []));
 
             if ($request->has('related_products')) {
                 $product->products()->detach();

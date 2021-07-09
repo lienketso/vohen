@@ -9,7 +9,7 @@ return [
     'used'                                             => 'Used',
     'start_date'                                       => 'Start date',
     'end_date'                                         => 'End date',
-    'intro'  => [
+    'intro'                                            => [
         'title'       => 'Chương trình khuyến mãi',
         'description' => 'Tạo ra các mã coupon, cài đặt một sản phẩm, hoặc một nhóm sản phẩm khuyến mãi dành cho các khách hàng thân thiết của bạn.',
         'button_text' => 'Tạo khuyến mãi',

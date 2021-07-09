@@ -3,11 +3,11 @@
 namespace Botble\JsValidation\Providers;
 
 use Botble\Base\Traits\LoadAndPublishDataTrait;
+use Botble\JsValidation\Javascript\ValidatorHandler;
 use Botble\JsValidation\JsValidatorFactory;
 use Botble\JsValidation\RemoteValidationMiddleware;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
-use Botble\JsValidation\Javascript\ValidatorHandler;
 
 class JsValidationServiceProvider extends ServiceProvider
 {
@@ -42,6 +42,7 @@ class JsValidationServiceProvider extends ServiceProvider
         $callback = function () {
             return true;
         };
+
         $this->app['validator']->extend(ValidatorHandler::JS_VALIDATION_DISABLE, $callback);
     }
 

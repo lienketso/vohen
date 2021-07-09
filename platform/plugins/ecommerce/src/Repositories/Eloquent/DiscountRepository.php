@@ -83,7 +83,7 @@ class DiscountRepository extends RepositoriesAbstract implements DiscountInterfa
                             ->whereIn('ec_discount_product_collections.product_collection_id', $productCollections);
                     })
                     ->orWhere(function ($sub) {
-                        $customerId = auth('customer')->check() ? auth('customer')->user()->id : -1;
+                        $customerId = auth('customer')->check() ? auth('customer')->id() : -1;
 
                         /**
                          * @var Builder $sub

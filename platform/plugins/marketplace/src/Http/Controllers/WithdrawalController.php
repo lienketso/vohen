@@ -38,7 +38,7 @@ class WithdrawalController extends BaseController
      */
     public function index(WithdrawalTable $table)
     {
-        page_title()->setTitle(trans('Withdrawal'));
+        page_title()->setTitle(trans('plugins/marketplace::withdrawal.name'));
 
         return $table->renderTable();
     }

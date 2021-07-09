@@ -97,6 +97,16 @@ class BaseHelper
     }
 
     /**
+     * @return string
+     */
+    public function adminLanguageDirection()
+    {
+        $direction = session('admin_locale_direction', setting('admin_locale_direction', 'ltr'));
+
+        return apply_filters(BASE_FILTER_SITE_LANGUAGE_DIRECTION, $direction);
+    }
+
+    /**
      * @return mixed
      */
     public function getHomepageId()

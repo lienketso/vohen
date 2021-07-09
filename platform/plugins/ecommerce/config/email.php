@@ -11,13 +11,13 @@ return [
             'can_off'     => true,
             'enabled'     => false,
         ],
-        'confirm-email'     => [
+        'confirm-email'           => [
             'title'       => 'Confirm email',
             'description' => 'Send email to user when they register an account to verify their email',
             'subject'     => 'Confirm Email Notification',
             'can_off'     => false,
         ],
-        'password-reminder' => [
+        'password-reminder'       => [
             'title'       => 'Reset password',
             'description' => 'Send email to user when requesting reset password',
             'subject'     => 'Reset Password',
@@ -26,7 +26,7 @@ return [
         'customer_new_order'      => [
             'title'       => 'plugins/ecommerce::email.customer_new_order_title',
             'description' => 'plugins/ecommerce::email.customer_new_order_description',
-            'subject'     => 'New order {{ order_id }}',
+            'subject'     => 'New order(s) at {{ site_title }}',
             'can_off'     => true,
             'enabled'     => false,
         ],
@@ -45,7 +45,7 @@ return [
         'admin_new_order'         => [
             'title'       => 'plugins/ecommerce::email.admin_new_order_title',
             'description' => 'plugins/ecommerce::email.admin_new_order_description',
-            'subject'     => 'New order {{ order_id }}',
+            'subject'     => 'New order(s) at {{ site_title }}',
             'can_off'     => true,
             'enabled'     => false,
         ],

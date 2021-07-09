@@ -10,40 +10,6 @@ use Botble\Ecommerce\Supports\RenderProductSwatchesSupport;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
-if (!function_exists('combinations')) {
-    /**
-     * @param array $array
-     * @param int $index
-     * @return array
-     */
-    function combinations($array, $index = 0)
-    {
-        if (!isset($array[$index])) {
-            return [];
-        }
-
-        if ($index == count($array) - 1) {
-            return $array[$index];
-        }
-
-        // Get combinations from subsequent arrays
-        $tmp = combinations($array, $index + 1);
-
-        $result = [];
-
-        // Concat each array from tmp with each element from $array[$index]
-        foreach ($array[$index] as $value) {
-            foreach ($tmp as $item) {
-                $result[] = is_array($item) ?
-                    array_merge([$value], $item) :
-                    [$value, $item];
-            }
-        }
-
-        return $result;
-    }
-}
-
 if (!function_exists('render_product_swatches')) {
     /**
      * @param Product $product

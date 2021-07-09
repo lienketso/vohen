@@ -49,7 +49,7 @@ class Core
      */
     public function __construct()
     {
-        $this->apiUrl = 'https://license.botble.com/';
+        $this->apiUrl = 'https://license.botble.com';
         $this->apiKey = 'CAF4B17F6D3F656125F9';
         $this->verificationPeriod = 1;
         $this->licenseFile = storage_path('.license');
@@ -62,6 +62,8 @@ class Core
             $this->apiUrl = Arr::get($core, 'apiUrl', $this->apiUrl);
             $this->apiKey = Arr::get($core, 'apiKey', $this->apiKey);
         }
+
+        $this->apiUrl = rtrim($this->apiUrl, '/');
     }
 
     /**
@@ -87,7 +89,7 @@ class Core
             'verify_type'  => $this->verifyType,
         ];
 
-        $response = $this->callApi($this->apiUrl . 'api/activate_license', $data);
+        $response = $this->callApi($this->apiUrl . '/api/activate_license', $data);
 
         if (!empty($createLicense)) {
             if ($response['status']) {
@@ -208,7 +210,7 @@ class Core
             }
 
             if (strtotime($today) >= strtotime(session($this->sessionKey))) {
-                $response = $this->callApi($this->apiUrl . 'api/verify_license', $data);
+                $response = $this->callApi($this->apiUrl . '/api/verify_license', $data);
                 if ($response['status'] == true) {
                     $tomorrow = date('d-m-Y', strtotime($today . ' + ' . $typeText));
                     session([$this->sessionKey => $tomorrow]);
@@ -218,7 +220,7 @@ class Core
             return $response;
         }
 
-        return $this->callApi($this->apiUrl . 'api/verify_license', $data);
+        return $this->callApi($this->apiUrl . '/api/verify_license', $data);
     }
 
     /**
@@ -254,7 +256,7 @@ class Core
             ];
         }
 
-        $response = $this->callApi($this->apiUrl . 'api/deactivate_license', $data);
+        $response = $this->callApi($this->apiUrl . '/api/deactivate_license', $data);
 
         if ($response['status']) {
             session()->forget($this->sessionKey);

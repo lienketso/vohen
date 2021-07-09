@@ -21,5 +21,9 @@ return [
 
     'order_recover_title'       => 'Incomplete order',
     'order_recover_description' => 'Send to custom to remind them about incomplete orders',
+    'view_order'                => 'View order',
+    'link_go_to_our_shop'       => 'or <a href=":link">Go to our shop</a>',
+    'order_number'              => 'Order number: <strong>:order_id</strong>',
+    'order_information'         => 'Order information:',
 ];
 

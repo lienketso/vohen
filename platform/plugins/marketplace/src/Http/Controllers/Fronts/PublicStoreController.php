@@ -3,6 +3,8 @@
 namespace Botble\Marketplace\Http\Controllers\Fronts;
 
 use Botble\Base\Enums\BaseStatusEnum;
+use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Marketplace\Http\Requests\CheckStoreUrlRequest;
 use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\SeoHelper\SeoOpenGraph;
@@ -45,7 +47,7 @@ class PublicStoreController
      */
     public function getStores(Request $request)
     {
-        Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Stores'), route('public.stores'));
+        Theme::breadcrumb()->add(__('Home'), route('public.index'))->add(__('Stores'), route('public.stores'));
         SeoHelper::setTitle(__('Stores'))->setDescription(__('Stores'));
 
         $stores = $this->storeRepository->advancedGet([
@@ -55,7 +57,7 @@ class PublicStoreController
                 'per_page'      => 12,
                 'current_paged' => (int)$request->input('page'),
             ],
-            'with' => ['slugable'],
+            'with'      => ['slugable'],
         ]);
 
         return Theme::scope('marketplace.stores', compact('stores'), 'plugins/marketplace::themes.stores')->render();
@@ -107,13 +109,36 @@ class PublicStoreController
 
         SeoHelper::setSeoOpenGraph($meta);
 
-        Theme::breadcrumb()->add(__('Home'), url('/'))
+        Theme::breadcrumb()->add(__('Home'), route('public.index'))
             ->add(__('Stores'), route('public.stores'));
 
         Theme::breadcrumb()->add($store->name, $store->url);
 
         $products = $store->products()->where('status', BaseStatusEnum::PUBLISHED)->paginate(12);
 
-        return Theme::scope('marketplace.store', compact('store', 'products'), 'plugins/marketplace::themes.store')->render();
+        return Theme::scope('marketplace.store', compact('store', 'products'), 'plugins/marketplace::themes.store')
+            ->render();
+    }
+
+    /**
+     * @param CheckStoreUrlRequest $request
+     * @param BaseHttpResponse $response
+     * @return BaseHttpResponse
+     */
+    public function checkStoreUrl(CheckStoreUrlRequest $request, BaseHttpResponse $response)
+    {
+        if (!$request->ajax()) {
+            abort(404);
+        }
+
+        $existing = SlugHelper::getSlug($request->input('url'), SlugHelper::getPrefix(Store::class), Store::class);
+
+        if ($existing && $existing->reference_id != $request->input('reference_id')) {
+            return $response
+                ->setError()
+                ->setMessage(__('Not Available'));
+        }
+
+        return $response->setMessage(__('Available'));
     }
 }

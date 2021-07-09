@@ -72,7 +72,7 @@ if (!function_exists('get_sale_percentage')) {
         }
 
         $down = $price - $salePrice;
-        $result = ceil(-($down / $price) * 100);
+        $result = $price > 0 ? ceil(-($down / $price) * 100) : 0;
 
         if ($abs === true) {
             return abs($result) . $symbol;

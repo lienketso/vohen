@@ -30,7 +30,7 @@ class MetaBox
     /**
      * @param string $id
      * @param string $title
-     * @param string|array $callback
+     * @param string|array|\Closure $callback
      * @param null $reference
      * @param string $context
      * @param string $priority
@@ -200,7 +200,7 @@ class MetaBox
             $fieldMeta->meta_value = [$value];
             $this->metaBoxRepository->createOrUpdate($fieldMeta);
             return true;
-        } catch (Exception $ex) {
+        } catch (Exception $exception) {
             return false;
         }
     }
@@ -215,6 +215,7 @@ class MetaBox
     public function getMetaData($object, string $key, $single = false, $select = ['meta_value'])
     {
         $field = $this->getMeta($object, $key, $select);
+
         if (!$field) {
             return $single ? '' : [];
         }
@@ -222,6 +223,7 @@ class MetaBox
         if ($single) {
             return $field->meta_value[0];
         }
+
         return $field->meta_value;
     }
 

@@ -4,18 +4,23 @@ namespace Botble\Ecommerce\Http\Controllers\Customers;
 
 use App\Http\Controllers\Controller;
 use Botble\ACL\Traits\RegistersUsers;
-use Botble\Base\Events\CreatedContentEvent;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Repositories\Interfaces\CustomerInterface;
+use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
+use Botble\Slug\Models\Slug;
 use EmailHandler;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
 use Response;
 use SeoHelper;
+use SlugHelper;
 use Theme;
 use URL;
 
@@ -46,17 +51,93 @@ class RegisterController extends Controller
      */
     protected $customerRepository;
 
-    protected $storeRepository;
     /**
      * Create a new controller instance.
      *
      * @param CustomerInterface $customerRepository
      */
-    public function __construct(CustomerInterface $customerRepository, StoreInterface $storeRepository)
+    public function __construct(CustomerInterface $customerRepository)
     {
         $this->middleware('customer.guest');
         $this->customerRepository = $customerRepository;
-        $this->storeRepository = $storeRepository;
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return Response
+     */
+    public function showRegistrationForm()
+    {
+        SeoHelper::setTitle(__('Register'));
+
+        Theme::breadcrumb()->add(__('Home'), route('public.index'))->add(__('Register'), route('customer.register'));
+
+        if (!session()->has('url.intended')) {
+            session(['url.intended' => url()->previous()]);
+        }
+
+        return Theme::scope('ecommerce.customers.register', [], 'plugins/ecommerce::themes.customers.register')
+            ->render();
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param Request $request
+     * @param BaseHttpResponse $response
+     * @return BaseHttpResponse
+     */
+    public function register(Request $request, BaseHttpResponse $response)
+    {
+        $this->validator($request->input())->validate();
+
+        if (is_plugin_active('marketplace') && $request->input('is_vendor') == 1) {
+            $existing = SlugHelper::getSlug($request->input('shop_url'), SlugHelper::getPrefix(Store::class),
+                Store::class);
+            if ($existing) {
+                return $response->setError()->setMessage(__('Shop URL is existing. Please choose another one!'));
+            }
+        }
+
+        event(new Registered($customer = $this->create($request->input())));
+
+        if (is_plugin_active('marketplace') && $request->input('is_vendor') == 1) {
+            $store = app(StoreInterface::class)->createOrUpdate([
+                'name'        => $request->input('shop_name'),
+                'phone'       => $request->input('shop_phone'),
+                'customer_id' => $customer->id,
+            ]);
+
+            Slug::create([
+                'reference_type' => Store::class,
+                'reference_id'   => $store->id,
+                'key'            => Str::slug($request->input('shop_url')),
+                'prefix'         => SlugHelper::getPrefix(Store::class),
+            ]);
+
+            $customer->is_vendor = true;
+            $this->customerRepository->createOrUpdate($customer);
+        }
+
+        EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
+            ->setVariableValues([
+                'customer_name' => $customer->name,
+            ])
+            ->sendUsingTemplate('welcome', $customer->email);
+
+        if (get_ecommerce_setting('verify_customer_email', 0)) {
+            $this->sendConfirmationToUser($customer);
+            return $this->registered($request, $customer)
+                ?: $response->setNextUrl(route('customer.login'))
+                    ->setMessage(__('Please confirm your email address.'));
+        }
+
+        $customer->confirmed_at = now();
+        $this->customerRepository->createOrUpdate($customer);
+        $this->guard()->login($customer);
+
+        return $response->setNextUrl($this->redirectPath())->setMessage(__('Registered successfully!'));
     }
 
     /**
@@ -77,6 +158,16 @@ class RegisterController extends Controller
             $rules += ['g-recaptcha-response' => 'required|captcha'];
         }
 
+        if (is_plugin_active('marketplace') && request()->input('is_vendor') == 1) {
+            $rules['shop_name'] = 'required|min:2';
+            $rules['shop_phone'] = 'required';
+            $rules['shop_url'] = 'required';
+        }
+
+        if (request()->has('agree_terms_and_policy')) {
+            $rules['agree_terms_and_policy'] = 'accepted:1';
+        }
+
         return Validator::make($data, $rules);
     }
 
@@ -89,7 +180,6 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return $this->customerRepository->create([
-            'is_vendor' => $data['is_vendor'],
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => bcrypt($data['password']),
@@ -97,61 +187,18 @@ class RegisterController extends Controller
     }
 
     /**
-     * Show the application registration form.
+     * Send the confirmation code to a user.
      *
-     * @return Response
+     * @param Customer $customer
      */
-    public function showRegistrationForm()
+    protected function sendConfirmationToUser($customer)
     {
-        SeoHelper::setTitle(__('Register'));
-
-        Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Register'), route('customer.register'));
-
-        return Theme::scope('ecommerce.customers.register', [], 'plugins/ecommerce::themes.customers.register')
-            ->render();
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param BaseHttpResponse $response
-     * @return BaseHttpResponse
-     */
-    public function register(Request $request, BaseHttpResponse $response)
-    {
-        $this->validator($request->input())->validate();
-        event(new Registered($customer = $this->create($request->input())));
-
-        EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
-            ->setVariableValues([
-                'customer_name'  => $customer->name,
-            ])
-            ->sendUsingTemplate('welcome', $customer->email);
-
-        if (get_ecommerce_setting('verify_customer_email', 0)) {
-            $this->sendConfirmationToUser($customer);
-            return $this->registered($request, $customer)
-                ?: $response->setNextUrl(route('customer.login'))
-                    ->setMessage(__('Please confirm your email address.'));
+        // Notify the user
+        $notificationConfig = config('plugins.ecommerce.general.customer.notification');
+        if ($notificationConfig) {
+            $notification = app($notificationConfig);
+            $customer->notify($notification);
         }
-
-        $customer->confirmed_at = now();
-        $create = $this->customerRepository->createOrUpdate($customer);
-        $this->guard()->login($customer);
-
-        //create store
-        if($create->is_vendor==1) {
-            $input = [
-                'customer_id' => $create->id,
-                'name' => $create->name,
-                'email' => $create->email
-            ];
-            $store = $this->storeRepository->createOrUpdate($input);
-            event(new CreatedContentEvent(STORE_MODULE_SCREEN_NAME, $request, $store));
-        }
-
-        return $response->setNextUrl($this->redirectPath())->setMessage(__('Registered successfully!'));
     }
 
     /**
@@ -167,23 +214,19 @@ class RegisterController extends Controller
     /**
      * Confirm a user with a given confirmation code.
      *
-     * @param string $email
+     * @param int $id
      * @param Request $request
      * @param BaseHttpResponse $response
      * @param CustomerInterface $customerRepository
      * @return BaseHttpResponse
      */
-    public function confirm($email, Request $request, BaseHttpResponse $response, CustomerInterface $customerRepository)
+    public function confirm($id, Request $request, BaseHttpResponse $response, CustomerInterface $customerRepository)
     {
         if (!URL::hasValidSignature($request)) {
             abort(404);
         }
 
-        $customer = $customerRepository->getFirstBy(['email' => $email]);
-
-        if (!$customer) {
-            abort(404);
-        }
+        $customer = $customerRepository->findOrFail($id);
 
         $customer->confirmed_at = now();
         $this->customerRepository->createOrUpdate($customer);
@@ -198,7 +241,7 @@ class RegisterController extends Controller
     /**
      * Resend a confirmation code to a user.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param CustomerInterface $customerRepository
      * @param BaseHttpResponse $response
      * @return BaseHttpResponse
@@ -223,22 +266,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * Send the confirmation code to a user.
-     *
-     * @param Customer $customer
-     */
-    protected function sendConfirmationToUser($customer)
-    {
-        // Notify the user
-        $notificationConfig = config('plugins.ecommerce.general.customer.notification');
-        if ($notificationConfig) {
-            $notification = app($notificationConfig);
-            $customer->notify($notification);
-        }
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function getVerify()
     {

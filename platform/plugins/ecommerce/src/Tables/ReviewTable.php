@@ -4,7 +4,6 @@ namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Ecommerce\Models\Review;
 use Botble\Ecommerce\Repositories\Interfaces\ReviewInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -33,9 +32,9 @@ class ReviewTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, ReviewInterface $reviewRepository)
     {
-        $this->repository = $reviewRepository;
-        $this->setOption('id', 'table-reviews');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $reviewRepository;
 
         if (!Auth::user()->hasAnyPermission(['review.edit', 'review.destroy'])) {
             $this->hasOperations = false;
@@ -70,14 +69,12 @@ class ReviewTable extends TableAbstract
             })
             ->editColumn('created_at', function ($item) {
                 return BaseHelper::formatDate($item->created_at);
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return view('plugins/ecommerce::reviews.partials.actions', compact('item'))->render();
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -152,14 +149,6 @@ class ReviewTable extends TableAbstract
     /**
      * {@inheritDoc}
      */
-    public function buttons()
-    {
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, [], Review::class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function bulkActions(): array
     {
         return $this->addDeleteAction(route('reviews.deletes'), 'review.destroy', parent::bulkActions());
@@ -195,6 +184,7 @@ class ReviewTable extends TableAbstract
         ) {
             return view('plugins/ecommerce::reviews.intro');
         }
+
         return parent::renderTable($data, $mergeData);
     }
 }

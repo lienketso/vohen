@@ -157,6 +157,7 @@ class ChunkStorage
             if ($shouldReject) {
                 return true;
             }
+
             if (is_callable($rejectClosure)) {
                 return $rejectClosure($file);
             }

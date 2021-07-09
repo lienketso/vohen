@@ -3,9 +3,6 @@
 @section('body-class') login @stop
 @section('body-style') background-image: url({{ get_login_background() }}); @stop
 
-@push('header')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
-@endpush
 @section ('page')
     <div class="container-fluid">
         <div class="row">
@@ -29,7 +26,7 @@
 
                     @yield('content')
 
-                    <div style="clear:both"></div>
+                    <div class="clearfix"></div>
 
                 </div> <!-- .login-container -->
 

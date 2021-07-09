@@ -22,7 +22,8 @@ return [
             'start' => 'To date',
         ],
         'image'                              => 'Images',
-        'label'                              => 'Product collections',
+        'collections'                        => 'Product collections',
+        'labels'                             => 'Labels',
         'price_sale'                         => 'Price sale',
         'product_type'                       => [
             'title' => 'Product type',
@@ -121,6 +122,7 @@ return [
     'generate_all_variations_confirmation'           => 'Are you sure you want to generate all variations for this product?',
     'delete_variation'                               => 'Delete variation?',
     'delete_variation_confirmation'                  => 'Are you sure you want to delete this variation? This action cannot be undo.',
+    'delete_variations_confirmation'                 => 'Are you sure you want to delete those variations? This action cannot be undo.',
     'product_create_validate_name_required'          => 'Please enter product\'s name',
     'product_create_validate_sale_price_max'         => 'The discount must be less than the original price',
     'product_create_validate_sale_price_required_if' => 'Must enter a discount when you want to schedule a promotion',
@@ -132,4 +134,8 @@ return [
         'out_of_stock' => 'Out of stock',
         'on_backorder' => 'On backorder',
     ],
+    'stock_status'                                   => 'Stock status',
+    'processing'                                     => 'Processing...',
+    'delete_selected_variations'                     => 'Delete selected variations',
+    'delete_variations'                              => 'Delete variations',
 ];

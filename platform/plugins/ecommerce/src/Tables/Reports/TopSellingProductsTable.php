@@ -42,7 +42,7 @@ class TopSellingProductsTable extends TableAbstract
      */
     public function ajax()
     {
-        return $this->table
+        $data = $this->table
             ->eloquent($this->query())
             ->editColumn('id', function ($item) {
                 if (!$item->is_variation) {
@@ -56,23 +56,13 @@ class TopSellingProductsTable extends TableAbstract
                     return Html::link($item->url, $item->name, ['target' => '_blank']);
                 }
 
-                $attributeText = '';
-                $attributes = get_product_attributes($item->id);
-                if (!empty($attributes)) {
-                    $attributeText .= ' (';
-                    foreach ($attributes as $index => $attribute) {
-                        $attributeText .= $attribute->attribute_set_title . ': ' . $attribute->title;
-                        if ($index < count($attributes) - 1) {
-                            $attributeText .= ', ';
-                        }
-                    }
-                    $attributeText .= ')';
-                }
+                $attributeText = $item->variation_attributes;
 
-                return Html::link($item->original_product->url, $item->original_product->name, ['target' => '_blank'])->toHtml() . Html::tag('small', $attributeText);
-            })
-            ->escapeColumns([])
-            ->make(true);
+                return Html::link($item->original_product->url, $item->original_product->name, ['target' => '_blank'])
+                        ->toHtml() . ' ' . Html::tag('small', $attributeText);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -86,10 +76,8 @@ class TopSellingProductsTable extends TableAbstract
             ->join('ec_orders', 'ec_orders.id', '=', 'ec_order_product.order_id')
             ->join('payments', 'payments.order_id', '=', 'ec_orders.id')
             ->where('payments.status', PaymentStatusEnum::COMPLETED)
-
             ->whereDate('ec_orders.created_at', '>=', now()->startOfMonth()->toDateString())
             ->whereDate('ec_orders.created_at', '<=', now()->endOfMonth()->toDateString())
-
             ->select([
                 'ec_products.id',
                 'ec_products.is_variation',
@@ -120,7 +108,7 @@ class TopSellingProductsTable extends TableAbstract
                 'orderable' => false,
                 'class'     => 'text-left',
             ],
-            'qty'          => [
+            'qty'  => [
                 'name'      => 'ec_order_product.qty',
                 'title'     => trans('plugins/ecommerce::reports.quantity'),
                 'orderable' => false,
@@ -138,6 +126,7 @@ class TopSellingProductsTable extends TableAbstract
         if ($this->query()->count() == 0) {
             return view('core/dashboard::partials.no-data')->render();
         }
+
         return parent::renderTable($data, $mergeData);
     }
 }

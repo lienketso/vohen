@@ -104,9 +104,11 @@ class ReportController extends BaseController
         $chartTime = null;
         $defaultRange = trans('plugins/ecommerce::reports.today');
 
+        $now = now();
+
         switch ($request->input('filter', 'week')) {
             case 'date':
-                $startDate = now()->startOfDay()->toDateString();
+                $startDate = $now->startOfDay()->toDateString();
                 $endDate = now()->toDateString();
                 $defaultRange = trans('plugins/ecommerce::reports.today');
                 break;

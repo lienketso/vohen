@@ -12,7 +12,7 @@ use Botble\Base\Listeners\CreatedContentListener;
 use Botble\Base\Listeners\DeletedContentListener;
 use Botble\Base\Listeners\SendMailListener;
 use Botble\Base\Listeners\UpdatedContentListener;
-use Event;
+use Illuminate\Support\Facades\Event;
 use File;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

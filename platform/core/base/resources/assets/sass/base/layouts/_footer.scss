@@ -129,11 +129,10 @@ Page footer
 /* Scroll Top Top */
 
 .scroll-to-top {
-    display: inline-block;
     padding: 1px;
     text-align: center;
     position: fixed;
-    bottom: 10px;
+    bottom: 40px;
     z-index: $zindex-go-to-top;
     display: none;
     right: 10px;

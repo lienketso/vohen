@@ -9,13 +9,11 @@ use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Http\Requests\CreateProductWhenCreatingOrderRequest;
-use Botble\Ecommerce\Http\Requests\ProductRequest;
 use Botble\Ecommerce\Http\Requests\ProductUpdateOrderByRequest;
 use Botble\Ecommerce\Http\Requests\ProductVersionRequest;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Repositories\Eloquent\ProductVariationRepository;
 use Botble\Ecommerce\Repositories\Interfaces\BrandInterface;
-use Botble\Ecommerce\Repositories\Interfaces\GroupedProductInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductAttributeInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductAttributeSetInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductCategoryInterface;
@@ -25,12 +23,8 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductVariationInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductVariationItemInterface;
 use Botble\Ecommerce\Services\Products\CreateProductVariationsService;
 use Botble\Ecommerce\Services\Products\StoreAttributesOfProductService;
-use Botble\Ecommerce\Services\Products\StoreProductService;
-use Botble\Ecommerce\Services\StoreProductTagService;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -139,7 +133,6 @@ trait ProductActionsTrait
                 $productRelatedToVariation->price = Arr::get($version, 'price', $product->price);
                 $productRelatedToVariation->sale_price = Arr::get($version, 'sale_price', $product->sale_price);
                 $productRelatedToVariation->description = Arr::get($version, 'description');
-                $productRelatedToVariation->images = json_encode(array_values(array_filter(Arr::get($version, 'images', []))));
 
                 $productRelatedToVariation->length = Arr::get($version, 'length', $product->length);
                 $productRelatedToVariation->wide = Arr::get($version, 'wide', $product->wide);
@@ -162,6 +155,11 @@ trait ProductActionsTrait
                 } else {
                     $productRelatedToVariation->start_date = Arr::get($version, 'start_date', $product->start_date);
                     $productRelatedToVariation->end_date = Arr::get($version, 'end_date', $product->end_date);
+                }
+
+                if ($isNew) {
+                    $productRelatedToVariation->images = json_encode(array_values(array_filter(Arr::get($version,
+                        'images') ? Arr::get($version, 'images') : [])));
                 }
 
                 $productRelatedToVariation = $this->productRepository->createOrUpdate($productRelatedToVariation);
@@ -287,24 +285,72 @@ trait ProductActionsTrait
      * @return BaseHttpResponse
      * @throws Exception
      */
-    public function postDeleteVersion(
+    public function deleteVersion(
         ProductVariationInterface $productVariation,
         ProductVariationItemInterface $productVariationItem,
         $variationId,
         BaseHttpResponse $response
     ) {
+        $result = $this->deleteVersionItem($productVariation, $productVariationItem, $variationId);
+
+        if ($result) {
+            return $response->setMessage(trans('core/base::notices.delete_success_message'));
+        }
+
+        return $response
+            ->setError()
+            ->setMessage(trans('core/base::notices.delete_error_message'));
+    }
+
+    /**
+     * @param Request $request
+     * @param ProductVariationInterface $productVariation
+     * @param ProductVariationItemInterface $productVariationItem
+     * @param BaseHttpResponse $response
+     * @return BaseHttpResponse
+     * @throws Exception
+     */
+    public function deleteVersions(
+        Request $request,
+        ProductVariationInterface $productVariation,
+        ProductVariationItemInterface $productVariationItem,
+        BaseHttpResponse $response
+    ) {
+        $ids = (array)$request->input('ids');
+
+        if (empty($ids)) {
+            return $response
+                ->setError()
+                ->setMessage(trans('core/base::notices.no_select'));
+        }
+
+        foreach ($ids as $id) {
+            $this->deleteVersionItem($productVariation, $productVariationItem, $id);
+        }
+
+        return $response->setMessage(trans('core/base::notices.delete_success_message'));
+    }
+
+    /**
+     * @param ProductVariationInterface $productVariation
+     * @param ProductVariationItemInterface $productVariationItem
+     * @param int $variationId
+     * @return bool
+     * @throws Exception
+     */
+    protected function deleteVersionItem(
+        ProductVariationInterface $productVariation,
+        ProductVariationItemInterface $productVariationItem,
+        $variationId
+    ) {
         $variation = $productVariation->findOrFail($variationId);
-
         $productVariationItem->deleteBy(['variation_id' => $variationId]);
-
         $productRelatedToVariation = $this->productRepository->findById($variation->product_id);
         if ($productRelatedToVariation) {
             event(new DeletedContentEvent(PRODUCT_MODULE_SCREEN_NAME, request(), $productRelatedToVariation));
         }
         $this->productRepository->deleteBy(['id' => $variation->product_id]);
-
         $result = $productVariation->delete($variation);
-
         if ($variation->is_default) {
             $latestVariation = $productVariation->getFirstBy(['configurable_product_id' => $variation->configurable_product_id]);
             $originProduct = $this->productRepository->findById($variation->configurable_product_id);
@@ -318,12 +364,10 @@ trait ProductActionsTrait
                     $originProduct->wide = $latestVariation->product->wide;
                     $originProduct->height = $latestVariation->product->height;
                     $originProduct->weight = $latestVariation->product->weight;
-
                     $originProduct->with_storehouse_management = $latestVariation->product->with_storehouse_management;
                     $originProduct->stock_status = $latestVariation->product->stock_status;
                     $originProduct->quantity = $latestVariation->product->quantity;
                     $originProduct->allow_checkout_when_out_of_stock = $latestVariation->product->allow_checkout_when_out_of_stock;
-
                     $originProduct->sale_price = $latestVariation->product->sale_price;
                     $originProduct->sale_type = $latestVariation->product->sale_type;
                     $originProduct->start_date = $latestVariation->product->start_date;
@@ -336,13 +380,7 @@ trait ProductActionsTrait
             }
         }
 
-        if ($result) {
-            return $response->setMessage(trans('core/base::notices.delete_success_message'));
-        }
-
-        return $response
-            ->setError()
-            ->setMessage(trans('core/base::notices.delete_error_message'));
+        return $result;
     }
 
     /**
@@ -368,7 +406,8 @@ trait ProductActionsTrait
                     ->setMessage(trans('plugins/ecommerce::products.form.variation_existed'));
             }
 
-            $this->postSaveAllVersions([$result['variation']->id => $request->input()], $productVariation, $id, $response);
+            $this->postSaveAllVersions([$result['variation']->id => $request->input()], $productVariation, $id,
+                $response);
 
             return $response->setMessage(trans('plugins/ecommerce::products.form.added_variation_success'));
         }
@@ -380,29 +419,40 @@ trait ProductActionsTrait
 
     /**
      * @param int $id
+     * @param Request $request
      * @param ProductVariationInterface $productVariation
      * @param BaseHttpResponse $response
      * @param ProductAttributeSetInterface $productAttributeSetRepository
      * @param ProductAttributeInterface $productAttributeRepository
      * @param ProductVariationItemInterface $productVariationItemRepository
      * @return BaseHttpResponse
-     * @throws Throwable
      */
     public function getVersionForm(
         $id,
+        Request $request,
         ProductVariationInterface $productVariation,
         BaseHttpResponse $response,
         ProductAttributeSetInterface $productAttributeSetRepository,
         ProductAttributeInterface $productAttributeRepository,
         ProductVariationItemInterface $productVariationItemRepository
     ) {
-        $variation = $productVariation->findOrFail($id);
-        $product = $this->productRepository->findOrFail($variation->product_id);
+        $product = null;
+        $variation = null;
+        $productVariationsInfo = collect([]);
 
-        $productAttributeSets = $productAttributeSetRepository->getAllWithSelected($variation->configurable_product_id);
-        $productAttributes = $productAttributeRepository->getAllWithSelected($variation->configurable_product_id);
+        if ($id) {
+            $variation = $productVariation->findOrFail($id);
+            $product = $this->productRepository->findOrFail($variation->product_id);
+            $productVariationsInfo = $productVariationItemRepository->getVariationsInfo([$id]);
+        }
 
-        $productVariationsInfo = $productVariationItemRepository->getVariationsInfo([$id]);
+        $productId = $variation ? $variation->configurable_product_id : $request->input('product_id');
+
+        if ($productId) {
+            $productAttributeSets = $productAttributeSetRepository->getByProductId($productId);
+        } else {
+            $productAttributeSets = $productAttributeSetRepository->getAllWithSelected($productId);
+        }
 
         $originalProduct = $product;
 
@@ -410,7 +460,6 @@ trait ProductActionsTrait
             ->setData(
                 view('plugins/ecommerce::products.partials.product-variation-form', compact(
                     'productAttributeSets',
-                    'productAttributes',
                     'product',
                     'productVariationsInfo',
                     'originalProduct'
@@ -453,7 +502,8 @@ trait ProductActionsTrait
                 ]);
             }
 
-            $this->postSaveAllVersions([$variation->id => $request->input()], $productVariation, $variation->product_id, $response);
+            $this->postSaveAllVersions([$variation->id => $request->input()], $productVariation, $variation->product_id,
+                $response);
 
             $productVariation->deleteBy(['product_id' => null]);
 
@@ -530,14 +580,14 @@ trait ProductActionsTrait
      * @return BaseHttpResponse
      * @throws Throwable
      */
-    public function getListProductForSearch($id, Request $request, BaseHttpResponse $response)
+    public function getListProductForSearch(Request $request, BaseHttpResponse $response)
     {
         $availableProducts = $this->productRepository
             ->advancedGet([
                 'condition' => [
                     'status' => BaseStatusEnum::PUBLISHED,
                     ['is_variation', '<>', 1],
-                    ['id', '<>', $id],
+                    ['id', '<>', $request->input('product_id', 0)],
                     ['name', 'LIKE', '%' . $request->input('keyword') . '%'],
                 ],
                 'select'    => [
@@ -575,9 +625,10 @@ trait ProductActionsTrait
             $product = $this->productRepository->findById($id);
         }
 
-        $dataUrl = route('products.get-list-product-for-search', $product ? $product->id : 0);
+        $dataUrl = route('products.get-list-product-for-search', ['product_id' => $product ? $product->id : 0]);
 
-        return $response->setData(view('plugins/ecommerce::products.partials.extras', compact('product', 'dataUrl'))->render());
+        return $response->setData(view('plugins/ecommerce::products.partials.extras',
+            compact('product', 'dataUrl'))->render());
     }
 
     /**

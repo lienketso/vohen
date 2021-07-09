@@ -16,11 +16,11 @@ use Botble\ACL\Repositories\Interfaces\RoleInterface;
 use Botble\ACL\Repositories\Interfaces\UserInterface;
 use Botble\Base\Supports\Helper;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
-use Event;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AclServiceProvider extends ServiceProvider

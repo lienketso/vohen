@@ -12,8 +12,8 @@ use Form;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Throwable;
 
 class TableController extends Controller
@@ -35,20 +35,19 @@ class TableController extends Controller
 
     /**
      * @param BulkChangeRequest $request
-     * @param TableBuilder $tableBuilder
      * @return array|mixed
      * @throws Throwable
      */
-    public function getDataForBulkChanges(BulkChangeRequest $request, TableBuilder $tableBuilder)
+    public function getDataForBulkChanges(BulkChangeRequest $request)
     {
-        $object = $tableBuilder->create($request->input('class'));
+        $object = $this->tableBuilder->create($request->input('class'));
 
         $data = $object->getValueInput(null, null, 'text');
         if (!$request->input('key')) {
             return $data;
         }
 
-        $column = Arr::get($object->getBulkChanges(), $request->input('key'), null);
+        $column = Arr::get($object->getBulkChanges(), $request->input('key'));
         if (empty($column)) {
             return $data;
         }
@@ -125,21 +124,20 @@ class TableController extends Controller
 
     /**
      * @param FilterRequest $request
-     * @param TableBuilder $tableBuilder
      * @return array|mixed
      * @throws BindingResolutionException
      * @throws Throwable
      */
-    public function getFilterInput(FilterRequest $request, TableBuilder $tableBuilder)
+    public function getFilterInput(FilterRequest $request)
     {
-        $object = $tableBuilder->create($request->input('class'));
+        $object = $this->tableBuilder->create($request->input('class'));
 
         $data = $object->getValueInput(null, null, 'text');
         if (!$request->input('key')) {
             return $data;
         }
 
-        $column = Arr::get($object->getFilters(), $request->input('key'), null);
+        $column = Arr::get($object->getFilters(), $request->input('key'));
         if (empty($column)) {
             return $data;
         }

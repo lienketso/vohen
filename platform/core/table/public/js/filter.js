@@ -21,9 +21,9 @@ var TableFilter = /*#__PURE__*/function () {
         type: 'GET',
         url: $('.filter-data-url').val(),
         data: {
-          'class': $('.filter-data-class').val(),
-          'key': $element.val(),
-          'value': $element.closest('.filter-item').find('.filter-column-value').val()
+          "class": $('.filter-data-class').val(),
+          key: $element.val(),
+          value: $element.closest('.filter-item').find('.filter-column-value').val()
         },
         success: function success(res) {
           var data = $.map(res.data, function (value, key) {

@@ -51,8 +51,9 @@ class Login {
 
         $('.login-form input').keypress(e => {
             if (e.which === 13) {
-                if ($('.login-form').validate().form()) {
-                    $('.login-form').submit(); //form validation success, call ajax form submit
+                let $form = $('.login-form');
+                if ($form.validate().form()) {
+                    $form.submit(); //form validation success, call ajax form submit
                 }
                 return false;
             }
@@ -120,4 +121,59 @@ class Login {
 
 $(document).ready(() => {
     new Login().init();
+
+    var username = document.querySelector('[name="username"]');
+    var email = document.querySelector('[name="email"]');
+    var password = document.querySelector('[name="password"]');
+    var passwordConfirmation = document.querySelector('[name="password_confirmation"]');
+
+    if (username) {
+        username.focus();
+
+        document.getElementById('emailGroup').classList.add('focused');
+
+        // Focus events for email and password fields
+        username.addEventListener('focusin', function () {
+            document.getElementById('emailGroup').classList.add('focused');
+        });
+
+        username.addEventListener('focusout', function () {
+            document.getElementById('emailGroup').classList.remove('focused');
+        });
+    }
+
+    if (email) {
+        email.focus();
+
+        document.getElementById('emailGroup').classList.add('focused');
+
+        // Focus events for email and password fields
+        email.addEventListener('focusin', function () {
+            document.getElementById('emailGroup').classList.add('focused');
+        });
+
+        email.addEventListener('focusout', function () {
+            document.getElementById('emailGroup').classList.remove('focused');
+        });
+    }
+
+    if (password) {
+        password.addEventListener('focusin', function () {
+            document.getElementById('passwordGroup').classList.add('focused');
+        });
+
+        password.addEventListener('focusout', function () {
+            document.getElementById('passwordGroup').classList.remove('focused');
+        });
+    }
+
+    if (passwordConfirmation) {
+        passwordConfirmation.addEventListener('focusin', function () {
+            document.getElementById('passwordConfirmationGroup').classList.add('focused');
+        });
+
+        passwordConfirmation.addEventListener('focusout', function () {
+            document.getElementById('passwordConfirmationGroup').classList.remove('focused');
+        });
+    }
 });

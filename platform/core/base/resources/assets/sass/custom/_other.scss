@@ -574,7 +574,48 @@ h4.modal-title {
                 display: inline-block;
                 position: relative;
                 cursor: pointer;
+                vertical-align: middle;
             }
         }
+    }
+}
+
+.m-50 {
+    margin: 50px;
+}
+
+.page-container-gray {
+    background: #eef1f5;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.page-content-transparent {
+    background-color: transparent;
+}
+
+
+.repeater-group {
+    padding: 10px;
+
+    .repeater-item-group {
+        padding: 10px;
+        border: 1px solid #aaaaaa;
+        padding-right: 45px;
+    }
+
+    .remove-item-button {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 25px;
+        height: 25px;
+        display: inline-block;
+        border-radius: 50%;
+        line-height: 25px;
+        text-align: center;
+        border: 1px solid #ddd;
     }
 }

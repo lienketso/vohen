@@ -211,7 +211,7 @@ table.dataTable {
   display: inline-block;
   padding-left: 0;
   border-radius: 0 !important;
-  margin: 8px 10px 0 0;
+  margin: 11px 10px 0 0;
 }
 .page-content .dataTables_wrapper .dataTables_paginate .pagination li a {
   background-color: #f1f1f1;
@@ -238,7 +238,7 @@ table.dataTable {
 .page-content .dataTables_wrapper .dataTables_length {
   float: left;
   padding: 0;
-  max-height: 35px;
+  max-height: 45px;
 }
 .page-content .dataTables_wrapper .dataTables_length label {
   font-weight: 400;
@@ -264,7 +264,7 @@ table.dataTable {
 .page-content .dataTables_wrapper .dataTables_info {
   margin-left: 10px;
   padding-top: 0;
-  line-height: 32px;
+  line-height: 40px;
   white-space: nowrap;
   display: inline-block;
   color: #d9534f;

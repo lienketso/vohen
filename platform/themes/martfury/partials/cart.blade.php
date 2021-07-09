@@ -3,12 +3,7 @@
         <div class="ps-cart__items">
             <div class="ps-cart__items__body">
                 @php
-                    $products = get_products([
-                        'condition' => [
-                            ['ec_products.id', 'IN', Cart::instance('cart')->content()->pluck('id')->all()],
-                        ],
-                        'with' => ['slugable'],
-                    ]);
+                    $products = Cart::instance('cart')->products();
                 @endphp
                 @if (count($products))
                     @foreach(Cart::instance('cart')->content() as $key => $cartItem)
@@ -24,7 +19,14 @@
                                 <div class="ps-product__content">
                                     <a class="ps-product__remove remove-cart-item" href="{{ route('public.cart.remove', $cartItem->rowId) }}"><i class="icon-cross"></i></a>
                                     <a href="{{ $product->original_product->url }}"> {{ $product->name }}</a>
-                                    <p class="mb-0"><small>{{ $cartItem->qty }} x {{ format_price($cartItem->price) }}</small></p>
+                                    <p class="mb-0">
+                                        <small>
+                                            <span class="d-inline-block">{{ $cartItem->qty }} x</span> <span class="cart-price">{{ format_price($cartItem->price) }} @if ($product->front_sale_price != $product->price)
+                                                    <small><del>{{ format_price($product->price_with_taxes) }}</del></small>
+                                                @endif
+                                            </span>
+                                        </small>
+                                    </p>
                                     <p class="mb-0"><small><small>{{ $cartItem->options['attributes'] ?? '' }}</small></small></p>
                                     @if (!empty($cartItem->options['extras']) && is_array($cartItem->options['extras']))
                                         @foreach($cartItem->options['extras'] as $option)
@@ -32,6 +34,12 @@
                                                 <p class="mb-0"><small>{{ $option['key'] }}: <strong> {{ $option['value'] }}</strong></small></p>
                                             @endif
                                         @endforeach
+                                    @endif
+                                    @if (is_plugin_active('marketplace') && $product->original_product->store->id)
+                                        <p class="d-block mb-0 sold-by">
+                                            <small>{{ __('Sold by') }}: <a href="{{ $product->original_product->store->url }}">{{ $product->original_product->store->name }}</a>
+                                            </small>
+                                        </p>
                                     @endif
                                 </div>
                             </div>

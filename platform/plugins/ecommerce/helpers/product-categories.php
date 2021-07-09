@@ -11,8 +11,12 @@ if (!function_exists('get_product_categories')) {
      * @param bool $parentOnly
      * @return array
      */
-    function get_product_categories(array $conditions = [], array $with = [], array $withCount = [], bool $parentOnly = false)
-    {
+    function get_product_categories(
+        array $conditions = [],
+        array $with = [],
+        array $withCount = [],
+        bool $parentOnly = false
+    ) {
         $repo = app(ProductCategoryInterface::class);
         $categories = $repo->getModel();
 

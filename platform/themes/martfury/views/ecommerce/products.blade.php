@@ -1,106 +1,74 @@
 <div class="ps-page--shop">
-    <div class="ps-container" id="app">
-        <div class="mt-40">
-            <featured-brands-component url="{{ route('public.ajax.featured-brands') }}"></featured-brands-component>
-        </div>
+    <div class="ps-container" @if (Route::currentRouteName() == 'public.products') id="app" @endif>
+        @if (theme_option('show_featured_brands_on_products_page', 'yes') == 'yes' &&  Route::currentRouteName() == 'public.products')
+            <div class="mt-40">
+                <featured-brands-component url="{{ route('public.ajax.featured-brands') }}"></featured-brands-component>
+            </div>
+        @endif
         <div class="ps-layout--shop">
             <div class="ps-layout__left">
-                <form action="{{ route('public.products') }}" method="GET">
-                    @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/filters')
-                </form>
-            </div>
-            <div class="ps-layout__right">
-                <div class="ps-block--shop-features">
-                    <div class="ps-block__header">
-                        <h3>{{ __('Recommended Items') }}</h3>
-                        <div class="ps-block__navigation">
-                            <a class="ps-carousel__prev" href="#recommended-products">
-                                <i class="icon-chevron-left"></i>
-                            </a>
-                            <a class="ps-carousel__next" href="#recommended-products">
-                                <i class="icon-chevron-right"></i>
-                            </a>
-                        </div>
+                <div class="screen-darken"></div>
+                <div class="ps-layout__left-container">
+                    <div class="ps-filter__header d-block d-xl-none">
+                        <h3>{{ __('Filter Products') }}</h3><a class="ps-btn--close ps-btn--no-boder" href="#"></a>
                     </div>
-                    <div class="ps-block__content">
-                        <featured-products-component url="{{ route('public.ajax.featured-products') }}" :id="'recommended-products'"></featured-products-component>
+                    <div class="ps-layout__left-content">
+                        <form action="{{ URL::current() }}" data-action="{{ route('public.products') }}" method="GET" id="products-filter-form">
+                            @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/filters')
+                        </form>
                     </div>
                 </div>
+            </div>
+            <div class="ps-layout__right">
+                @if (theme_option('show_recommend_items_on_products_page', 'yes') == 'yes' && Route::currentRouteName() == 'public.products')
+                    <div class="ps-block--shop-features">
+                        <div class="ps-block__header">
+                            <h3>{{ __('Recommended Items') }}</h3>
+                            <div class="ps-block__navigation">
+                                <a class="ps-carousel__prev" href="#recommended-products">
+                                    <i class="icon-chevron-left"></i>
+                                </a>
+                                <a class="ps-carousel__next" href="#recommended-products">
+                                    <i class="icon-chevron-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="ps-block__content">
+                            <featured-products-component url="{{ route('public.ajax.featured-products') }}" :id="'recommended-products'"></featured-products-component>
+                        </div>
+                    </div>
+                @endif
                 <div class="ps-shopping ps-tab-root">
-                    <div class="ps-shopping__header">
-                        <p><strong> {{ $products->total() }}</strong> {{ __('Products found') }}</p>
-                        <div class="ps-shopping__actions">
-                            <form action="{{ URL::current() }}" method="GET">
+                    <div class="row bg-light py-2 mb-3">
+                        <div class="col-12 col-sm-6 col-md-3 d-xl-none px-2 px-sm-3">
+                            <div class="header__filter d-xl-none mx-auto mb-3 mb-sm-0">
+                                <button id="products-filter-sidebar" type="button">
+                                    <i class="icon-equalizer"></i><span class="ml-2">{{ __('Filter') }}</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3 col-xl-6 d-none d-md-block">
+                            <div class="products-found pt-2">
+                                <strong>{{ $products->total() }}</strong><span class="ml-1">{{ __('Products found') }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 px-2 px-sm-3">
+                            <div class="d-flex justify-content-center justify-content-sm-end">
                                 @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/sort')
-                            </form>
-                            <div class="ps-shopping__view">
-                                <ul class="ps-tab-list">
-                                    <li class="active"><a href="#tab-1"><i class="icon-grid"></i></a></li>
-                                    <li><a href="#tab-2"><i class="icon-list4"></i></a></li>
-                                </ul>
+                                <div class="ps-shopping__view ml-2">
+                                    <ul class="prodducts-layout mb-0 p-0">
+                                        <li @if (request()->get('layout') != 'list') class="active" @endif><a href="#grid" data-layout="grid"><i class="icon-grid"></i></a></li>
+                                        <li @if (request()->get('layout') == 'list') class="active" @endif><a href="#list" data-layout="list"><i class="icon-list4"></i></a></li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <header class="header--mobile-categories d-sm-none d-block">
-                        <div class="header__filter">
-                            <button class="ps-shop__filter-mb" id="filter-sidebar">
-                                <i class="icon-equalizer"></i><span>{{ __('Filter') }}</span>
-                            </button>
-                            <div class="header__sort">
-                                <i class="icon-sort-amount-desc"></i>
-                                <form action="{{ URL::current() }}" method="GET">
-                                    @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/sort')
-                                </form>
-                            </div>
-                        </div>
-                    </header>
-                    <div class="ps-tabs">
-                        <div class="ps-tab active" id="tab-1">
-                            <div class="ps-shopping-product">
-                                <div class="row">
-                                    @if ($products->count() > 0)
-                                        @foreach($products as $product)
-                                            <div class="col-xl-3 col-lg-4 col-md-4 col-sm-6 col-6 ">
-                                                <div class="ps-product">
-                                                    {!! Theme::partial('product-item', compact('product')) !!}
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="ps-pagination">
-                                {!! $products->withQueryString()->links() !!}
-                            </div>
-                        </div>
-                        <div class="ps-tab" id="tab-2">
-                            <div class="ps-shopping-product">
-                                @if ($products->count() > 0)
-                                    @foreach($products as $product)
-                                        <div class="ps-product ps-product--wide">
-                                            {!! Theme::partial('product-item-grid', compact('product')) !!}
-                                        </div>
-                                    @endforeach
-                                @endif
-                            </div>
-                            <div class="ps-pagination">
-                                {!! $products->withQueryString()->links() !!}
-                            </div>
-                        </div>
+                    <div class="ps-tabs ps-products-listing">
+                        @include(Theme::getThemeNamespace('views.ecommerce.includes.product-items'))
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="ps-filter--sidebar">
-    <div class="ps-filter__header">
-        <h3>{{ __('Filter Products') }}</h3><a class="ps-btn--close ps-btn--no-boder" href="#"></a>
-    </div>
-    <div class="ps-filter__content">
-        <form action="{{ route('public.products') }}" method="GET">
-            @include(Theme::getThemeNamespace() . '::views/ecommerce/includes/filters')
-        </form>
     </div>
 </div>

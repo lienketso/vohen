@@ -144,6 +144,21 @@
                         <div class="form-group">
 
                             <label class="text-title-field"
+                                   for="admin_locale_direction">{{ trans('core/setting::setting.general.admin_locale_direction') }}
+                            </label>
+                            <label class="hrv-label">
+                                <input type="radio" name="admin_locale_direction" class="hrv-radio" value="ltr"
+                                       @if (setting('admin_locale_direction', 'ltr') == 'ltr') checked @endif>{{ trans('core/setting::setting.locale_direction_ltr') }}
+                            </label>
+                            <label class="hrv-label">
+                                <input type="radio" name="admin_locale_direction" class="hrv-radio" value="rtl"
+                                       @if (setting('admin_locale_direction', 'ltr') == 'rtl') checked @endif>{{ trans('core/setting::setting.locale_direction_rtl') }}
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="text-title-field"
                                    for="rich_editor">{{ trans('core/setting::setting.general.rich_editor') }}
                             </label>
                             <label class="hrv-label">

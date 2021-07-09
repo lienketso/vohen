@@ -119,42 +119,37 @@
                                         ]);
 
                                     @endphp
-                                    <tr>
-                                        <td class="text-center">{{ $key + 1 }}</td>
-                                        <td class="text-center">
-                                            <img src="{{ RvMedia::getImageUrl($product->image, 'thumb', false, RvMedia::getDefaultImage()) }}" width="50" alt="{{ $product->name }}"></td>
-                                        <td>
-                                            {{ $product->name }} ({{ $product->sku }})
+                                    @if ($product)
+                                        <tr>
+                                            <td class="text-center">{{ $key + 1 }}</td>
+                                            <td class="text-center">
+                                                <img src="{{ RvMedia::getImageUrl($product->image, 'thumb', false, RvMedia::getDefaultImage()) }}" width="50" alt="{{ $product->name }}"></td>
+                                            <td>
+                                                {{ $product->name }} ({{ $product->sku }})
 
-                                            @if ($product->is_variation)
-                                                <p style="margin-bottom: 0">
-                                                    <small>
-                                                        @php $attributes = get_product_attributes($product->id) @endphp
-                                                        @if (!empty($attributes))
-                                                            @foreach ($attributes as $attribute)
-                                                                {{ $attribute->attribute_set_title }}: {{ $attribute->title }}@if (!$loop->last), @endif
-                                                            @endforeach
+                                                @if ($product->is_variation)
+                                                    <p class="mb-0">
+                                                        <small>{{ $product->variation_attributes }}</small>
+                                                    </p>
+                                                @endif
+
+                                                @if (!empty($orderProduct->options) && is_array($orderProduct->options))
+                                                    @foreach($orderProduct->options as $option)
+                                                        @if (!empty($option['key']) && !empty($option['value']))
+                                                            <p class="mb-0"><small>{{ $option['key'] }}: <strong> {{ $option['value'] }}</strong></small></p>
                                                         @endif
-                                                    </small>
-                                                </p>
-                                            @endif
-
-                                            @if (!empty($orderProduct->options) && is_array($orderProduct->options))
-                                                @foreach($orderProduct->options as $option)
-                                                    @if (!empty($option['key']) && !empty($option['value']))
-                                                        <p style="margin-bottom: 0"><small>{{ $option['key'] }}: <strong> {{ $option['value'] }}</strong></small></p>
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                        </td>
-                                        <td>{{ format_price($orderProduct->price, $orderProduct->currency) }}</td>
-                                        <td class="text-center">{{ $orderProduct->qty }}</td>
-                                        <td class="money text-right">
-                                            <strong>
-                                                {{ format_price($orderProduct->price * $orderProduct->qty, $orderProduct->currency) }}
-                                            </strong>
-                                        </td>
-                                    </tr>
+                                                    @endforeach
+                                                @endif
+                                            </td>
+                                            <td>{{ format_price($orderProduct->price, $orderProduct->currency) }}</td>
+                                            <td class="text-center">{{ $orderProduct->qty }}</td>
+                                            <td class="money text-right">
+                                                <strong>
+                                                    {{ format_price($orderProduct->price * $orderProduct->qty, $orderProduct->currency) }}
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                                 </tbody>
                             </table>

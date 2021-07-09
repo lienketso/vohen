@@ -38,14 +38,12 @@ class OrderIncompleteTable extends OrderTable
             })
             ->editColumn('created_at', function ($item) {
                 return BaseHelper::formatDate($item->created_at);
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('orders.view-incomplete-order', 'orders.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -130,21 +128,5 @@ class OrderIncompleteTable extends OrderTable
     public function bulkActions(): array
     {
         return $this->addDeleteAction(route('orders.deletes'), 'orders.destroy', parent::bulkActions());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getBulkChanges(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buttons()
-    {
-        return [];
     }
 }

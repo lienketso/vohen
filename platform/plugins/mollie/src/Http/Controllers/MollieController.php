@@ -5,18 +5,15 @@ namespace Botble\Mollie\Http\Controllers;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Payment\Enums\PaymentStatusEnum;
-use Botble\Payment\Services\Traits\PaymentTrait;
+use Botble\Payment\Supports\PaymentHelper;
 use Illuminate\Http\Request;
 use Mollie;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Types\PaymentStatus;
-use OrderHelper;
 use Throwable;
 
 class MollieController extends BaseController
 {
-    use PaymentTrait;
-
     /**
      * @param Request $request
      * @param BaseHttpResponse $response
@@ -30,7 +27,7 @@ class MollieController extends BaseController
         } catch (ApiException $exception) {
             return $response
                 ->setError()
-                ->setNextUrl(route('public.checkout.success', OrderHelper::getOrderSessionToken()))
+                ->setNextUrl(PaymentHelper::getRedirectURL())
                 ->setMessage($exception->getMessage());
         }
 
@@ -51,8 +48,10 @@ class MollieController extends BaseController
                 break;
         }
 
-        $this->storeLocalPayment([
-            'amount'          => $result->amount->value,
+        $orderIds = (array)$result->metadata->order_id;
+
+        do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
+            'amount'          => $request->input('amount'),
             'currency'        => $result->amount->currency,
             'charge_id'       => $result->id,
             'payment_channel' => MOLLIE_PAYMENT_METHOD_NAME,
@@ -60,20 +59,20 @@ class MollieController extends BaseController
             'customer_id'     => $request->input('customer_id'),
             'customer_type'   => $request->input('customer_type'),
             'payment_type'    => 'direct',
-            'order_id'        => $result->metadata->order_id,
+            'order_id'        => $orderIds,
         ]);
 
-        OrderHelper::processOrder($result->metadata->order_id, $result->id);
+        $redirectURL = PaymentHelper::getRedirectURL();
 
         if (!$result->isPaid()) {
             return $response
                 ->setError()
-                ->setNextUrl(route('public.checkout.success', OrderHelper::getOrderSessionToken()))
+                ->setNextUrl($redirectURL)
                 ->setMessage(__('Error when processing payment via Mollie!'));
         }
 
         return $response
-            ->setNextUrl(route('public.checkout.success', OrderHelper::getOrderSessionToken()))
+            ->setNextUrl($redirectURL)
             ->setMessage(__('Checkout successfully!'));
     }
 }

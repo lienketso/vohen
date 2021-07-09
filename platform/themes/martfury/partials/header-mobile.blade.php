@@ -24,7 +24,7 @@
         @endif
     </div>
     <div class="navigation--mobile">
-        <div class="navigation__left"><a class="ps-logo" href="{{ url('/') }}"><img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}"></a></div>
+        <div class="navigation__left"><a class="ps-logo" href="{{ route('public.index') }}"><img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}"></a></div>
         @if (is_plugin_active('ecommerce'))
             <div class="navigation__right">
                 <div class="header__actions">

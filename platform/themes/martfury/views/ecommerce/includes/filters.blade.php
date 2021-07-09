@@ -1,6 +1,6 @@
 @php
     $brands = get_all_brands(['status' => \Botble\Base\Enums\BaseStatusEnum::PUBLISHED], ['slugable'], ['products']);
-    $categories = get_product_categories(['status' => \Botble\Base\Enums\BaseStatusEnum::PUBLISHED], ['slugable', 'children', 'children.slugable'], ['products'], true);
+    $categories = get_product_categories(['status' => \Botble\Base\Enums\BaseStatusEnum::PUBLISHED], ['slugable', 'children:id,name,parent_id', 'children.slugable'], ['products'], true);
     $tags = app(\Botble\Ecommerce\Repositories\Interfaces\ProductTagInterface::class)->advancedGet([
         'condition' => ['status' => \Botble\Base\Enums\BaseStatusEnum::PUBLISHED],
         'with'      => ['slugable'],
@@ -8,21 +8,25 @@
         'order_by'  => ['products_count' => 'desc'],
         'take'      => 10,
     ]);
-
     $rand = mt_rand();
+    $categoriesRequest = request()->input('categories', []);
+    $urlCurrent = URL::current();
 @endphp
 
 <aside class="widget widget_shop">
     <h4 class="widget-title">{{ __('Product Categories') }}</h4>
     <ul class="ps-list--categories">
         @foreach($categories as $category)
-            <li class="@if (URL::current() == $category->url || (!empty(request()->input('categories', [])) && in_array($category->id, request()->input('categories', [])))) current-menu-item @endif @if ($category->children->count()) menu-item-has-children @endif">
+            <li class="@if ($urlCurrent == $category->url || (!empty($categoriesRequest && in_array($category->id, $categoriesRequest)))) current-menu-item @endif @if ($category->children->count()) menu-item-has-children @endif">
                 <a href="{{ $category->url }}">{{ $category->name }}</a>
                 @if ($category->children->count())
+                    @php
+                        $category->children->append(['url']);
+                    @endphp
                     <span class="sub-toggle"><i class="icon-angle"></i></span>
-                    <ul class="sub-menu">
+                    <ul class="sub-menu" @if (in_array($urlCurrent, collect($category->children->toArray())->pluck('url')->toArray())) style="display:block" @endif>
                         @foreach($category->children as $child)
-                            <li @if(URL::current() == $child->url) class="current-menu-item" @endif><a href="{{ $child->url }}">{{ $child->name }}</a></li>
+                            <li @if($urlCurrent == $child->url) class="current-menu-item" @endif><a href="{{ $child->url }}">{{ $child->name }}</a></li>
                         @endforeach
                     </ul>
                 @endif
@@ -65,16 +69,19 @@
         <div class="nonlinear" data-min="0" data-max="{{ theme_option('max_filter_price', 100000) }}"></div>
         <div class="ps-slider__meta">
             <div data-current-exchange-rate="{{ get_current_exchange_rate() }}"></div>
-            <input class="product-filter-item product-filter-item-price-0" name="min_price" value="{{ request()->input('min_price', 0) }}" type="hidden">
-            <input class="product-filter-item product-filter-item-price-1" name="max_price" value="{{ request()->input('max_price', theme_option('max_filter_price', 100000)) }}" type="hidden">
+            <input class="product-filter-item product-filter-item-price-0" name="min_price" data-min="0" value="{{ request()->input('min_price', 0) }}" type="hidden">
+            <input class="product-filter-item product-filter-item-price-1" name="max_price" data-max="{{ theme_option('max_filter_price', 100000) }}" value="{{ request()->input('max_price', theme_option('max_filter_price', 100000)) }}" type="hidden">
             <span class="ps-slider__value">
-            <span class="ps-slider__min"></span> {{ get_application_currency()->title }}</span> - <span class="ps-slider__value"><span class="ps-slider__max"></span> {{ get_application_currency()->title }}
+                <span class="ps-slider__min"></span> {{ get_application_currency()->title }}</span> - 
+                <span class="ps-slider__value"><span class="ps-slider__max"></span> {{ get_application_currency()->title }}
             </span>
         </div>
     </div>
-
 
     {!! render_product_swatches_filter([
         'view' => Theme::getThemeNamespace() . '::views.ecommerce.attributes.attributes-filter-renderer'
     ]) !!}
 </aside>
+
+<input type="hidden" name="sort-by" class="product-filter-item" value="{{ request()->input('sort-by') }}">
+<input type="hidden" name="layout" class="product-filter-item" value="{{ request()->input('layout') }}">

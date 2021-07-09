@@ -331,7 +331,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           });
 
           if (ids.length === 0) {
-            Botble.showError('Please select at least one record to perform this action!');
+            Botble.showError(BotbleVariables.languages.tables.please_select_record);
             return false;
           }
 
@@ -392,7 +392,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           });
 
           if (ids.length === 0) {
-            Botble.showError('Please select at least one record to perform this action!');
+            Botble.showError(BotbleVariables.languages.tables.please_select_record);
             return false;
           }
 

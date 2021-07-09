@@ -24,35 +24,3 @@
         <div class="clearfix"></div>
     {!! Form::close() !!}
 @stop
-
-@push('footer')
-    <script>
-        var email = document.querySelector('[name="email"]');
-        var password = document.querySelector('[name="password"]');
-        var passwordConfirmation = document.querySelector('[name="password_confirmation"]');
-        email.focus();
-        document.getElementById('emailGroup').classList.add('focused');
-
-        // Focus events for email and password fields
-        email.addEventListener('focusin', function(){
-            document.getElementById('emailGroup').classList.add('focused');
-        });
-        email.addEventListener('focusout', function(){
-            document.getElementById('emailGroup').classList.remove('focused');
-        });
-
-        password.addEventListener('focusin', function(){
-            document.getElementById('passwordGroup').classList.add('focused');
-        });
-        password.addEventListener('focusout', function(){
-            document.getElementById('passwordGroup').classList.remove('focused');
-        });
-
-        passwordConfirmation.addEventListener('focusin', function(){
-            document.getElementById('passwordConfirmationGroup').classList.add('focused');
-        });
-        passwordConfirmation.addEventListener('focusout', function(){
-            document.getElementById('passwordConfirmationGroup').classList.remove('focused');
-        });
-    </script>
-@endpush

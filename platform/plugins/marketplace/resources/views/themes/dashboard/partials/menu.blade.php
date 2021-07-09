@@ -6,11 +6,6 @@
             'name'  => __('Dashboard')
         ],
         [
-            'key'   => 'marketplace.vendor.store',
-            'icon'  => 'icon-cart',
-            'name'  => 'Gian hàng'
-        ],
-        [
             'key'   => 'marketplace.vendor.products.index',
             'icon'  => 'icon-database',
             'name'  => __('Products')
@@ -23,17 +18,12 @@
         [
             'key'   => 'marketplace.vendor.withdrawals.index',
             'icon'  => 'icon-bag-dollar',
-            'name'  => 'Rút tiền'
-        ],
-        [
-            'key'   => 'marketplace.vendor.warehouse',
-            'icon'  => 'icon-accessibility',
-            'name'  => 'Quản lý kho'
+            'name'  => __('Withdrawals')
         ],
         [
             'key'   => 'marketplace.vendor.settings',
             'icon'  => 'icon-cog',
-            'name'  => 'Cấu hình'
+            'name'  => __('Settings')
         ],
     ];
 @endphp
@@ -46,5 +36,5 @@
             </a>
         </li>
     @endforeach
-    <li><a href="{{ route('customer.overview') }}"><i class="icon-user"></i>{{ __('Customer dashboard') }}</a></li>
+    <li><a href="{{ route('customer.overview') }}"><i class="icon-user"></i> Tài khoản</a></li>
 </ul>

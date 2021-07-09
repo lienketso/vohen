@@ -22,8 +22,8 @@ return [
     'can'                                              => 'can',
     'cannot'                                           => 'cannot',
     'use_with_promotion'                               => 'be used with promotion',
-    'create_discount_validate_title_required_if'                                => 'Please enter the name of the promotion',
-    'create_discount_validate_code_required_if'                                 => 'Please enter the promotion code',
-    'create_discount_validate_value_required'                                   => 'Amount must be greater than 0',
-    'create_discount_validate_target_required'                                  => 'No object selected for promotion',
+    'create_discount_validate_title_required_if'       => 'Please enter the name of the promotion',
+    'create_discount_validate_code_required_if'        => 'Please enter the promotion code',
+    'create_discount_validate_value_required'          => 'Amount must be greater than 0',
+    'create_discount_validate_target_required'         => 'No object selected for promotion',
 ];

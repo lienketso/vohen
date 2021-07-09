@@ -3,8 +3,8 @@
 namespace Botble\Ecommerce\Forms;
 
 use Assets;
-use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Enums\BaseStatusEnum;
+use Botble\Base\Forms\FormAbstract;
 use Botble\Ecommerce\Http\Requests\FlashSaleRequest;
 use Botble\Ecommerce\Models\FlashSale;
 
@@ -53,10 +53,13 @@ class FlashSaleForm extends FormAbstract
                 'default_value' => now()->addDay()->format('Y/m/d'),
             ])
             ->addMetaBoxes([
-                'products'    => [
-                    'title'          => trans('plugins/ecommerce::flash-sale.products'),
-                    'content'        => view('plugins/ecommerce::flash-sales.products', ['flashSale' => $this->getModel(), 'products' => $this->getModel()->id ? $this->getModel()->products : collect([])]),
-                    'priority'       => 0,
+                'products' => [
+                    'title'    => trans('plugins/ecommerce::flash-sale.products'),
+                    'content'  => view('plugins/ecommerce::flash-sales.products', [
+                        'flashSale' => $this->getModel(),
+                        'products'  => $this->getModel()->id ? $this->getModel()->products : collect([]),
+                    ]),
+                    'priority' => 0,
                 ],
             ])
             ->setBreakFieldPoint('status');

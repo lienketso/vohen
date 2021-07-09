@@ -29,12 +29,12 @@ class ConfirmEmailNotification extends Notification implements ShouldQueue
      * Get the mail representation of the notification.
      *
      * @param mixed $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME)
-            ->setVariableValue('verify_link', URL::signedRoute('customer.confirm', ['email' => $notifiable->email]));
+            ->setVariableValue('verify_link', URL::signedRoute('customer.confirm', ['user' => $notifiable->id]));
 
         $template = 'confirm-email';
         $content = EmailHandler::prepareData(EmailHandler::getTemplateContent($template));

@@ -7,6 +7,7 @@ use Botble\Ecommerce\Repositories\Interfaces\DiscountInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Cart;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use OrderHelper;
 
 class HandleApplyPromotionsService
@@ -20,6 +21,11 @@ class HandleApplyPromotionsService
      * @var ProductInterface
      */
     protected $productRepository;
+
+    /**
+     * @var null|Collection
+     */
+    protected $promotions;
 
     /**
      * HandleApplyPromotionsService constructor.
@@ -36,11 +42,20 @@ class HandleApplyPromotionsService
      * @param string $token
      * @return float
      */
-    public function execute($token = null)
+    public function execute($token = null, array $data = [], $prefix = '')
     {
-        $promotions = $this->discountRepository->getAvailablePromotions();
+        if (is_null($this->promotions)) {
+            $promotions = $this->discountRepository->getAvailablePromotions();
+            $this->promotions = $promotions;
+        } else {
+            $promotions = $this->promotions;
+        }
 
         $promotionDiscountAmount = 0;
+
+        $rawTotal = Arr::get($data, 'rawTotal', Cart::instance('cart')->rawTotal());
+        $cartItems = Arr::get($data, 'cartItems', Cart::instance('cart')->content());
+        $countCart = Arr::get($data, 'countCart', Cart::instance('cart')->count());
 
         foreach ($promotions as $promotion) {
             /**
@@ -50,7 +65,7 @@ class HandleApplyPromotionsService
                 case 'amount':
                     switch ($promotion->target) {
                         case 'amount-minimum-order':
-                            if ($promotion->min_order_price <= Cart::instance('cart')->rawTotal()) {
+                            if ($promotion->min_order_price <= $rawTotal) {
                                 $promotionDiscountAmount += $promotion->value;
                             }
                             break;
@@ -58,7 +73,7 @@ class HandleApplyPromotionsService
                             $promotionDiscountAmount += $promotion->value;
                             break;
                         default:
-                            if (Cart::instance('cart')->count() >= $promotion->product_quantity) {
+                            if ($countCart >= $promotion->product_quantity) {
                                 $promotionDiscountAmount += $promotion->value;
                             }
                             break;
@@ -67,26 +82,23 @@ class HandleApplyPromotionsService
                 case 'percentage':
                     switch ($promotion->target) {
                         case 'amount-minimum-order':
-                            if ($promotion->min_order_price <= Cart::instance('cart')->rawTotal()) {
-                                $promotionDiscountAmount += Cart::instance('cart')
-                                        ->rawTotal() * $promotion->value / 100;
+                            if ($promotion->min_order_price <= $rawTotal) {
+                                $promotionDiscountAmount += $rawTotal * $promotion->value / 100;
                             }
                             break;
                         case 'all-orders':
-                            $promotionDiscountAmount += Cart::instance('cart')->rawTotal() * $promotion->value / 100;
+                            $promotionDiscountAmount += $rawTotal * $promotion->value / 100;
                             break;
                         default:
-                            if (Cart::instance('cart')->count() >= $promotion->product_quantity) {
-                                $promotionDiscountAmount += Cart::instance('cart')
-                                        ->rawTotal() * $promotion->value / 100;
+                            if ($countCart >= $promotion->product_quantity) {
+                                $promotionDiscountAmount += $rawTotal * $promotion->value / 100;
                             }
                             break;
                     }
                     break;
                 case 'same-price':
-                    if ($promotion->product_quantity > 1 && Cart::instance('cart')
-                            ->count() >= $promotion->product_quantity) {
-                        foreach (Cart::instance('cart')->content() as $item) {
+                    if ($promotion->product_quantity > 1 && $countCart >= $promotion->product_quantity) {
+                        foreach ($cartItems as $item) {
                             if ($item->qty >= $promotion->product_quantity) {
                                 if (in_array($promotion->target, ['specific-product', 'product-variant']) &&
                                     in_array($item->id, $promotion->products()->pluck('product_id')->all())
@@ -118,7 +130,8 @@ class HandleApplyPromotionsService
             $token = OrderHelper::getOrderSessionToken();
         }
 
-        Arr::set($sessionData, 'promotion_discount_amount', $promotionDiscountAmount);
+        $sessionData = OrderHelper::getOrderSessionData($token);
+        Arr::set($sessionData, $prefix . 'promotion_discount_amount', $promotionDiscountAmount);
         OrderHelper::setOrderSessionData($token, $sessionData);
 
         return $promotionDiscountAmount;

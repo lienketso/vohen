@@ -23,7 +23,7 @@ class UpdateTaxesTable extends Migration
         });
 
         Schema::table('ec_products', function (Blueprint $table) {
-           $table->integer('tax_id')->unsigned()->nullable();
+            $table->integer('tax_id')->unsigned()->nullable();
         });
     }
 

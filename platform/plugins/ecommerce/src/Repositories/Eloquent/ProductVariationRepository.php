@@ -109,7 +109,8 @@ class ProductVariationRepository extends RepositoriesAbstract implements Product
 
         $this->resetModel();
 
-        return empty($variation) ? Product::with($with)->find($variationId) : Product::with($with)->find($variation->configurable_product_id);
+        return empty($variation) ? Product::with($with)->find($variationId) : Product::with($with)
+            ->find($variation->configurable_product_id);
     }
 
     /**

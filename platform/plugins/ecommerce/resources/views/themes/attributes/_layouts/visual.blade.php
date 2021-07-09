@@ -3,13 +3,19 @@
     <div class="attribute-values">
         <ul class="visual-swatch attribute-swatch">
             @foreach($attributes->where('attribute_set_id', $set->id) as $attribute)
-                <li data-slug="{{ $attribute->slug }}" class="attribute-swatch-item"
+                <li data-slug="{{ $attribute->slug }}"
+                    data-id="{{ $attribute->id }}"
+                    class="attribute-swatch-item @if (!$variationInfo->where('id', $attribute->id)->count()) pe-none @endif"
                     data-toggle="tooltip"
                     data-placement="top"
                     title="{{ $attribute->title }}">
                     <div class="custom-radio">
                         <label>
-                            <input class="form-control product-filter-item" type="radio" name="attribute_{{ $set->slug }}" value="{{ $attribute->id }}" {{ in_array($attribute->id, $selected) ? 'checked' : '' }}>
+                            <input class="form-control product-filter-item"
+                                type="radio"
+                                name="attribute_{{ $set->slug }}"
+                                value="{{ $attribute->id }}"
+                                {{ $selected->where('id', $attribute->id)->count() ? 'checked' : '' }}>
                             <span style="{{ $attribute->image ? 'background-image: url(' . RvMedia::getImageUrl($attribute->image) . ');' : 'background-color: ' . $attribute->color . ';' }}"></span>
                         </label>
                     </div>

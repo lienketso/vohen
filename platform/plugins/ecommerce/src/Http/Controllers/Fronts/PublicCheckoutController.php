@@ -726,7 +726,6 @@ class PublicCheckoutController
                 'charge_id' => null,
             ];
 
-
             switch ($request->input('payment_method')) {
                 case PaymentMethodEnum::STRIPE:
                     $result = $stripePaymentService->execute($request);

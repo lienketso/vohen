@@ -3,7 +3,6 @@
 namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
-use Botble\Ecommerce\Models\Customer;
 use Botble\Ecommerce\Repositories\Interfaces\CustomerInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -31,9 +30,9 @@ class CustomerTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, CustomerInterface $customerRepository)
     {
-        $this->repository = $customerRepository;
-        $this->setOption('id', 'table-customers');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $customerRepository;
 
         if (!Auth::user()->hasAnyPermission(['customer.edit', 'customer.destroy'])) {
             $this->hasOperations = false;
@@ -63,14 +62,12 @@ class CustomerTable extends TableAbstract
             })
             ->editColumn('created_at', function ($item) {
                 return BaseHelper::formatDate($item->created_at);
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('customer.edit', 'customer.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -128,9 +125,7 @@ class CustomerTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('customer.create'), 'customer.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, Customer::class);
+        return $this->addCreateButton(route('customer.create'), 'customer.create');
     }
 
     /**

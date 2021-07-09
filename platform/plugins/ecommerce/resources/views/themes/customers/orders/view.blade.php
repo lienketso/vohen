@@ -130,14 +130,7 @@
                                     {{ $product->name }} @if ($product->sku) ({{ $product->sku }}) @endif
                                     @if ($product->is_variation)
                                         <p>
-                                            <small>
-                                                @php $attributes = get_product_attributes($product->id) @endphp
-                                                @if (!empty($attributes))
-                                                    @foreach ($attributes as $attribute)
-                                                        {{ $attribute->attribute_set_title }}: {{ $attribute->title }}@if (!$loop->last), @endif
-                                                    @endforeach
-                                                @endif
-                                            </small>
+                                            <small>{{ $product->variation_attributes }}</small>
                                         </p>
                                     @endif
 

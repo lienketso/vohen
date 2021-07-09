@@ -50,7 +50,8 @@ return [
         'select'                                => '— Select —',
         'show_site_name'                        => 'Show site name after page title, separate with "-"?',
         'locale'                                => 'Site language',
-        'locale_direction'                      => 'Language direction',
+        'locale_direction'                      => 'Front site language direction',
+        'admin_locale_direction'                => 'Admin language direction',
         'admin_login_screen_backgrounds'        => 'Login screen backgrounds (~1366x768)',
     ],
     'email'                        => [

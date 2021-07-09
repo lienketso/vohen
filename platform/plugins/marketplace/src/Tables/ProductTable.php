@@ -62,7 +62,7 @@ class ProductTable extends TableAbstract
                     return RvMedia::getImageUrl($item->image, 'thumb', false, RvMedia::getDefaultImage());
                 }
 
-                return view('plugins/ecommerce::products.partials.thumbnail', compact('item'))->render();
+                return $this->displayThumbnail($item->image);
             })
             ->editColumn('checkbox', function ($item) {
                 return $this->getCheckbox($item->id);
@@ -80,7 +80,7 @@ class ProductTable extends TableAbstract
                 return $item->with_storehouse_management ? $item->quantity : '&#8734;';
             })
             ->editColumn('sku', function ($item) {
-                return $item->sku ? $item->sku : '&mdash;';
+                return $item->sku ?: '&mdash;';
             })
             ->editColumn('created_at', function ($item) {
                 return BaseHelper::formatDate($item->created_at);
@@ -154,12 +154,12 @@ class ProductTable extends TableAbstract
                 'title' => trans('core/base::tables.name'),
                 'class' => 'text-left',
             ],
-            'price'        => [
+            'price'      => [
                 'name'  => 'ec_products.price',
                 'title' => trans('plugins/ecommerce::products.price'),
                 'class' => 'text-left',
             ],
-            'quantity'        => [
+            'quantity'   => [
                 'name'  => 'ec_products.quantity',
                 'title' => trans('plugins/ecommerce::products.quantity'),
                 'class' => 'text-left',

@@ -12,7 +12,6 @@ use Illuminate\Validation\ValidationException;
 use SeoHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Theme;
-use URL;
 
 class LoginController extends Controller
 {
@@ -44,9 +43,6 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('customer.guest', ['except' => 'logout']);
-
-        session(['url.intended' => URL::previous()]);
-        $this->redirectTo = session()->get('url.intended');
     }
 
     /**
@@ -58,7 +54,11 @@ class LoginController extends Controller
     {
         SeoHelper::setTitle(__('Login'));
 
-        Theme::breadcrumb()->add(__('Home'), url('/'))->add(__('Login'), route('customer.login'));
+        Theme::breadcrumb()->add(__('Home'), route('public.index'))->add(__('Login'), route('customer.login'));
+
+        if (!session()->has('url.intended')) {
+            session(['url.intended' => url()->previous()]);
+        }
 
         return Theme::scope('ecommerce.customers.login', [], 'plugins/ecommerce::themes.customers.login')->render();
     }
@@ -135,7 +135,7 @@ class LoginController extends Controller
     /**
      * Attempt to log the user into the application.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @return bool
      * @throws ValidationException
      */
@@ -147,9 +147,10 @@ class LoginController extends Controller
             if (get_ecommerce_setting('verify_customer_email', 0) && empty($customer->confirmed_at)) {
                 throw ValidationException::withMessages([
                     'confirmation' => [
-                        __('The given email address has not been confirmed. <a href=":resend_link">Resend confirmation link.</a>', [
-                            'resend_link' => route('customer.resend_confirmation', ['email' => $customer->email]),
-                        ]),
+                        __('The given email address has not been confirmed. <a href=":resend_link">Resend confirmation link.</a>',
+                            [
+                                'resend_link' => route('customer.resend_confirmation', ['email' => $customer->email]),
+                            ]),
                     ],
                 ]);
             }

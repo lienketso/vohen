@@ -8,9 +8,6 @@ use Botble\Base\Models\BaseModel;
 use Botble\Base\Traits\EnumCastable;
 use Botble\Ecommerce\Enums\StockStatusEnum;
 use Botble\Ecommerce\Services\Products\UpdateDefaultProductService;
-use Botble\Marketplace\Models\ProductWarehouse;
-use Botble\Marketplace\Models\Store;
-use Botble\Marketplace\Models\Warehouse;
 use EcommerceHelper;
 use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -70,7 +67,6 @@ class Product extends BaseModel
         'status',
         'views',
         'stock_status',
-        'store_id'
     ];
 
     /**
@@ -109,7 +105,6 @@ class Product extends BaseModel
             $product->productAttributeSets()->detach();
             $product->productAttributes()->detach();
             $product->productCollections()->detach();
-            $product->warehouse()->detach();
             $product->discounts()->detach();
             $product->crossSales()->detach();
             $product->upSales()->detach();
@@ -205,6 +200,9 @@ class Product extends BaseModel
         return $this->belongsToMany(Product::class, 'ec_grouped_products', 'parent_product_id', 'product_id');
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function productLabels()
     {
         return $this->belongsToMany(
@@ -214,6 +212,7 @@ class Product extends BaseModel
             'product_label_id'
         );
     }
+
     /**
      * @return BelongsTo
      */
@@ -259,6 +258,22 @@ class Product extends BaseModel
     public function variations()
     {
         return $this->hasMany(ProductVariation::class, 'configurable_product_id');
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function parentProduct()
+    {
+        return $this->belongsToMany(Product::class, 'ec_product_variations', 'product_id', 'configurable_product_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function pVariations()
+    {
+        return $this->hasMany(ProductVariation::class, 'product_id');
     }
 
     /**
@@ -484,6 +499,18 @@ class Product extends BaseModel
     }
 
     /**
+     * @return bool
+     */
+    public function isOutOfStock()
+    {
+        if (!$this->with_storehouse_management) {
+            return $this->stock_status == StockStatusEnum::OUT_OF_STOCK;
+        }
+
+        return $this->quantity <= 0 && !$this->allow_checkout_when_out_of_stock;
+    }
+
+    /**
      * @return string|null
      */
     public function getStockStatusHtmlAttribute()
@@ -494,18 +521,6 @@ class Product extends BaseModel
         }
 
         return $this->stock_status->toHtml();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isOutOfStock()
-    {
-        if (!$this->with_storehouse_management) {
-            return $this->stock_status == StockStatusEnum::OUT_OF_STOCK;
-        }
-
-        return $this->quantity <= 0 && !$this->allow_checkout_when_out_of_stock;
     }
 
     /**
@@ -551,7 +566,8 @@ class Product extends BaseModel
                             ->where('ec_discount_products.product_id', $this->id);
                     })
                     ->orWhere(function ($sub) {
-                        $collections = $this->productCollections->pluck('ec_product_collections.id')->all();
+                        $collections = $this->productCollections->pluck('id')->all();
+
                         /**
                          * @var Builder $sub
                          */
@@ -560,7 +576,7 @@ class Product extends BaseModel
                             ->whereIn('ec_discount_product_collections.product_collection_id', $collections);
                     })
                     ->orWhere(function ($sub) {
-                        $customerId = auth('customer')->check() ? auth('customer')->user()->id : -1;
+                        $customerId = auth('customer')->check() ? auth('customer')->id() : -1;
 
                         /**
                          * @var Builder $sub
@@ -648,21 +664,9 @@ class Product extends BaseModel
         return $this->price + $this->price * ($this->tax->percentage / 100);
     }
 
-    //warehouse
-    public function warehouse()
-    {
-        return $this->belongsToMany(
-            Warehouse::class,
-            'ec_product_warehouse',
-            'product_id',
-            'warehouse_id'
-        )->withTimestamps();
-    }
-
-    public function store(){
-        return $this->belongsTo(Store::class,'store_id');
-    }
-
+    /**
+     * @return HasMany
+     */
     public function variationProductAttributes()
     {
         return $this
@@ -682,6 +686,9 @@ class Product extends BaseModel
             ]);
     }
 
+    /**
+     * @return string
+     */
     public function getVariationAttributesAttribute()
     {
         if (!$this->variationProductAttributes->count()) {
@@ -692,5 +699,4 @@ class Product extends BaseModel
 
         return '(' . mapped_implode(', ', $attributes, ': ') . ')';
     }
-
 }

@@ -3,7 +3,6 @@
 namespace Botble\Ecommerce\Tables;
 
 use BaseHelper;
-use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Repositories\Interfaces\DiscountInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -30,9 +29,9 @@ class DiscountTable extends TableAbstract
      */
     public function __construct(DataTables $table, UrlGenerator $urlGenerator, DiscountInterface $discountRepository)
     {
-        $this->repository = $discountRepository;
-        $this->setOption('id', 'table-discounts');
         parent::__construct($table, $urlGenerator);
+
+        $this->repository = $discountRepository;
 
         if (!Auth::user()->hasPermission('discounts.destroy')) {
             $this->hasOperations = false;
@@ -60,6 +59,7 @@ class DiscountTable extends TableAbstract
                 if ($item->quantity === null) {
                     return $item->total_used;
                 }
+
                 return $item->total_used . '/' . $item->quantity;
             })
             ->editColumn('start_date', function ($item) {
@@ -70,14 +70,12 @@ class DiscountTable extends TableAbstract
                     return '-';
                 }
                 return $item->end_date;
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations(null, 'discounts.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -135,9 +133,7 @@ class DiscountTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('discounts.create'), 'discounts.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, Discount::class);
+        return $this->addCreateButton(route('discounts.create'), 'discounts.create');
     }
 
     /**

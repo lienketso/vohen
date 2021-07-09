@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 use Paystack;
 use Throwable;
+use Illuminate\Support\Arr;
 
 class HookServiceProvider extends ServiceProvider
 {
@@ -75,7 +76,9 @@ class HookServiceProvider extends ServiceProvider
     public function checkoutWithPaystack(array $data, Request $request)
     {
         if ($request->input('payment_method') == PAYSTACK_PAYMENT_METHOD_NAME) {
-            $orderAddress = $this->app->make(OrderAddressInterface::class)->getFirstBy(['order_id' => $request->input('order_id')]);
+            $orderIds = (array) $request->input('order_id', []);
+            $orderId = Arr::first($orderIds);
+            $orderAddress = $this->app->make(OrderAddressInterface::class)->getFirstBy(['order_id' => $orderId]);
 
             $response = Paystack::getAuthorizationResponse([
                 'reference' => Paystack::genTranxRef(),
@@ -83,7 +86,7 @@ class HookServiceProvider extends ServiceProvider
                 'currency'  => $request->input('currency'),
                 'amount'    => (int)$request->input('amount') * 100,
                 'email'     => $orderAddress ? $orderAddress->email : 'no-email@domain.com',
-                'metadata'  => json_encode(['order_id' => $request->input('order_id')]),
+                'metadata'  => json_encode(['order_id' => $orderIds]),
             ]);
 
             if ($response['status']) {

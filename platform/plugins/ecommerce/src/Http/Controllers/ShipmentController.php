@@ -90,19 +90,21 @@ class ShipmentController extends BaseController
             ]),
             'shipment_id' => $id,
             'order_id'    => $shipment->order_id,
-            'user_id'     => Auth::user()->getKey() ?? 0,
+            'user_id'     => Auth::id() ?? 0,
         ]);
 
         switch ($request->input('status')) {
             case ShippingStatusEnum::DELIVERED:
-                $this->orderRepository->createOrUpdate(['status' => OrderStatusEnum::COMPLETED],
+                $order = $this->orderRepository->createOrUpdate(['status' => OrderStatusEnum::COMPLETED],
                     ['id' => $shipment->order_id]);
+
+                do_action(ACTION_AFTER_ORDER_STATUS_COMPELETED_ECOMMERCE, $order, $request);
 
                 $this->orderHistoryRepository->createOrUpdate([
                     'action'      => 'update_status',
                     'description' => trans('plugins/ecommerce::shipping.order_confirmed_by'),
                     'order_id'    => $shipment->order_id,
-                    'user_id'     => Auth::user()->getKey() ?? 0,
+                    'user_id'     => Auth::id() ?? 0,
                 ]);
                 break;
             case ShippingStatusEnum::CANCELED:
@@ -110,7 +112,7 @@ class ShipmentController extends BaseController
                     'action'      => 'cancel_shipment',
                     'description' => trans('plugins/ecommerce::shipping.shipping_canceled_by'),
                     'order_id'    => $shipment->order_id,
-                    'user_id'     => Auth::user()->getKey(),
+                    'user_id'     => Auth::id(),
                 ]);
                 break;
         }
@@ -136,7 +138,7 @@ class ShipmentController extends BaseController
             ]),
             'shipment_id' => $id,
             'order_id'    => $shipment->order_id,
-            'user_id'     => Auth::user()->getKey() ?? 0,
+            'user_id'     => Auth::id() ?? 0,
         ]);
 
         return $response->setMessage(trans('plugins/ecommerce::shipping.update_cod_status_success'));

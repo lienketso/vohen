@@ -6,7 +6,7 @@
             `use strict`;
 
             Morris.{{ $chart->chartType }}(
-                    {!! $chart->toJSON() !!}
+                {!! $chart->toJSON() !!}
             );
         });
     </script>

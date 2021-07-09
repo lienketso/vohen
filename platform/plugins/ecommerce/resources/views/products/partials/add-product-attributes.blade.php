@@ -43,7 +43,7 @@
             @foreach ($productAttributeSets as $attributeSet)
                 <div class="product-select-attribute-item-wrap-template product-select-attribute-item-value-wrap-{{ $attributeSet->id }}">
                     <select class="next-input product-select-attribute-item-value product-select-attribute-item-value-id-{{ $attributeSet->id }}" data-set-id="{{ $attributeSet->id }}">
-                        @foreach ($productAttributes->where('attribute_set_id', $attributeSet->id) as $attribute)
+                        @foreach ($attributeSet->attributes as $attribute)
                             <option value="{{ $attribute->id }}">
                                 {{ $attribute->title }}
                             </option>
@@ -72,11 +72,8 @@
                             <div class="form-group">
                                 <label class="text-title-field">{{ trans('plugins/ecommerce::products.form.value') }}</label>
                                 <div class="product-select-attribute-item-value-wrap">
-                                    @php
-                                        $firstAttributeId = $productAttributeSets->first() ? $productAttributeSets->first()->id : 0;
-                                    @endphp
-                                    <select class="next-input product-select-attribute-item-value product-select-attribute-item-value-id-{{ $firstAttributeId }}"  name="added_attributes[{{ $firstAttributeId }}]" data-set-id="{{ $firstAttributeId }}">
-                                        @foreach ($productAttributes->where('attribute_set_id', $firstAttributeId) as $attribute)
+                                    <select class="next-input product-select-attribute-item-value product-select-attribute-item-value-id-{{ $attributeSetId }}"  name="added_attributes[{{ $attributeSetId }}]" data-set-id="{{ $attributeSetId }}">
+                                        @foreach ($productAttributes as $attribute)
                                             <option value="{{ $attribute->id }}">
                                                 {{ $attribute->title }}
                                             </option>

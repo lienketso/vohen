@@ -7,6 +7,7 @@ use Botble\Ecommerce\Repositories\Interfaces\ProductCollectionInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Ecommerce\Repositories\Interfaces\ReviewInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 if (!function_exists('get_product_by_id')) {
@@ -233,18 +234,19 @@ if (!function_exists('get_trending_products')) {
 if (!function_exists('get_featured_product_categories')) {
     /**
      * Get featured product categories
-     * @param array $args ['limit' => int, 'order' => array, 'select' => array()]
+     * @param array $args
      * @return mixed
      */
     function get_featured_product_categories($args = [])
     {
         $params = array_merge([
-            'limit'  => 0,
-            'order'  => [
+            'limit'     => 0,
+            'order'     => [
                 'ec_product_categories.order' => 'DESC',
             ],
-            'select' => ['*'],
-            'with'   => ['slugable'],
+            'select'    => ['*'],
+            'with'      => ['slugable'],
+            'withCount' => [],
         ], $args);
 
         return app(ProductCategoryInterface::class)->advancedGet([
@@ -255,6 +257,7 @@ if (!function_exists('get_featured_product_categories')) {
             'take'      => $params['limit'],
             'order_by'  => $params['order'],
             'select'    => $params['select'],
+            'withCount' => Arr::get($params, 'withCount', []),
         ]);
     }
 }
@@ -263,8 +266,11 @@ if (!function_exists('get_product_collections')) {
     /**
      * @return Collection
      */
-    function get_product_collections(array $condition, array $with = [], array $select = ['*'])
-    {
+    function get_product_collections(
+        array $condition = ['status' => BaseStatusEnum::PUBLISHED],
+        array $with = [],
+        array $select = ['*']
+    ) {
         return app(ProductCollectionInterface::class)->allBy($condition, $with, $select);
     }
 }
@@ -400,9 +406,12 @@ if (!function_exists('get_cross_sale_products')) {
     {
         $withCount = [];
         if (EcommerceHelper::isReviewEnabled()) {
-            $withCount = ['reviews', 'reviews as reviews_avg' => function($query) {
-                $query->select(DB::raw('avg(star)'));
-            }];
+            $withCount = [
+                'reviews',
+                'reviews as reviews_avg' => function ($query) {
+                    $query->select(DB::raw('avg(star)'));
+                },
+            ];
         }
 
         $with = array_merge([
@@ -429,9 +438,12 @@ if (!function_exists('get_up_sale_products')) {
     {
         $withCount = [];
         if (EcommerceHelper::isReviewEnabled()) {
-            $withCount = ['reviews', 'reviews as reviews_avg' => function($query) {
-                $query->select(DB::raw('avg(star)'));
-            }];
+            $withCount = [
+                'reviews',
+                'reviews as reviews_avg' => function ($query) {
+                    $query->select(DB::raw('avg(star)'));
+                },
+            ];
         }
 
         $with = array_merge([
@@ -519,5 +531,41 @@ if (!function_exists('get_product_attributes_with_set')) {
         }
 
         return $attributes;
+    }
+}
+
+if (!function_exists('handle_next_attributes_in_product')) {
+    /**
+     * @return array
+     */
+    function handle_next_attributes_in_product(
+        $productAttributes,
+        $productVariationsInfo,
+        $setId,
+        $selectedAttributes,
+        $key,
+        $variationNextIds,
+        $variationInfo = null,
+        $unavailableAttributeIds = []
+    ) {
+        foreach ($productAttributes as $attribute) {
+            if ($variationInfo != null && !$variationInfo->where('id', $attribute->id)->count()) {
+                $unavailableAttributeIds[] = $attribute->id;
+            }
+            if (in_array($attribute->id, $selectedAttributes)) {
+                $variationIds = $productVariationsInfo
+                    ->where('attribute_set_id', $setId)
+                    ->where('id', $attribute->id)
+                    ->pluck('variation_id')
+                    ->toArray();
+                if ($key == 0) {
+                    $variationNextIds = $variationIds;
+                } else {
+                    $variationNextIds = array_intersect($variationNextIds, $variationIds);
+                }
+            }
+        }
+
+        return [$variationNextIds, $unavailableAttributeIds];
     }
 }

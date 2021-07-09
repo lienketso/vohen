@@ -120,7 +120,15 @@ class User extends Authenticatable
      */
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar->url ? RvMedia::url($this->avatar->url) : (new Avatar)->create($this->name)->toBase64();
+        if ($this->avatar->url) {
+            return RvMedia::url($this->avatar->url);
+        }
+
+        try {
+            return (new Avatar)->create($this->name)->toBase64();
+        } catch (Exception $exception) {
+            return RvMedia::getDefaultImage();
+        }
     }
 
     /**

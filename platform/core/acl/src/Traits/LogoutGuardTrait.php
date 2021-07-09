@@ -49,11 +49,11 @@ trait LogoutGuardTrait
     /**
      * Get the Auth identifier for the specified guard.
      *
-     * @param $guard
+     * @param string $guard
      * @return mixed
      */
     public function getAuthIdentifier($guard)
     {
-        return Auth::guard($guard)->user()->getAuthIdentifier();
+        return Auth::guard($guard)->id();
     }
 }

@@ -58,7 +58,12 @@ class SettingController extends BaseController
      */
     public function postEdit(SettingRequest $request, BaseHttpResponse $response)
     {
-        $this->saveSettings($request->except(['_token', 'locale']));
+        $this->saveSettings($request->except([
+            '_token',
+            'locale',
+            'default_admin_theme',
+            'admin_locale_direction',
+        ]));
 
         $locale = $request->input('locale');
         if ($locale != false && array_key_exists($locale, Language::getAvailableLocales())) {
@@ -67,6 +72,24 @@ class SettingController extends BaseController
 
         if (!app()->environment('demo')) {
             setting()->set('locale', $locale)->save();
+        }
+
+        $adminTheme = $request->input('default_admin_theme');
+        if ($adminTheme != setting('default_admin_theme')) {
+            session()->put('admin-theme', $adminTheme);
+        }
+
+        if (!app()->environment('demo')) {
+            setting()->set('default_admin_theme', $adminTheme)->save();
+        }
+
+        $adminLocalDirection = $request->input('admin_locale_direction');
+        if ($adminLocalDirection != setting('admin_locale_direction')) {
+            session()->put('admin_locale_direction', $adminLocalDirection);
+        }
+
+        if (!app()->environment('demo')) {
+            setting()->set('admin_locale_direction', $adminLocalDirection)->save();
         }
 
         return $response

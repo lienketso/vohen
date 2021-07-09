@@ -53,7 +53,11 @@ if (!function_exists('is_in_admin')) {
      */
     function is_in_admin(): bool
     {
-        $isInAdmin = request()->segment(1) === BaseHelper::getAdminPrefix();
+        $prefix = BaseHelper::getAdminPrefix();
+
+        $segments = array_slice(request()->segments(), 0, count(explode('/', $prefix)));
+
+        $isInAdmin = implode('/', $segments) === $prefix;
 
         return apply_filters(IS_IN_ADMIN_FILTER, $isInAdmin);
     }

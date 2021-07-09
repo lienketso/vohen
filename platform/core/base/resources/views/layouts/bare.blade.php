@@ -6,7 +6,7 @@
         @include('core/base::layouts.partials.top-header')
 
         <div class="page-container">
-            <div class="page-content" style="background-color: transparent;">
+            <div class="page-content page-content-transparent">
                 @yield('content')
             </div>
             <div class="clearfix"></div>

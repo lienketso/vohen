@@ -17,7 +17,7 @@
                 <p class="text-right mobile-total"> {{ format_price($order->amount) }} </p>
             </div>
         </div>
-        <div id="{{ 'cart-item-' . $order->id }}" class=" collapse-products">
+        <div id="{{ 'cart-item-' . $order->id }}" class="collapse collapse-products">
             @foreach ($order->products as $orderProduct)
                 @php
                     $product = get_products([

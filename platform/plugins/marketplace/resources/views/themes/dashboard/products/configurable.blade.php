@@ -1,7 +1,6 @@
 <div id="product-variations-wrapper">
     <div class="variation-actions">
         <a href="#" class="btn-trigger-select-product-attributes" data-target="{{ route('marketplace.vendor.products.store-related-attributes', $product->id) }}">{{ trans('plugins/ecommerce::products.edit_attribute') }}</a>
-        <a href="#" class="btn-trigger-add-new-product-variation" data-target="{{ route('marketplace.vendor.products.add-version', $product->id) }}">{{ trans('plugins/ecommerce::products.add_new_variation') }}</a>
         <a href="#" class="btn-trigger-generate-all-versions" data-target="{{ route('marketplace.vendor.products.generate-all-versions', $product->id) }}">{{ trans('plugins/ecommerce::products.generate_all_variations') }}</a>
     </div>
     @if (!$productVariations->isEmpty())
@@ -73,9 +72,17 @@
     @else
         <p>{{ trans('plugins/ecommerce::products.variations_box_description') }}</p>
     @endif
+
+    <br>
+    <a href="#" class="btn-trigger-add-new-product-variation"
+       data-target="{{ route('marketplace.vendor.products.add-version', $product->id) }}"
+       data-load-form="{{ route('marketplace.vendor.products.get-version-form', ['id' => 0, 'product_id' => $product->id]) }}"
+       data-processing="{{ trans('plugins/ecommerce::products.processing') }}"
+    >{{ trans('plugins/ecommerce::products.add_new_variation') }}</a>
+
     {!! Form::modalAction('select-attribute-sets-modal', trans('plugins/ecommerce::products.select_attribute'), 'info', view('plugins/ecommerce::products.partials.attribute-sets', compact('productAttributeSets'))->render(), 'store-related-attributes-button', trans('plugins/ecommerce::products.save_changes')) !!}
-    {!! Form::modalAction('add-new-product-variation-modal', trans('plugins/ecommerce::products.add_new_variation'), 'info', view('plugins/ecommerce::products.partials.product-variation-form', ['productAttributeSets' => $productAttributeSets, 'productAttributes' => $productAttributes, 'product' => null, 'originalProduct' => $product, 'productVariationsInfo' => null])->render(), 'store-product-variation-button', trans('plugins/ecommerce::products.save_changes')) !!}
-    {!! Form::modalAction('edit-product-variation-modal', trans('plugins/ecommerce::products.edit_variation'), 'info', view('plugins/ecommerce::products.partials.product-variation-form', ['productAttributeSets' => $productAttributeSets, 'productAttributes' => $productAttributes, 'product' => null, 'originalProduct' => $product, 'productVariationsInfo' => null])->render(), 'update-product-variation-button', trans('plugins/ecommerce::products.save_changes')) !!}
+    {!! Form::modalAction('add-new-product-variation-modal', trans('plugins/ecommerce::products.add_new_variation'), 'info', null, 'store-product-variation-button', trans('plugins/ecommerce::products.save_changes'), 'modal-lg') !!}
+    {!! Form::modalAction('edit-product-variation-modal', trans('plugins/ecommerce::products.edit_variation'), 'info', null, 'update-product-variation-button', trans('plugins/ecommerce::products.save_changes'), 'modal-lg') !!}
     {!! Form::modalAction('generate-all-versions-modal', trans('plugins/ecommerce::products.generate_all_variations'), 'info', trans('plugins/ecommerce::products.generate_all_variations_confirmation'), 'generate-all-versions-button', trans('plugins/ecommerce::products.continue')) !!}
     {!! Form::modalAction('confirm-delete-version-modal', trans('plugins/ecommerce::products.delete_variation'), 'danger', trans('plugins/ecommerce::products.delete_variation_confirmation'), 'delete-version-button', trans('plugins/ecommerce::products.continue')) !!}
 </div>

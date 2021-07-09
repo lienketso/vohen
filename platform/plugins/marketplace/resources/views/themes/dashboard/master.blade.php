@@ -25,6 +25,11 @@
     <link rel="stylesheet" href="{{ asset('vendor/core/plugins/marketplace/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/core/plugins/marketplace/css/marketplace.css') }}">
 
+    @if (BaseHelper::siteLanguageDirection() == 'rtl')
+        <link rel="stylesheet" href="{{ asset('vendor/core/core/base/css/rtl.css') }}">
+        <link rel="stylesheet" href="{{ asset('vendor/core/plugins/marketplace/css/marketplace-rtl.css') }}">
+    @endif
+
     <!-- Put translation key to translate in VueJS -->
     <script type="text/javascript">
         window.trans = JSON.parse('{!! addslashes(json_encode(trans('plugins/member::dashboard'))) !!}');
@@ -40,7 +45,7 @@
     </script>
 </head>
 
-<body>
+<body @if (BaseHelper::siteLanguageDirection() == 'rtl') dir="rtl" @endif>
 @include('core/base::layouts.partials.svg-icon')
 <header class="header--mobile">
     <div class="header__left">
@@ -62,7 +67,6 @@
     </div>
     <div class="ps-drawer__content">
         @include('plugins/marketplace::themes.dashboard.partials.menu')
-
     </div>
 </aside>
 <div class="ps-site-overlay"></div>
@@ -74,11 +78,12 @@
                     <div class="ps-block__left"><img src="{{ auth('customer')->user()->avatar_url }}" alt="{{ auth('customer')->user()->name }}" width="80" /></div>
                     <div class="ps-block__right">
                         <p>{{ __('Hello') }}, {{ auth('customer')->user()->name }}</p>
+                        <small>{{ __('Joined on :date', ['date' => auth('customer')->user()->created_at->format('M d, Y')]) }}</small>
                     </div>
                     <div class="ps-block__action"><a href="{{ route('customer.logout') }}"><i class="icon-exit"></i></a></div>
                 </div>
                 <div class="ps-block--earning-count"><small>{{ __('Earning') }}</small>
-                    <h3>$0</h3>
+                    <h3>{{ format_price(auth('customer')->user()->balance) }}</h3>
                 </div>
             </div>
             <div class="ps-sidebar__content">
@@ -134,10 +139,32 @@
 
 <!-- custom code-->
 <script src="{{ asset('vendor/core/plugins/marketplace/js/main.js') }}"></script>
+<script src="{{ asset('vendor/core/plugins/marketplace/js/marketplace.js') }}"></script>
 
 {!! Assets::renderFooter() !!}
 @stack('scripts')
 @stack('footer')
+
+@if (session()->has('success_msg') || session()->has('error_msg') || (isset($errors) && $errors->count() > 0) || isset($error_msg))
+    <script type="text/javascript">
+        $(document).ready(function () {
+            @if (session()->has('success_msg'))
+            Botble.showSuccess('{{ session('success_msg') }}');
+            @endif
+            @if (session()->has('error_msg'))
+            Botble.showError('{{ session('error_msg') }}');
+            @endif
+            @if (isset($error_msg))
+            Botble.showError('{{ $error_msg }}');
+            @endif
+            @if (isset($errors))
+            @foreach ($errors->all() as $error)
+            Botble.showError('{{ $error }}');
+            @endforeach
+            @endif
+        });
+    </script>
+@endif
 </body>
 
 </html>

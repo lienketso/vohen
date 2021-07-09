@@ -85,6 +85,7 @@ return [
     'new_order_notice'                               => 'You have <span class="bold">:count</span> New Order(s)',
     'view_all'                                       => 'View all',
     'cancel_order'                                   => 'Cancel order',
+    'order_canceled'                                 => 'Order canceled',
     'order_was_canceled_at'                          => 'Order was canceled at',
     'completed'                                      => 'Completed',
     'uncompleted'                                    => 'Uncompleted',
@@ -158,4 +159,5 @@ return [
     'send_an_email_to_recover_this_order'            => 'Send an email to customer to recover this order',
     'see_maps'                                       => 'See maps',
     'one_or_more_products_dont_have_enough_quantity' => 'One or more products don\'t have enough quantity!',
+    'cannot_send_order_recover_to_mail'              => 'The email could not be found so it can\'t send a recovery email to the customer.',
 ];

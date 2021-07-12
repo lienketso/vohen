@@ -5,6 +5,7 @@ namespace Botble\Marketplace\Http\Controllers\Fronts;
 use Assets;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Repositories\Interfaces\CustomerInterface;
+use Botble\Marketplace\Repositories\Interfaces\RevenueInterface;
 use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
 use Botble\Marketplace\Http\Requests\BecomeVendorRequest;
 use Botble\Marketplace\Models\Store;
@@ -17,6 +18,7 @@ use Exception;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use RvMedia;
@@ -46,6 +48,8 @@ class DashboardController
      */
     protected $vendorInfoRepository;
 
+    protected $revenueRepository;
+
     /**
      * DashboardController constructor.
      * @param Repository $config
@@ -57,11 +61,13 @@ class DashboardController
         Repository $config,
         CustomerInterface $customerRepository,
         StoreInterface $storeRepository,
-        VendorInfoInterface $vendorInfoRepository)
+        VendorInfoInterface $vendorInfoRepository,
+        RevenueInterface $revenueRepository)
     {
         $this->storeRepository = $storeRepository;
         $this->customerRepository = $customerRepository;
         $this->vendorInfoRepository = $vendorInfoRepository;
+        $this->revenueRepository = $revenueRepository;
         Assets::setConfig($config->get('plugins.marketplace.assets', []));
 
         Theme::asset()

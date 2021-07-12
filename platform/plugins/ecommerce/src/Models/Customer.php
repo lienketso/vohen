@@ -135,4 +135,5 @@ class Customer extends Authenticatable
 
         return parent::__get($key);
     }
+
 }

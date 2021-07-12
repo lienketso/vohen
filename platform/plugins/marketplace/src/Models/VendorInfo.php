@@ -44,7 +44,8 @@ class VendorInfo extends BaseModel
      */
     public function isCheckSignature()
     {
-        return get_marketplace_setting('check_valid_signature', config('plugins.marketplace.general.check_signature_vendor', true));
+        return get_marketplace_setting('check_valid_signature',
+            config('plugins.marketplace.general.check_signature_vendor', true));
     }
 
     /**
@@ -96,9 +97,9 @@ class VendorInfo extends BaseModel
                 $totalRevenueOriginal = $vendorInfo->getOriginal('total_icome');
                 $totalRevenue = $vendorInfo->total_icome;
                 if ($balanceOriginal != $balance || $totalFeeOriginal != $totalFee || $totalRevenueOriginal != $totalRevenue) {
-                    if ($vendorInfo->isCheckSignature() && !$vendorInfo->checkSignature()) {
-                        throw new Exception(__('Invalid signature of vendor info'));
-                    }
+//                    if ($vendorInfo->isCheckSignature() && !$vendorInfo->checkSignature()) {
+//                        throw new Exception(__('Invalid signature of vendor info'));
+//                    }
                     $vendorInfo->signature = Hash::make($vendorInfo->getSignatureKey(true));
                 }
             }

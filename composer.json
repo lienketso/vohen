@@ -31,7 +31,7 @@
         "fakerphp/faker": "^1.10",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "^5.0",
+        "nunomaduro/collision": "^5.2",
         "phpunit/phpunit": "^9.3.3",
         "laravel/tinker": "^2.5",
         "barryvdh/laravel-debugbar": "^3.2",
@@ -66,7 +66,10 @@
             "merge-extra": false,
             "merge-extra-deep": false,
             "merge-scripts": false
-        }
+        },
+        "google/apiclient-services": [
+            "Analytics"
+        ]
     },
     "scripts": {
         "post-root-package-install": [
@@ -78,6 +81,9 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "Google\\Task\\Composer::cleanup"
         ]
     },
     "config": {

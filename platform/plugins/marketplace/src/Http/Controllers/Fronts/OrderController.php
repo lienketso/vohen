@@ -510,8 +510,7 @@ class OrderController extends BaseController
             //update fee ship cho mp_vendor_info
             $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
             $data = [
-                'total_fee'=> $vendorInfo->total_fee + $order->shipping_amount,
-                'balance'=>$vendorInfo->balance - $order->shipping_amount
+                'total_fee'=> $vendorInfo->total_fee + $order->shipping_amount
             ];
             $this->vendorInfoRepository->update([
                 'customer_id'=>auth('customer')->user()->id
@@ -671,16 +670,16 @@ class OrderController extends BaseController
             'sub_amount'=>$order->amount,
             'fee'=>0,
             'amount'=>$order->amount,
-            'current_balance'=>$order->sub_total,
+            'current_balance'=>$order->amount,
             'currency'=>'VND',
             'description'=>'Cập nhật doanh thu'
         ]);
         //update mp_vendor_info
         $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
         $data = [
-            'balance'=> $vendorInfo->balance + $order->sub_total,
+            'balance'=> $vendorInfo->balance + $order->amount,
             'total_fee'=> $vendorInfo->total_fee + $order->shipping_amount,
-            'total_revenue'=>$vendorInfo->total_revenua + $order->sub_total
+            'total_revenue'=>$vendorInfo->total_revenue + $order->amount
         ];
         $this->vendorInfoRepository->update([
             'customer_id'=>auth('customer')->user()->id
@@ -763,6 +762,18 @@ class OrderController extends BaseController
             }
         }
 
+        $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
+        //Xóa bảng doanh thu mp_customer_revenue
+        $this->revenueRepository->deleteBy(['order_id'=>$order->id]);
+        //hoàn tiền cập nhật mp_vendor_info
+
+        $data = [
+            'balance'=> $vendorInfo->balance - $request->input('refund_amount'),
+            'total_fee' => $vendorInfo->total_fee - $order->shipping_amount,
+            'total_revenue'=> $vendorInfo->total_revenue - $request->input('refund_amount'),
+        ];
+        $this->vendorInfoRepository->update(['customer_id'=>auth('customer')->user()->id],$data);
+
         if ($request->input('refund_amount', 0) > 0) {
             $this->orderHistoryRepository->createOrUpdate([
                 'action'      => 'refund',
@@ -776,7 +787,14 @@ class OrderController extends BaseController
                     'method' => $payment->payment_channel ?? PaymentMethodEnum::COD,
                 ]),
             ]);
+
+
+
         }
+
+
+
+
 
         return $response->setMessage(trans('plugins/ecommerce::order.refund_success'));
     }

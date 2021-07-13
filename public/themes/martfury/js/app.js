@@ -3534,7 +3534,7 @@ var render = function() {
         return !_vm.isLoading
           ? _c(
               "div",
-              { staticClass: "col-xl-2 col-lg-3 col-md-4 col-sm-4 col-6" },
+              { staticClass: "col-xl-2 col-lg-3 col-md-4 col-sm-4 col-4" },
               [
                 _c("div", { staticClass: "ps-block--category" }, [
                   _c("a", {

@@ -45,8 +45,8 @@
                     <div class="col-md-8">
                         <div class="ps-card ps-card--sale-report">
                             <div class="ps-card__header">
-                                <h4>{{ __('Sales Reports') }}</h4>
-                                <a href="{{ route('marketplace.vendor.revenues.index') }}"><small>{{ __('Revenues') }} <i class="fas fa-angle-double-right"></i></small></a>
+                                <h4>Báo cáo bán hàng</h4>
+                                <a href="{{ route('marketplace.vendor.revenues.index') }}"><small>Doanh thu <i class="fas fa-angle-double-right"></i></small></a>
                             </div>
                             <div class="ps-card__content">
                                 <order-in-month-chart url="{{ route('marketplace.vendor.chart.month') }}" ></order-in-month-chart>
@@ -56,7 +56,7 @@
                     <div class="col-md-4">
                         <div class="ps-card ps-card--earning">
                             <div class="ps-card__header">
-                                <h4>{{ __('Earnings') }}</h4>
+                                <h4>Thu nhập</h4>
                             </div>
                             <div class="ps-card__content">
                                 <div class="ps-card__chart">
@@ -64,12 +64,12 @@
                                     <div class="ps-card__information">
                                         <i class="icon icon-wallet"></i>
                                         <strong>{{ format_price($user->balance) }}</strong>
-                                        <small>{{ __('Balance') }}</small>
+                                        <small>Số dư</small>
                                     </div>
                                 </div>
                                 <div class="ps-card__status">
-                                    <p class="yellow"><strong> {{ format_price($user->total_revenue) }}</strong><span>{{ __('Revenue') }}</span></p>
-                                    <p class="green"><strong> {{ format_price($user->total_fee) }}</strong><span>{{ __('Fees') }}</span></p>
+                                    <p class="yellow"><strong> {{ format_price($user->total_revenue) }}</strong><span>Doanh thu</span></p>
+                                    <p class="green"><strong> {{ format_price($user->total_fee) }}</strong><span>Phí</span></p>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
             @if ($totalOrders)
                 <div class="ps-card">
                     <div class="ps-card__header">
-                        <h4>{{ __('Recent Orders') }}</h4>
+                        <h4>Những đơn đặt hàng gần đây</h4>
                     </div>
                     <div class="ps-card__content">
                         <div class="table-responsive">
@@ -116,14 +116,14 @@
                             </table>
                         </div>
                     </div>
-                    <div class="ps-card__footer"><a class="ps-card__morelink" href="{{ route('marketplace.vendor.orders.index') }}">{{ __('View Full Orders') }}<i class="icon icon-chevron-right"></i></a></div>
+                    <div class="ps-card__footer"><a class="ps-card__morelink" href="{{ route('marketplace.vendor.orders.index') }}">Xem tất cả đơn hàng<i class="icon icon-chevron-right"></i></a></div>
                 </div>
             @endif
         </div>
         <div class="ps-section__right">
             <section class="ps-card ps-card--statics">
                 <div class="ps-card__header">
-                    <h4>{{ __('Statistics') }}</h4>
+                    <h4>Số liệu thống kê</h4>
 <!--                    <div class="ps-card__sortby"><i class="icon-calendar-empty"></i>
                         <div class="form-group&#45;&#45;select">
                             <select class="form-control">
@@ -145,7 +145,7 @@
                     <div class="ps-block--stat pink">
                         <div class="ps-block__left"><span><i class="icon-bag-dollar"></i></span></div>
                         <div class="ps-block__content">
-                            <p>{{ __('Revenue') }}</p>
+                            <p>Doanh thu</p>
                             <h4>{{ format_price($user->total_revenue) }}<small class="asc"><i class="icon-arrow-up"></i></small></h4>
                         </div>
                     </div>

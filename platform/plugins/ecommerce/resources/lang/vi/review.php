@@ -20,7 +20,7 @@ return [
     'user'                 => 'Người dùng',
     'star'                 => 'Sao',
     'status'               => 'Trạng thái',
-    'intro'                => [
+    'intro'  => [
         'title'       => 'Quản lý danh sách nhận xét của khách hàng',
         'description' => 'Lưu trữ các nhận xét, đánh giá của khách hàng',
     ],

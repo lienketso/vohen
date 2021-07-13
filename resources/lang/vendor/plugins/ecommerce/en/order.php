@@ -58,7 +58,7 @@ return [
     'address_city_required'                          => 'The city field is required.',
     'address_address_required'                       => 'The address field is required.',
     'create_order_from_payment_page'                 => 'Order was created from checkout page',
-    'order_was_verified_by'                          => 'Order was verified by %user_name%',
+    'order_was_verified_by'                          => 'Đơn đặt hàng đã được xác minh bởi %user_name%',
     'new_order'                                      => 'New order :order_id',
     'payment_was_confirmed_by'                       => 'Payment was confirmed (amount :money) by %user_name%',
     'edit_order'                                     => 'Edit order :code',

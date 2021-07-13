@@ -12,6 +12,11 @@
   color: transparent;
 }
 
+.ps-product .ps-product__actions li a.active {
+  background-color: var(--color-1st);
+  color: #ffffff;
+}
+
 .button-loading:before {
   content: "";
   position: absolute;

@@ -18,7 +18,7 @@
         [
             'key'   => 'marketplace.vendor.withdrawals.index',
             'icon'  => 'icon-bag-dollar',
-            'name'  => __('Withdrawals')
+            'name'  => 'Yêu cầu rút tiền'
         ],
         [
             'key'   => 'marketplace.vendor.settings',

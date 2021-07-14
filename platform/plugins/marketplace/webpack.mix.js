@@ -9,6 +9,7 @@ const dist = 'public/vendor/core/plugins/' + directory;
 mix
     .js(source + '/resources/assets/js/marketplace.js', dist + '/js')
     .js(source + '/resources/assets/js/dashboard.js', dist + '/js')
+    .js(source + '/resources/assets/js/discount.js', dist + '/js')
     .sass(source + '/resources/assets/sass/marketplace.scss', dist + '/css')
     .sass(source + '/resources/assets/sass/marketplace-rtl.scss', dist + '/css')
 

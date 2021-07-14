@@ -13,7 +13,7 @@ class DiscountRepository extends RepositoriesAbstract implements DiscountInterfa
      */
     public function getAvailablePromotions()
     {
-        return $this->model
+        $data = $this->model
             ->where('type', 'promotion')
             ->where('start_date', '<=', now())
             ->where(function ($query) {
@@ -38,8 +38,9 @@ class DiscountRepository extends RepositoriesAbstract implements DiscountInterfa
                             ->whereIn('target', ['customer', 'group-products', 'specific-product', 'product-variant'])
                             ->where('product_quantity', '>', 1);
                     });
-            })
-            ->get();
+            });
+
+        return $this->applyBeforeExecuteQuery($data)->get();
     }
 
     /**
@@ -47,7 +48,7 @@ class DiscountRepository extends RepositoriesAbstract implements DiscountInterfa
      */
     public function getProductPriceBasedOnPromotion(array $productIds = [], array $productCollections = [])
     {
-        return $this->model
+        $data = $this->model
             ->where('type', 'promotion')
             ->where('start_date', '<=', now())
             ->leftJoin('ec_discount_products', 'ec_discounts.id', '=', 'ec_discount_products.discount_id')
@@ -102,7 +103,8 @@ class DiscountRepository extends RepositoriesAbstract implements DiscountInterfa
                     ->orWhere('end_date', '>=', now());
             })
             ->where('product_quantity', 1)
-            ->select('ec_discounts.*')
-            ->first();
+            ->select('ec_discounts.*');
+
+        return $this->applyBeforeExecuteQuery($data, true)->get();
     }
 }

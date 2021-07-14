@@ -160,4 +160,5 @@ return [
     'see_maps'                                       => 'See maps',
     'one_or_more_products_dont_have_enough_quantity' => 'One or more products don\'t have enough quantity!',
     'cannot_send_order_recover_to_mail'              => 'The email could not be found so it can\'t send a recovery email to the customer.',
+    'payment_info'                                   => 'Payment Info',
 ];

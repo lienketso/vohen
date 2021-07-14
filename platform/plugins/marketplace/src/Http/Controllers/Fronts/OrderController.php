@@ -26,8 +26,6 @@ use Botble\Ecommerce\Repositories\Interfaces\ShipmentInterface;
 use Botble\Ecommerce\Repositories\Interfaces\StoreLocatorInterface;
 use Botble\Ecommerce\Services\HandleApplyCouponService;
 use Botble\Ecommerce\Services\HandleShippingFeeService;
-use Botble\Marketplace\Repositories\Interfaces\RevenueInterface;
-use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
 use Botble\Marketplace\Tables\OrderTable;
 use Botble\Payment\Enums\PaymentMethodEnum;
 use Botble\Payment\Enums\PaymentStatusEnum;
@@ -97,10 +95,6 @@ class OrderController extends BaseController
      */
     protected $addressRepository;
 
-    protected $revenueRepository;
-
-    protected $vendorInfoRepository;
-
     /**
      * @param OrderInterface $orderRepository
      * @param CustomerInterface $customerRepository
@@ -123,9 +117,7 @@ class OrderController extends BaseController
         PaymentInterface $paymentRepository,
         StoreLocatorInterface $storeLocatorRepository,
         OrderProductInterface $orderProductRepository,
-        AddressInterface $addressRepository,
-        RevenueInterface $revenueRepository,
-        VendorInfoInterface $vendorInfoRepository
+        AddressInterface $addressRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
@@ -137,8 +129,6 @@ class OrderController extends BaseController
         $this->storeLocatorRepository = $storeLocatorRepository;
         $this->orderProductRepository = $orderProductRepository;
         $this->addressRepository = $addressRepository;
-        $this->revenueRepository = $revenueRepository;
-        $this->vendorInfoRepository = $vendorInfoRepository;
 
         Assets::setConfig(config('plugins.marketplace.assets', []));
     }
@@ -189,8 +179,6 @@ class OrderController extends BaseController
                 $weight += $product->weight;
             }
         }
-
-        $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
 
         $defaultStore = get_primary_store_locator();
 
@@ -506,16 +494,6 @@ class OrderController extends BaseController
                 'order_id'    => $id,
                 'user_id'     => 0,
             ]);
-
-            //update fee ship cho mp_vendor_info
-//            $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
-//            $data = [
-//                'total_fee'=> $vendorInfo->total_fee + $order->shipping_amount
-//            ];
-//            $this->vendorInfoRepository->update([
-//                'customer_id'=>auth('customer')->user()->id
-//            ], $data);
-
         }
 
         return $result;
@@ -663,29 +641,6 @@ class OrderController extends BaseController
             'user_id'     => 0,
         ]);
 
-//        //create customer_revenua_table
-//        $revenua = $this->revenueRepository->createOrUpdate([
-//            'customer_id'=>auth('customer')->user()->id,
-//            'order_id'=>$order->id,
-//            'sub_amount'=>$order->amount,
-//            'fee'=>0,
-//            'amount'=>$order->amount,
-//            'current_balance'=>$order->amount,
-//            'currency'=>'VND',
-//            'description'=>'Cập nhật doanh thu'
-//        ]);
-//        //update mp_vendor_info
-//        $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
-//        $data = [
-//            'balance'=> $vendorInfo->balance + $order->amount,
-//            'total_fee'=> $vendorInfo->total_fee + $order->shipping_amount,
-//            'total_revenue'=>$vendorInfo->total_revenue + $order->amount
-//        ];
-//        $this->vendorInfoRepository->update([
-//            'customer_id'=>auth('customer')->user()->id
-//        ], $data);
-
-
         return $response->setMessage(trans('plugins/ecommerce::order.confirm_payment_success'));
     }
 
@@ -762,18 +717,6 @@ class OrderController extends BaseController
             }
         }
 
-//        $vendorInfo = $this->vendorInfoRepository->getFirstBy(['customer_id'=>auth('customer')->user()->id]);
-//        //Xóa bảng doanh thu mp_customer_revenue
-//        $this->revenueRepository->deleteBy(['order_id'=>$order->id]);
-//        //hoàn tiền cập nhật mp_vendor_info
-//
-//        $data = [
-//            'balance'=> $vendorInfo->balance - $request->input('refund_amount'),
-//            'total_fee' => $vendorInfo->total_fee - $order->shipping_amount,
-//            'total_revenue'=> $vendorInfo->total_revenue - $request->input('refund_amount'),
-//        ];
-//        $this->vendorInfoRepository->update(['customer_id'=>auth('customer')->user()->id],$data);
-
         if ($request->input('refund_amount', 0) > 0) {
             $this->orderHistoryRepository->createOrUpdate([
                 'action'      => 'refund',
@@ -787,14 +730,7 @@ class OrderController extends BaseController
                     'method' => $payment->payment_channel ?? PaymentMethodEnum::COD,
                 ]),
             ]);
-
-
-
         }
-
-
-
-
 
         return $response->setMessage(trans('plugins/ecommerce::order.refund_success'));
     }

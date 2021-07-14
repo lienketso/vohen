@@ -17,12 +17,12 @@
                                     <a href="{{ $product->original_product->url }}"><img src="{{ $cartItem->options['image'] }}" alt="{{ $product->name }}" /></a>
                                 </div>
                                 <div class="ps-product__content">
-                                    <a class="ps-product__remove remove-cart-item" href="{{ route('public.cart.remove', $cartItem->rowId) }}"><i class="icon-cross"></i></a>
+                                    <a class="ps-product__remove remove-cart-item" href="#" data-url="{{ route('public.cart.remove', $cartItem->rowId) }}"><i class="icon-cross"></i></a>
                                     <a href="{{ $product->original_product->url }}"> {{ $product->name }}</a>
                                     <p class="mb-0">
                                         <small>
                                             <span class="d-inline-block">{{ $cartItem->qty }} x</span> <span class="cart-price">{{ format_price($cartItem->price) }} @if ($product->front_sale_price != $product->price)
-                                                    <small><del>{{ format_price($product->price_with_taxes) }}</del></small>
+                                                    <small><del>{{ format_price($product->price) }}</del></small>
                                                 @endif
                                             </span>
                                         </small>

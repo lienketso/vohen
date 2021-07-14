@@ -10,9 +10,9 @@
             <tr>
                 <td>
                     <span class="rule-to-value-missing @if ($rule->to) hidden @endif">{{ trans('plugins/ecommerce::shipping.greater_than') }}</span>
-                    <span><span class="from-value-label">{{ human_price_text($rule->from, get_application_currency()) }}</span><span class="unit-item-label">{{ $rule->type === 'base_on_price' ? get_application_currency()->symbol : 'grams' }}</span></span>&nbsp;
+                    <span><span class="from-value-label">{{ human_price_text($rule->from, get_application_currency()) }}</span><span class="unit-item-label">{{ $rule->type === 'base_on_price' ? get_application_currency()->symbol : ecommerce_weight_unit() }}</span></span>&nbsp;
 
-                    <span class="rule-to-value-wrap @if (!$rule->to) hidden @endif">- <span><span class="to-value-label">{{ human_price_text($rule->to, get_application_currency()) }}</span> <span class="unit-item-label">{{ $rule->type === 'base_on_price' ? get_application_currency()->symbol : 'grams' }}</span></span></span>
+                    <span class="rule-to-value-wrap @if (!$rule->to) hidden @endif">- <span><span class="to-value-label">{{ human_price_text($rule->to, get_application_currency()) }}</span> <span class="unit-item-label">{{ $rule->type === 'base_on_price' ? get_application_currency()->symbol : ecommerce_weight_unit() }}</span></span></span>
                 </td>
                 <td class="text-right">
                     <label><span><span class="rule-price-item">{{ human_price_text($rule->price ?? 0, get_application_currency()) }}</span> {{ get_application_currency()->symbol }}</span> </label>
@@ -37,7 +37,7 @@
                                         <div class="ui-select-wrapper">
                                             <select class="select-rule-type ui-select" name="type">
                                                 <option value="base_on_price" data-text="{{ trans('plugins/ecommerce::shipping.base_on_price') }}" data-unit="{{ get_application_currency()->symbol }}" @if ($rule && $rule->type === 'base_on_price') selected @endif>{{ trans('plugins/ecommerce::shipping.base_on_price') }}</option>
-                                                <option value="base_on_weight" data-text="{{ trans('plugins/ecommerce::shipping.base_on_weight') }}" data-unit="grams" @if ($rule && $rule->type === 'base_on_weight') selected @endif>{{ trans('plugins/ecommerce::shipping.base_on_weight') }}</option>
+                                                <option value="base_on_weight" data-text="{{ trans('plugins/ecommerce::shipping.base_on_weight', ['unit' => ecommerce_weight_unit()]) }}" data-unit="{{ ecommerce_weight_unit() }}" @if ($rule && $rule->type === 'base_on_weight') selected @endif>{{ trans('plugins/ecommerce::shipping.base_on_weight', ['unit' => ecommerce_weight_unit()]) }}</option>
                                             </select>
                                             <svg class="svg-next-icon svg-next-icon-size-16">
                                                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#select-chevron"></use>
@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="flexbox-content-no-padding pl15">
                                     <div class="form-group">
-                                        <label class="text-title-field rule-from-to-label">{{ $rule && $rule->type === 'base_on_weight' ? trans('plugins/ecommerce::shipping.base_on_weight') : trans('plugins/ecommerce::shipping.base_on_price') }}</label>
+                                        <label class="text-title-field rule-from-to-label">{{ $rule && $rule->type === 'base_on_weight' ? trans('plugins/ecommerce::shipping.base_on_weight', ['unit' => ecommerce_weight_unit()]) : trans('plugins/ecommerce::shipping.base_on_price') }}</label>
                                         <div class="flexbox-grid-default flexbox-align-items-center">
                                             <div class="flexbox-auto-content">
                                                 <div class="next-input--stylized">

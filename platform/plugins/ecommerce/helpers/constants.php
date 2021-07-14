@@ -20,8 +20,12 @@ if (!defined('BRAND_MODULE_SCREEN_NAME')) {
     define('BRAND_MODULE_SCREEN_NAME', 'brand');
 }
 
+if (!defined('PRODUCT_COLLECTION_MODULE_SCREEN_NAME')) {
+    define('PRODUCT_COLLECTION_MODULE_SCREEN_NAME', 'product-collection');
+}
+
 if (!defined('PRODUCT_LABEL_MODULE_SCREEN_NAME')) {
-    define('PRODUCT_LABEL_MODULE_SCREEN_NAME', 'product-collection');
+    define('PRODUCT_LABEL_MODULE_SCREEN_NAME', 'product-label');
 }
 
 if (!defined('CURRENCY_MODULE_SCREEN_NAME')) {

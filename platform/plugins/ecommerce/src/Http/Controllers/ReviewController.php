@@ -2,6 +2,7 @@
 
 namespace Botble\Ecommerce\Http\Controllers;
 
+use Assets;
 use Botble\Base\Events\DeletedContentEvent;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
@@ -37,6 +38,8 @@ class ReviewController extends BaseController
     public function index(ReviewTable $dataTable)
     {
         page_title()->setTitle(trans('plugins/ecommerce::review.name'));
+
+        Assets::addStylesDirectly('vendor/core/plugins/ecommerce/css/review.css');
 
         return $dataTable->renderTable();
     }

@@ -23,6 +23,7 @@ class ProductCollectionRepository extends RepositoriesAbstract implements Produc
         if (empty($slug)) {
             $slug = time();
         }
+
         $this->resetModel();
 
         return $slug;

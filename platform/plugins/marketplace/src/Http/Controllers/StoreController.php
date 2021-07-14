@@ -14,7 +14,10 @@ use Botble\Marketplace\Http\Requests\StoreRequest;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\Marketplace\Tables\StoreTable;
 use Exception;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Throwable;
 
 class StoreController extends BaseController
 {
@@ -33,8 +36,8 @@ class StoreController extends BaseController
 
     /**
      * @param StoreTable $table
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @throws \Throwable
+     * @return Factory|View
+     * @throws Throwable
      */
     public function index(StoreTable $table)
     {

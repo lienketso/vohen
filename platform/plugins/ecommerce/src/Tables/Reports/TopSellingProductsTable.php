@@ -70,8 +70,7 @@ class TopSellingProductsTable extends TableAbstract
      */
     public function query()
     {
-        $query = $this->repository
-            ->getModel()
+        $query = $this->repository->getModel()
             ->join('ec_order_product', 'ec_products.id', '=', 'ec_order_product.product_id')
             ->join('ec_orders', 'ec_orders.id', '=', 'ec_order_product.order_id')
             ->join('payments', 'payments.order_id', '=', 'ec_orders.id')
@@ -79,10 +78,10 @@ class TopSellingProductsTable extends TableAbstract
             ->whereDate('ec_orders.created_at', '>=', now()->startOfMonth()->toDateString())
             ->whereDate('ec_orders.created_at', '<=', now()->endOfMonth()->toDateString())
             ->select([
-                'ec_products.id',
-                'ec_products.is_variation',
-                'ec_products.name',
-                'ec_order_product.qty',
+                'ec_products.id as id',
+                'ec_products.is_variation as is_variation',
+                'ec_products.name as name',
+                'ec_order_product.qty as qty',
             ])
             ->orderBy('ec_order_product.qty', 'DESC');
 
@@ -96,20 +95,17 @@ class TopSellingProductsTable extends TableAbstract
     {
         return [
             'id'   => [
-                'name'      => 'ec_products.id',
                 'title'     => trans('plugins/ecommerce::order.product_id'),
                 'width'     => '80px',
                 'orderable' => false,
                 'class'     => 'no-sort text-center',
             ],
             'name' => [
-                'name'      => 'ec_products.name',
                 'title'     => trans('plugins/ecommerce::reports.product_name'),
                 'orderable' => false,
                 'class'     => 'text-left',
             ],
             'qty'  => [
-                'name'      => 'ec_order_product.qty',
                 'title'     => trans('plugins/ecommerce::reports.quantity'),
                 'orderable' => false,
                 'class'     => 'text-center',

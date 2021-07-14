@@ -23,21 +23,21 @@ return [
     ],
     'resources'      => [
         'scripts' => [
-            'core'              => [
+            'core'               => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
                     'local' => '/vendor/core/core/base/js/core.js',
                 ],
             ],
-            'app'               => [
+            'app'                => [
                 'use_cdn'  => false,
                 'location' => 'header',
                 'src'      => [
                     'local' => '/vendor/core/core/base/js/app.js',
                 ],
             ],
-            'jquery-validation' => [
+            'jquery-validation'  => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
@@ -54,7 +54,7 @@ return [
                     'local' => '/vendor/core/core/base/libraries/jquery.blockui.min.js',
                 ],
             ],
-            'jquery-ui'         => [
+            'jquery-ui'          => [
                 'use_cdn'  => true,
                 'location' => 'footer',
                 'src'      => [
@@ -62,7 +62,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js',
                 ],
             ],
-            'fancybox'          => [
+            'fancybox'           => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
@@ -70,14 +70,14 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js',
                 ],
             ],
-            'are-you-sure'      => [
+            'are-you-sure'       => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
                     'local' => '/vendor/core/core/base/libraries/jquery.are-you-sure/jquery.are-you-sure.js',
                 ],
             ],
-            'toastr'            => [
+            'toastr'             => [
                 'use_cdn'  => true,
                 'location' => 'footer',
                 'src'      => [
@@ -85,7 +85,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.2/toastr.min.js',
                 ],
             ],
-            'datatables'        => [
+            'datatables'         => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
@@ -98,14 +98,14 @@ return [
                     ],
                 ],
             ],
-            'datepicker'        => [
+            'datepicker'         => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
                     'local' => '/vendor/core/core/base/libraries/bootstrap-datepicker/js/bootstrap-datepicker.min.js',
                 ],
             ],
-            'moment'            => [
+            'moment'             => [
                 'use_cdn'  => true,
                 'location' => 'footer',
                 'src'      => [
@@ -113,7 +113,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment-with-locales.min.js',
                 ],
             ],
-            'select2'           => [
+            'select2'            => [
                 'use_cdn'  => true,
                 'location' => 'footer',
                 'src'      => [
@@ -121,14 +121,14 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js',
                 ],
             ],
-            'input-mask'        => [
+            'input-mask'         => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
                     'local' => '/vendor/core/core/base/libraries/jquery-inputmask/jquery.inputmask.bundle.min.js',
                 ],
             ],
-            'form-validation'   => [
+            'form-validation'    => [
                 'use_cdn'  => false,
                 'location' => 'footer',
                 'src'      => [
@@ -147,7 +147,7 @@ return [
         ],
         /* -- STYLESHEET ASSETS -- */
         'styles'  => [
-            'fontawesome' => [
+            'fontawesome'        => [
                 'use_cdn'  => true,
                 'location' => 'header',
                 'src'      => [
@@ -155,14 +155,14 @@ return [
                     'cdn'   => '//use.fontawesome.com/releases/v5.0.13/css/all.css',
                 ],
             ],
-            'core'        => [
+            'core'               => [
                 'use_cdn'  => false,
                 'location' => 'header',
                 'src'      => [
                     'local' => '/vendor/core/core/base/css/core.css',
                 ],
             ],
-            'jquery-ui'   => [
+            'jquery-ui'          => [
                 'use_cdn'  => true,
                 'location' => 'footer',
                 'src'      => [
@@ -170,7 +170,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.theme.css',
                 ],
             ],
-            'pace'        => [
+            'pace'               => [
                 'use_cdn'  => true,
                 'location' => 'header',
                 'src'      => [
@@ -178,7 +178,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-minimal.css',
                 ],
             ],
-            'fancybox'    => [
+            'fancybox'           => [
                 'use_cdn'  => false,
                 'location' => 'header',
                 'src'      => [
@@ -186,7 +186,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css',
                 ],
             ],
-            'datatables'  => [
+            'datatables'         => [
                 'use_cdn'  => false,
                 'location' => 'header',
                 'src'      => [
@@ -197,14 +197,14 @@ return [
                     ],
                 ],
             ],
-            'datepicker'  => [
+            'datepicker'         => [
                 'use_cdn'  => false,
                 'location' => 'header',
                 'src'      => [
                     'local' => '/vendor/core/core/base/libraries/bootstrap-datepicker/css/bootstrap-datepicker3.min.css',
                 ],
             ],
-            'select2'     => [
+            'select2'            => [
                 'use_cdn'  => true,
                 'location' => 'header',
                 'src'      => [
@@ -215,7 +215,7 @@ return [
                     'cdn'   => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css',
                 ],
             ],
-            'toastr'      => [
+            'toastr'             => [
                 'use_cdn'  => true,
                 'location' => 'header',
                 'src'      => [

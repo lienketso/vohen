@@ -13,11 +13,8 @@ class CurrencyRepository extends RepositoriesAbstract implements CurrencyInterfa
     public function getAllCurrencies()
     {
         $data = $this->model
-            ->orderBy('order', 'ASC')
-            ->get();
+            ->orderBy('order', 'ASC');
 
-        $this->resetModel();
-
-        return $data;
+        return $this->applyBeforeExecuteQuery($data)->get();
     }
 }

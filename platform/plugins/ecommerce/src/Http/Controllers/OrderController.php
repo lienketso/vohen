@@ -289,9 +289,14 @@ class OrderController extends BaseController
 
                 $this->orderProductRepository->create($data);
 
+                $ids = [$product->id];
+                if ($product->is_variation && $product->original_product) {
+                    $ids[] = $product->original_product->id;
+                }
+
                 $this->productRepository
                     ->getModel()
-                    ->where('id', $product->id)
+                    ->whereIn('id', $ids)
                     ->where('with_storehouse_management', 1)
                     ->where('quantity', '>=', Arr::get($productItem, 'quantity', 1))
                     ->decrement('quantity', Arr::get($productItem, 'quantity', 1));
@@ -316,11 +321,7 @@ class OrderController extends BaseController
             ])
             ->addScripts(['blockui', 'input-mask']);
 
-        $order = $this->orderRepository
-            ->getModel()
-            ->where('id', $id)
-            ->with(['products', 'user'])
-            ->firstOrFail();
+        $order = $this->orderRepository->findOrFail($id, ['products', 'user']);
 
         page_title()->setTitle(trans('plugins/ecommerce::order.edit_order', ['code' => get_order_code($id)]));
 

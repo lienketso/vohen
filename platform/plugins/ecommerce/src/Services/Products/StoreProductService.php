@@ -64,7 +64,13 @@ class StoreProductService
 
         $product->fill($data);
 
-        $product->images = json_encode(array_values(array_filter($request->input('images', []))));
+        $images = [];
+
+        if ($request->input('images', [])) {
+            $images = array_values(array_filter($request->input('images', [])));
+        }
+
+        $product->images = json_encode($images);
 
         if (!$hasVariation || $forceUpdateAll) {
             if ($product->sale_price > $product->price) {

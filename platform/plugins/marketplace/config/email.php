@@ -4,7 +4,7 @@ return [
     'name'        => 'Marketplace',
     'description' => 'Config email templates for Marketplace',
     'templates'   => [
-        'store_new_order'      => [
+        'store_new_order' => [
             'title'       => 'plugins/marketplace::marketplace.email.store_new_order_title',
             'description' => 'plugins/marketplace::marketplace.email.store_new_order_description',
             'subject'     => 'New order(s) at {{ site_title }}',
@@ -13,7 +13,7 @@ return [
         ],
     ],
     'variables'   => [
-        'store_name'    => 'plugins/marketplace::marketplace.email.store_name',
+        'store_name'       => 'plugins/marketplace::marketplace.email.store_name',
         'product_list'     => 'plugins/ecommerce::ecommerce.product_list',
         'payment_detail'   => 'plugins/ecommerce::ecommerce.payment_detail',
         'shipping_method'  => 'plugins/ecommerce::ecommerce.shipping_method',

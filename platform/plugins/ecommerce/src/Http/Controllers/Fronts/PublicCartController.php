@@ -159,7 +159,7 @@ class PublicCartController extends Controller
 
             $parentIds = $products->pluck('original_product.id')->toArray();
 
-            $crossSellProducts = get_cart_cross_sale_products($parentIds, 7);
+            $crossSellProducts = get_cart_cross_sale_products($parentIds, theme_option('number_of_cross_sale_product', 4));
         }
 
         SeoHelper::setTitle(__('Shopping Cart'));

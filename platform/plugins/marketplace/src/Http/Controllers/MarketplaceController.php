@@ -2,16 +2,14 @@
 
 namespace Botble\Marketplace\Http\Controllers;
 
-use Assets;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Setting\Supports\SettingStore;
 use Exception;
 use Illuminate\Contracts\View\Factory;
-use Illuminate\View\View;
-use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class MarketplaceController extends BaseController
 {
@@ -33,13 +31,15 @@ class MarketplaceController extends BaseController
      * @param Request $request
      * @param BaseHttpResponse $response
      * @param SettingStore $settingStore
-     * @return Factory|View
+     * @return BaseHttpResponse|Factory|View
+     * @throws Exception
      */
     public function settings(Request $request, BaseHttpResponse $response)
     {
         if ($request->method() == 'POST') {
             return $this->postSettings($request, $response);
         }
+
         page_title()->setTitle(trans('plugins/marketplace::marketplace.settings.name'));
 
         return view('plugins/marketplace::settings.index');
@@ -51,7 +51,8 @@ class MarketplaceController extends BaseController
      * @return BaseHttpResponse
      * @throws Exception
      */
-    private function postSettings($request, $response) {
+    private function postSettings($request, $response)
+    {
         $settingKey = get_marketplace_setting_key();
         $filtered = collect($request->all())->filter(function ($value, $key) use ($settingKey) {
             return Str::startsWith($key, $settingKey);

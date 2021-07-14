@@ -27,14 +27,12 @@
                 </p>
             @endif
             @if (EcommerceHelper::isReviewEnabled())
-                @if ($product->reviews_count > 0)
-                    <div class="rating_wrap">
-                        <div class="rating">
-                            <div class="product_rate" style="width: {{ $product->reviews_avg * 20 }}%"></div>
-                        </div>
-                        <span class="rating_num">({{ $product->reviews_count }})</span>
+                <div class="rating_wrap">
+                    <div class="rating">
+                        <div class="product_rate" style="width: {{ $product->reviews_avg * 20 }}%"></div>
                     </div>
-                @endif
+                    <span class="rating_num">({{ $product->reviews_count }})</span>
+                </div>
             @endif
             <div class="ps-product__desc">
                 {!! clean($product->description) !!}
@@ -43,11 +41,11 @@
         <div class="ps-product__shopping">
             <p class="ps-product__price @if ($product->front_sale_price !== $product->price) sale @endif">{{ format_price($product->front_sale_price_with_taxes) }} @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</p>
             @if (EcommerceHelper::isCartEnabled())
-                <a class="ps-btn add-to-cart-button" data-id="{{ $product->id }}" href="{{ route('public.cart.add-to-cart') }}">{{ __('Add to cart') }}</a>
+                <a class="ps-btn add-to-cart-button" data-id="{{ $product->id }}" href="#" data-url="{{ route('public.cart.add-to-cart') }}">{{ __('Add to cart') }}</a>
             @endif
             <ul class="ps-product__actions">
-                <li><a class="js-add-to-wishlist-button" href="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i> {{ __('Wishlist') }}</a></li>
-                <li><a class="js-add-to-compare-button" href="{{ route('public.compare.add', $product->id) }}"><i class="icon-chart-bars"></i>
+                <li><a class="js-add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i> {{ __('Wishlist') }}</a></li>
+                <li><a class="js-add-to-compare-button" href="#" data-url="{{ route('public.compare.add', $product->id) }}"><i class="icon-chart-bars"></i>
                     {{ __('Compare') }}</a></li>
             </ul>
         </div>

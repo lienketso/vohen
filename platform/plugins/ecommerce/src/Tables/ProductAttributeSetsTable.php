@@ -80,19 +80,16 @@ class ProductAttributeSetsTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_product_attribute_sets.id',
-            'ec_product_attribute_sets.created_at',
-            'ec_product_attribute_sets.title',
-            'ec_product_attribute_sets.slug',
-            'ec_product_attribute_sets.order',
-            'ec_product_attribute_sets.status',
-        ];
+        $query = $this->repository->getModel()->select([
+            'id',
+            'created_at',
+            'title',
+            'slug',
+            'order',
+            'status',
+        ]);
 
-        $query = $model->select($select);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -154,18 +151,18 @@ class ProductAttributeSetsTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_product_attribute_sets.title'      => [
+            'title'      => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_product_attribute_sets.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
             ],
-            'ec_product_attribute_sets.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

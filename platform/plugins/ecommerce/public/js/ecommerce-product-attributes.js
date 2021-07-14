@@ -25,6 +25,8 @@ var EcommerceProductAttribute = /*#__PURE__*/function () {
     key: "handleChooseImage",
     value: function handleChooseImage() {
       new RvMediaStandAlone('.image-box .btn-images', {
+        filter: 'image',
+        view_in: 'all_media',
         onSelectFiles: function onSelectFiles(files, $el) {
           var firstItem = _.first(files);
 

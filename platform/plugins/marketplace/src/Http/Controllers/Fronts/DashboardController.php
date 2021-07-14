@@ -5,22 +5,26 @@ namespace Botble\Marketplace\Http\Controllers\Fronts;
 use Assets;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Ecommerce\Repositories\Interfaces\CustomerInterface;
-use Botble\Marketplace\Repositories\Interfaces\RevenueInterface;
-use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
 use Botble\Marketplace\Http\Requests\BecomeVendorRequest;
 use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
+use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
 use Botble\Media\Chunks\Exceptions\UploadMissingFileException;
 use Botble\Media\Chunks\Handler\DropZoneUploadHandler;
 use Botble\Media\Chunks\Receiver\FileReceiver;
 use Botble\Slug\Models\Slug;
 use Exception;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Response;
 use RvMedia;
 use SeoHelper;
 use SlugHelper;
@@ -48,8 +52,6 @@ class DashboardController
      */
     protected $vendorInfoRepository;
 
-    protected $revenueRepository;
-
     /**
      * DashboardController constructor.
      * @param Repository $config
@@ -61,13 +63,11 @@ class DashboardController
         Repository $config,
         CustomerInterface $customerRepository,
         StoreInterface $storeRepository,
-        VendorInfoInterface $vendorInfoRepository,
-        RevenueInterface $revenueRepository)
-    {
+        VendorInfoInterface $vendorInfoRepository
+    ) {
         $this->storeRepository = $storeRepository;
         $this->customerRepository = $customerRepository;
         $this->vendorInfoRepository = $vendorInfoRepository;
-        $this->revenueRepository = $revenueRepository;
         Assets::setConfig($config->get('plugins.marketplace.assets', []));
 
         Theme::asset()
@@ -82,7 +82,7 @@ class DashboardController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
     public function index()
     {
@@ -104,7 +104,7 @@ class DashboardController
     /**
      * @param Request $request
      * @param BaseHttpResponse $response
-     * @return BaseHttpResponse|\Illuminate\Http\JsonResponse
+     * @return BaseHttpResponse|JsonResponse
      */
     public function postUpload(Request $request, BaseHttpResponse $response)
     {
@@ -159,7 +159,7 @@ class DashboardController
     /**
      * @param Request $request
      * @return mixed
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function postUploadFromEditor(Request $request)
     {
@@ -167,7 +167,7 @@ class DashboardController
     }
 
     /**
-     * @return \Response
+     * @return Response
      */
     public function getBecomeVendor()
     {
@@ -184,7 +184,7 @@ class DashboardController
      * @param BecomeVendorRequest $request
      * @param BaseHttpResponse $response
      * @return BaseHttpResponse
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function postBecomeVendor(BecomeVendorRequest $request, BaseHttpResponse $response)
     {
@@ -214,10 +214,10 @@ class DashboardController
         if (!$customer->vendorInfo->id) {
             // Create vendor info
             $this->vendorInfoRepository->createOrUpdate([
-                'customer_id'   => $customer->id,
+                'customer_id' => $customer->id,
             ]);
         }
-        
+
         $this->customerRepository->createOrUpdate($customer);
 
         return $response->setNextUrl(route('marketplace.vendor.dashboard'))->setMessage(__('Registered successfully!'));

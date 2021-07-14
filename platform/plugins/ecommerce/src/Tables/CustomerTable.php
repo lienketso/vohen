@@ -75,18 +75,15 @@ class CustomerTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_customers.id',
-            'ec_customers.name',
-            'ec_customers.email',
-            'ec_customers.avatar',
-            'ec_customers.created_at',
-        ];
+        $query = $this->repository->getModel()->select([
+            'id',
+            'name',
+            'email',
+            'avatar',
+            'created_at',
+        ]);
 
-        $query = $model->select($select);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -96,23 +93,19 @@ class CustomerTable extends TableAbstract
     {
         return [
             'id'         => [
-                'name'  => 'ec_customers.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
                 'class' => 'text-left',
             ],
             'name'       => [
-                'name'  => 'ec_customers.name',
                 'title' => trans('core/base::forms.name'),
                 'class' => 'text-left',
             ],
             'email'      => [
-                'name'  => 'ec_customers.email',
                 'title' => trans('plugins/ecommerce::customer.name'),
                 'class' => 'text-left',
             ],
             'created_at' => [
-                'name'  => 'ec_customers.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
                 'class' => 'text-left',
@@ -142,17 +135,17 @@ class CustomerTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_customers.name'       => [
+            'name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_customers.email'      => [
+            'email'      => [
                 'title'    => trans('core/base::tables.email'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_customers.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

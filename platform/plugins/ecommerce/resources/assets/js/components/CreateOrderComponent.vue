@@ -358,7 +358,7 @@
                                     <div class="flexbox-auto-left">
                                         <a v-b-modal.edit-email>
                                             <span data-placement="top" data-toggle="tooltip"
-                                                  data-original-title="Chỉnh sửa email">
+                                                  data-original-title="Edit email">
                                                 <svg class="svg-next-icon svg-next-icon-size-12">
                                                     <use xmlns:xlink="http://www.w3.org/1999/xlink"
                                                          xlink:href="#next-edit"></use>
@@ -653,31 +653,31 @@
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('Name') }}</label>
                         <input type="text" class="next-input customer-address-name"
-                               :value="child_customer_address.name">
+                               v-model="child_customer_address.name">
                     </div>
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('Phone') }}</label>
                         <input type="text" class="next-input customer-address-phone"
-                               :value="child_customer_address.phone">
+                               v-model="child_customer_address.phone">
                     </div>
                 </div>
                 <div class="next-form-grid">
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('Address') }}</label>
                         <input type="text" class="next-input customer-address-address"
-                               :value="child_customer_address.address">
+                               v-model="child_customer_address.address">
                     </div>
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('Email') }}</label>
                         <input type="text" class="next-input customer-address-email"
-                               :value="child_customer_address.email">
+                               v-model="child_customer_address.email">
                     </div>
                 </div>
                 <div class="next-form-grid">
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('Country') }}</label>
                         <div class="ui-select-wrapper">
-                            <select class="ui-select" v-model="child_customer_address.country">
+                            <select class="ui-select customer-address-country" v-model="child_customer_address.country">
                                 <option v-for="(countryName, countryCode) in countries" :value="countryCode">
                                     {{ countryName }}
                                 </option>
@@ -692,25 +692,25 @@
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('State')}}</label>
                         <input type="text" class="next-input customer-address-state"
-                               :value="child_customer_address.state">
+                               v-model="child_customer_address.state">
                     </div>
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('City/District') }}</label>
                         <input type="text" class="next-input customer-address-city"
-                               :value="child_customer_address.city">
+                               v-model="child_customer_address.city">
                     </div>
                 </div>
                 <div class="next-form-grid" v-if="zip_code_enabled">
                     <div class="next-form-grid-cell">
                         <label class="text-title-field">{{ __('Zip code')}}</label>
                         <input type="text" class="next-input customer-address-zip-code"
-                               :value="child_customer_address.zip_code">
+                               v-model="child_customer_address.zip_code">
                     </div>
                 </div>
             </div>
         </b-modal>
 
-        <b-modal id="make-paid" title="Create a new order" ok-title="Create order" cancel-title="Close"
+        <b-modal id="make-paid" title="Create a new order" :ok-title="__('Create order')" :cancel-title="__('Close')"
                  @ok="createOrder($event, true)">
             <label class="ws-nm">{{ __('Confirm payment is paid for this order') }}</label>
             <p>
@@ -730,7 +730,7 @@
             <p>{{ __('Paid amount') }} : <span>{{ child_total_amount | formatPrice }} {{ currency }}</span></p>
         </b-modal>
 
-        <b-modal id="make-pending" title="Create a new order" ok-title="Create order" cancel-title="Close"
+        <b-modal id="make-pending" title="Create a new order" :ok-title="__('Create order')" :cancel-title="__('Close')"
                  @ok="createOrder($event)">
             <label class="ws-nm">{{ __('Confirm that payment for this order will be paid later') }}</label>
             <p>
@@ -1170,9 +1170,10 @@
 
                 if (this.customer) {
 
-                    $($event.target).addClass('button-loading');
-
                     let $modal = $(event.target).closest('.modal-dialog');
+
+                    $($event.target).find('.btn-primary').addClass('button-loading');
+
                     this.child_customer_address.name = $modal.find('.customer-address-name').val();
                     this.child_customer_address.email = $modal.find('.customer-address-email').val();
                     this.child_customer_address.phone = $modal.find('.customer-address-phone').val();
@@ -1182,9 +1183,12 @@
                     this.child_customer_address.country = $modal.find('.customer-address-country').val();
                     this.child_customer_address.zip_code = $modal.find('.customer-address-zip-code').val();
 
-                    // this.loadCountries();
-                    this.$root.$emit('bv::hide::modal', 'edit-address');
-                    $($event.target).removeClass('button-loading');
+                    let context = this;
+
+                    setTimeout(() => {
+                        $($event.target).find('.btn-primary').removeClass('button-loading');
+                        context.$root.$emit('bv::hide::modal', 'edit-address');
+                    }, 500);
                 }
             },
             createNewCustomer: function ($event) {

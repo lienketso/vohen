@@ -352,15 +352,16 @@
                             <label class="text-title-field"
                                    for="quick_buy_target_page">{{ trans('plugins/ecommerce::ecommerce.setting.quick_buy_target') }}
                             </label>
-                            <div class="ui-select-wrapper">
-                                <select name="quick_buy_target_page" class="ui-select form-control select-full" id="quick_buy_target_page">
-                                    <option value="checkout" @if (EcommerceHelper::getQuickBuyButtonTarget() == 'checkout') selected @endif>{{ trans('plugins/ecommerce::ecommerce.setting.checkout_page') }}</option>
-                                    <option value="cart" @if (EcommerceHelper::getQuickBuyButtonTarget() == 'cart') selected @endif>{{ trans('plugins/ecommerce::ecommerce.setting.cart_page') }}</option>
-                                </select>
-                                <svg class="svg-next-icon svg-next-icon-size-16">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#select-chevron"></use>
-                                </svg>
-                            </div>
+                            <label class="hrv-label">
+                                <input type="radio" name="quick_buy_target_page" class="hrv-radio"
+                                       value="checkout"
+                                       @if (EcommerceHelper::getQuickBuyButtonTarget() == 'checkout') checked @endif>{{ trans('plugins/ecommerce::ecommerce.setting.checkout_page') }}
+                            </label>
+                            <label class="hrv-label">
+                                <input type="radio" name="quick_buy_target_page" class="hrv-radio"
+                                       value="cart"
+                                       @if (EcommerceHelper::getQuickBuyButtonTarget() == 'cart') checked @endif>{{ trans('plugins/ecommerce::ecommerce.setting.cart_page') }}
+                            </label>
                         </div>
 
                         <div class="form-group">
@@ -393,6 +394,32 @@
                                        value="0"
                                        @if (get_ecommerce_setting('verify_customer_email', 0) == 0) checked @endif>{{ trans('core/setting::setting.general.no') }}
                             </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="text-title-field"
+                                   for="enable_guest_checkout">{{ trans('plugins/ecommerce::ecommerce.setting.enable_guest_checkout') }}
+                            </label>
+                            <label class="hrv-label">
+                                <input type="radio" name="enable_guest_checkout" class="hrv-radio"
+                                       value="1"
+                                       @if (EcommerceHelper::isEnabledGuestCheckout()) checked @endif>{{ trans('core/setting::setting.general.yes') }}
+                            </label>
+                            <label class="hrv-label">
+                                <input type="radio" name="enable_guest_checkout" class="hrv-radio"
+                                       value="0"
+                                       @if (!EcommerceHelper::isEnabledGuestCheckout()) checked @endif>{{ trans('core/setting::setting.general.no') }}
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="text-title-field"
+                                   for="minimum_order_amount">{{ trans('plugins/ecommerce::ecommerce.setting.minimum_order_amount', ['currency' => cms_currency()->getDefaultCurrency()->title]) }}
+                            </label>
+                            <div class="next-input--stylized">
+                                <span class="next-input-add-on next-input__add-on--before unit-item-price-label">{{ cms_currency()->getDefaultCurrency()->symbol }}</span>
+                                <input type="text" name="minimum_order_amount" class="next-input input-mask-number next-input--invisible" value="{{ get_ecommerce_setting('minimum_order_amount', 0) }}">
+                            </div>
                         </div>
 
                         <div class="form-group">

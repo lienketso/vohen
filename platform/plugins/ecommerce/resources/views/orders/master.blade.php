@@ -11,15 +11,15 @@
     @endif
 
     {!! Html::style('vendor/core/core/base/libraries/font-awesome/css/fontawesome.min.css') !!}
-    {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme.css?v=1.0.5') !!}
+    {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme.css?v=1.0.6') !!}
 
     @if (BaseHelper::siteLanguageDirection() == 'rtl')
-        {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme-rtl.css?v=1.0.5') !!}
+        {!! Html::style('vendor/core/plugins/ecommerce/css/front-theme-rtl.css?v=1.0.6') !!}
     @endif
 
     {!! Html::style('vendor/core/core/base/libraries/toastr/toastr.min.css') !!}
 
-    {!! Html::script('vendor/core/plugins/ecommerce/js/checkout.js?v=1.0.5') !!}
+    {!! Html::script('vendor/core/plugins/ecommerce/js/checkout.js?v=1.0.6') !!}
 </head>
 <body class="checkout-page" @if (BaseHelper::siteLanguageDirection() == 'rtl') dir="rtl" @endif>
     <div class="checkout-content-wrap">

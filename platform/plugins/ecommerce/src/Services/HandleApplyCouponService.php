@@ -90,9 +90,9 @@ class HandleApplyCouponService
         if ($discount->type_option == 'shipping') {
             $isFreeShipping = true;
             if ($prefix) {
-                Arr::set($sessionData, $prefix . 'is_free_ship', true);
+                Arr::set($sessionData, $prefix . 'is_free_shipping', true);
             } else {
-                $sessionData['is_free_ship'] = true;
+                $sessionData['is_free_shipping'] = true;
             }
             OrderHelper::setOrderSessionData($token, $sessionData);
         } elseif ($discount->type_option === 'amount' && $discount->discount_on === 'per-order') {
@@ -186,6 +186,7 @@ class HandleApplyCouponService
                 'discount_amount'      => $couponDiscountAmount,
                 'is_free_shipping'     => $isFreeShipping,
                 'discount_type_option' => $discount->type_option,
+                'discount'             => $discount,
             ],
         ];
     }
@@ -305,7 +306,7 @@ class HandleApplyCouponService
         $isFreeShipping = false;
 
         if ($discount->type_option == 'shipping') {
-            $sessionData['is_free_ship'] = true;
+            $sessionData['is_free_shipping'] = true;
             $isFreeShipping = true;
         } elseif ($discount->type_option === 'amount' && $discount->discount_on === 'per-order') {
             $couponDiscountAmount = $discount->value;

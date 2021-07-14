@@ -15,7 +15,7 @@
                     <a class="ps-post__title" href="{{ $post->url }}">{{ $post->name }}</a>
                 </div>
                 <div class="ps-post__bottom">
-                    <p>{{ $post->created_at->format('M d, Y') }} @if ($post->author) {{ __('by') }} {{ $post->author->getFullName() }} @endif</p>
+                    <p>{{ $post->created_at->translatedFormat('M d, Y') }} @if ($post->author) {{ __('by') }} {{ $post->author->name }} @endif</p>
                 </div>
             </div>
         </div>
@@ -42,7 +42,7 @@
                                 <a class="ps-post__title" href="{{ $post->url }}">{{ $post->name }}</a>
                             </div>
                             <div class="ps-post__bottom">
-                                <p>{{ $post->created_at->format('M d, Y') }} @if ($post->author) {{ __('by') }} {{ $post->author->getFullName() }} @endif</p>
+                                <p>{{ $post->created_at->translatedFormat('M d, Y') }} @if ($post->author) {{ __('by') }} {{ $post->author->name }} @endif</p>
                             </div>
                         </div>
                     </div>

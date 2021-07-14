@@ -82,19 +82,16 @@ class BrandTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_brands.id',
-            'ec_brands.name',
-            'ec_brands.created_at',
-            'ec_brands.status',
-            'ec_brands.is_featured',
-            'ec_brands.logo',
-        ];
+        $query = $this->repository->getModel()->select([
+            'id',
+            'name',
+            'created_at',
+            'status',
+            'is_featured',
+            'logo',
+        ]);
 
-        $query = $model->select($select);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -156,18 +153,18 @@ class BrandTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_brands.name'       => [
+            'name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_brands.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
             ],
-            'ec_brands.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

@@ -20,6 +20,10 @@ class ProductCategoryForm extends FormAbstract
 
         $categories = [];
         foreach ($list as $row) {
+            if ($this->getModel() && ($this->model->id === $row->id || $this->model->id === $row->parent_id)) {
+                continue;
+            }
+
             $categories[$row->id] = $row->indent_text . ' ' . $row->name;
         }
         $categories[0] = trans('plugins/ecommerce::product-categories.none');

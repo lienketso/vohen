@@ -2,6 +2,9 @@
 
 namespace Botble\Ecommerce\Services\ProductAttributes;
 
+use Botble\Base\Events\CreatedContentEvent;
+use Botble\Base\Events\DeletedContentEvent;
+use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Ecommerce\Models\ProductAttributeSet;
 use Botble\Ecommerce\Repositories\Eloquent\ProductAttributeRepository;
 use Botble\Ecommerce\Repositories\Eloquent\ProductAttributeSetRepository;
@@ -45,9 +48,21 @@ class StoreAttributeSetService
     {
         $data = $request->input();
 
+        if (!$productAttributeSet->id) {
+            $isUpdated = false;
+        } else {
+            $isUpdated = true;
+        }
+
         $productAttributeSet->fill($data);
 
         $productAttributeSet = $this->productAttributeSetRepository->createOrUpdate($productAttributeSet);
+
+        if (!$isUpdated) {
+            event(new CreatedContentEvent(PRODUCT_ATTRIBUTE_SETS_MODULE_SCREEN_NAME, $request, $productAttributeSet));
+        } else {
+            event(new UpdatedContentEvent(PRODUCT_ATTRIBUTE_SETS_MODULE_SCREEN_NAME, $request, $productAttributeSet));
+        }
 
         $attributes = json_decode($request->get('attributes', '[]'), true) ?: [];
         $deletedAttributes = json_decode($request->get('deleted_attributes', '[]'), true) ?: [];
@@ -66,11 +81,16 @@ class StoreAttributeSetService
     protected function deleteAttributes($productAttributeSetId, array $attributeIds)
     {
         foreach ($attributeIds as $id) {
-            $this->productAttributeRepository
-                ->deleteBy([
+            $attribute = $this->productAttributeRepository
+                ->getFirstBy([
                     'id'               => $id,
                     'attribute_set_id' => $productAttributeSetId,
                 ]);
+
+            if ($attribute) {
+                $attribute->delete();
+                event(new DeletedContentEvent(PRODUCT_ATTRIBUTES_MODULE_SCREEN_NAME, request(), $attribute));
+            }
         }
     }
 
@@ -85,10 +105,14 @@ class StoreAttributeSetService
                 $attribute = $this->productAttributeRepository->findById($item['id']);
                 if (!$attribute) {
                     $item['attribute_set_id'] = $productAttributeSetId;
-                    $this->productAttributeRepository->create($item);
+                    $attribute = $this->productAttributeRepository->create($item);
+
+                    event(new CreatedContentEvent(PRODUCT_ATTRIBUTES_MODULE_SCREEN_NAME, request(), $attribute));
                 } else {
                     $attribute->fill($item);
-                    $this->productAttributeRepository->createOrUpdate($attribute);
+                    $attribute = $this->productAttributeRepository->createOrUpdate($attribute);
+
+                    event(new UpdatedContentEvent(PRODUCT_ATTRIBUTES_MODULE_SCREEN_NAME, request(), $attribute));
                 }
             }
         }

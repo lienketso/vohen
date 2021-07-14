@@ -136,4 +136,11 @@ class Customer extends Authenticatable
         return parent::__get($key);
     }
 
+    /**
+     * @return HasMany
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'customer_id');
+    }
 }

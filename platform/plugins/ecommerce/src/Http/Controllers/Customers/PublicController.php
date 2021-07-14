@@ -197,12 +197,14 @@ class PublicController extends Controller
         $orders = $this->orderRepository->advancedGet([
             'condition' => [
                 'user_id'               => auth('customer')->id(),
-                'ec_orders.is_finished' => 1,
+                'is_finished' => 1,
             ],
             'paginate'  => [
                 'per_page'      => 10,
                 'current_paged' => (int)$request->input('page'),
             ],
+            'with'      => ['currency'],
+            'withCount' => ['products']
         ]);
 
         Theme::breadcrumb()
@@ -227,10 +229,7 @@ class PublicController extends Controller
                 'user_id' => auth('customer')->id(),
             ],
             ['ec_orders.*'],
-            [
-                'address',
-                'products',
-            ]
+            ['address', 'products']
         );
 
         if (!$order) {
@@ -340,6 +339,7 @@ class PublicController extends Controller
 
         Theme::breadcrumb()
             ->add(__('Home'), route('public.index'))
+            ->add(__('Address books'), route('customer.address'))
             ->add(__('Create Address'), route('customer.address.create'));
 
         return Theme::scope('ecommerce.customers.address.create', [],

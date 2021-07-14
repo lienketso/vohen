@@ -1,10 +1,10 @@
 <div class="customer-address-payment-form">
 
-    <div class="form-group">
-        @if (!auth('customer')->check())
+    @if (EcommerceHelper::isEnabledGuestCheckout() && !auth('customer')->check())
+        <div class="form-group">
             <p>{{ __('You have an account already?') }} <a href="{{ route('customer.login') }}">{{ __('Login') }}</a></p>
-        @endif
-    </div>
+        </div>
+    @endif
 
     @if (auth('customer')->check())
         @php

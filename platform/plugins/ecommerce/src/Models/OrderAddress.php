@@ -5,6 +5,8 @@ namespace Botble\Ecommerce\Models;
 use Botble\Base\Models\BaseModel;
 use Botble\Base\Supports\Avatar;
 use Botble\Base\Supports\Helper;
+use Exception;
+use RvMedia;
 
 class OrderAddress extends BaseModel
 {
@@ -47,6 +49,10 @@ class OrderAddress extends BaseModel
      */
     public function getAvatarUrlAttribute()
     {
-        return (string)(new Avatar)->create($this->name)->toBase64();
+        try {
+            return (new Avatar)->create($this->name)->toBase64();
+        } catch (Exception $exception) {
+            return RvMedia::getDefaultImage();
+        }
     }
 }

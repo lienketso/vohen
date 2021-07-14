@@ -41,7 +41,7 @@ class RevenueController
 
     /**
      * @param BaseHttpResponse $response
-     * @return BaseHttpResponse|\Illuminate\Http\JsonResponse
+     * @return BaseHttpResponse|JsonResponse
      */
     public function getMonthChart(BaseHttpResponse $response)
     {

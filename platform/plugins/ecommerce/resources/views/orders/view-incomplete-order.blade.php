@@ -18,7 +18,7 @@
                     <div class="ws-nm">
                         <input type="text" class="next-input" onclick="this.focus(); this.select();" value="{{ route('public.checkout.recover', $order->token) }}">
                         <br>
-                        @if ($order->user->email ? $order->user->email : $order->address->email)
+                        @if ($order->user->email ?: $order->address->email)
                             <button class="btn btn-secondary btn-trigger-send-order-recover-modal" data-action="{{ route('orders.send-order-recover-email', $order->id) }}">{{ trans('plugins/ecommerce::order.send_an_email_to_recover_this_order') }}</button>
                         @else
                             <strong><i>{{ trans('plugins/ecommerce::order.cannot_send_order_recover_to_mail') }}</i></strong>
@@ -39,13 +39,13 @@
                                 <table class="table-normal">
                                     <tbody>
                                         @php
-                                            $order->load(['products.product' => function ($q) { return $q->where(['ec_products.status' => \Botble\Base\Enums\BaseStatusEnum::PUBLISHED]); }]);
+                                            $order->load(['products.product']);
                                         @endphp
                                         @foreach ($order->products as $orderProduct)
                                             @php
                                                 $product = $orderProduct->product;
                                             @endphp
-                                            @if ($product)
+                                            @if ($product && $product->original_product)
                                                 <tr>
                                                     <td class="width-60-px min-width-60-px">
                                                         <div class="wrap-img"><img class="thumb-image thumb-image-cartorderlist" src="{{ RvMedia::getImageUrl($product->original_product->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}"></div>
@@ -133,13 +133,13 @@
                         <ul class="ws-nm">
                             <li class="overflow-ellipsis">
                                 <div class="mb5">
-                                    <a class="hover-underline text-capitalize" href="#">{{ $order->user->name ? $order->user->name : $order->address->name }}</a>
+                                    <a class="hover-underline text-capitalize" href="#">{{ $order->user->name ?: $order->address->name }}</a>
                                 </div>
                                 @if ($order->user->id)
                                     <div><i class="fas fa-inbox mr5"></i><span>{{ $order->user->orders()->count() }}</span> {{ trans('plugins/ecommerce::order.orders') }}</div>
                                 @endif
                                 <ul class="ws-nm text-infor-subdued">
-                                    <li class="overflow-ellipsis"><a class="hover-underline" href="mailto:{{ $order->user->email ? $order->user->email : $order->address->email }}">{{ $order->user->email ? $order->user->email : $order->address->email }}</a></li>
+                                    <li class="overflow-ellipsis"><a class="hover-underline" href="mailto:{{ $order->user->email ?: $order->address->email }}">{{ $order->user->email ?: $order->address->email }}</a></li>
                                     @if ($order->user->id)
                                         <li><div>{{ trans('plugins/ecommerce::order.have_an_account_already') }}</div></li>
                                     @else
@@ -172,7 +172,7 @@
                                     <div>{{ $order->address->state }}</div>
                                     <div>{{ $order->address->country_name }}</div>
                                     <div>
-                                        <a target="_blank" class="hover-underline" href="https://maps.google.com/?q={{ $order->address->address }}, {{ $order->address->city }}, {{ $order->address->state }}, {{ $order->address->country_name }}">{{ trans('plugins/ecommerce::order.see_maps') }}</a>
+                                        <a target="_blank" class="hover-underline" href="https://maps.google.com/?q={{ $order->full_address }}">{{ trans('plugins/ecommerce::order.see_maps') }}</a>
                                     </div>
                                 </div>
                             </li>

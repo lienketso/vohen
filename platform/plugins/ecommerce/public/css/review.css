@@ -1,26 +1,39 @@
-#list-reviews ul {
-  list-style: none;
-  padding-left: 0;
-}
-#list-reviews ul li {
-  border: 1px solid #dddddd;
-  padding: 10px;
-  margin-bottom: 15px;
+@charset "UTF-8";
+.rating_wrap {
+  font-family: "Font Awesome 5 Free" !important;
+  vertical-align: top;
+  overflow: hidden;
   position: relative;
-}
-#list-reviews ul li .review-author {
-  font-size: 14px;
-  font-weight: bold;
-}
-#list-reviews ul li .review-author, #list-reviews ul li .review-rating {
+  height: 20px;
+  width: 75px;
   display: inline-block;
 }
-#list-reviews ul li .delete-review-btn {
+.rating_wrap::before {
+  font-size: 12px;
+  content: "";
+  top: 0;
   position: absolute;
-  right: 8px;
-  top: 8px;
-  cursor: pointer;
+  left: 0;
+  float: left;
+  color: #d2d2d2;
+  letter-spacing: 2px;
+  font-weight: 600;
 }
-#list-reviews ul .review-rating .rating-container {
-  font-size: 0.8em;
+.rating_wrap .product_rate {
+  overflow: hidden;
+  font-family: "Font Awesome 5 Free" !important;
+  top: 0;
+  left: 0;
+  position: absolute;
+  padding-top: 1.5em;
+  color: #EDB867;
+}
+.rating_wrap .product_rate::before {
+  font-size: 12px;
+  content: "";
+  top: 0;
+  position: absolute;
+  left: 0;
+  letter-spacing: 2px;
+  font-weight: 600;
 }

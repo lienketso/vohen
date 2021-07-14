@@ -20,18 +20,18 @@
                             @foreach ($wishlist as $item)
                                 @php $product = $item->product; @endphp
                                 <tr>
-                                    <td data-label="{{ __('Remove') }}">&nbsp;<a class="js-remove-from-wishlist-button" href="{{ route('public.wishlist.remove', $product->id) }}"><i class="icon-cross"></i></a></td>
+                                    <td data-label="{{ __('Remove') }}">&nbsp;<a class="js-remove-from-wishlist-button" href="#" data-url="{{ route('public.wishlist.remove', $product->id) }}"><i class="icon-cross"></i></a></td>
                                     <td data-label="{{ __('Product') }}">
                                         <div class="ps-product--cart">
                                             <div class="ps-product__thumbnail"><a href="{{ $product->original_product->url }}"><img src="{{ RvMedia::getImageUrl($product->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}"></a></div>
                                             <div class="ps-product__content">
                                                 <a href="{{ $product->original_product->url }}">{{ $product->name }}</a>
                                                 @if (EcommerceHelper::isReviewEnabled())
-                                                    @php $countRating = get_count_reviewed_of_product($product->id); @endphp
+                                                    @php $countRating = $product->reviews()->count(); @endphp
                                                     @if ($countRating > 0)
                                                         <div class="rating_wrap">
                                                             <div class="rating">
-                                                                <div class="product_rate" style="width: {{ get_average_star_of_product($product->id) * 20 }}%"></div>
+                                                                <div class="product_rate" style="width: {{ $product->reviews()->avg('star') * 20 }}%"></div>
                                                             </div>
                                                             <span class="rating_num">({{ $countRating }})</span>
                                                         </div>
@@ -42,7 +42,7 @@
                                     </td>
                                     <td class="price" data-label="{{ __('Price') }}"><span>{{ format_price($product->front_sale_price_with_taxes) }}</span> @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</td>
                                     @if (EcommerceHelper::isCartEnabled())
-                                        <td data-label="{{ __('Action') }}"><a class="ps-btn add-to-cart-button" data-id="{{ $product->id }}" href="{{ route('public.cart.add-to-cart') }}">{{ __('Add to cart') }}</a></td>
+                                        <td data-label="{{ __('Action') }}"><a class="ps-btn add-to-cart-button" data-id="{{ $product->id }}" href="#" data-url="{{ route('public.cart.add-to-cart') }}">{{ __('Add to cart') }}</a></td>
                                     @endif
                                 </tr>
                             @endforeach
@@ -52,18 +52,18 @@
                                     $product = app(\Botble\Ecommerce\Repositories\Interfaces\ProductInterface::class)->findById($cartItem->id);
                                 @endphp
                                 <tr>
-                                    <td data-label="{{ __('Remove') }}">&nbsp;<a class="js-remove-from-wishlist-button" href="{{ route('public.wishlist.remove', $product->id) }}"><i class="icon-cross"></i></a></td>
+                                    <td data-label="{{ __('Remove') }}">&nbsp;<a class="js-remove-from-wishlist-button" href="#" data-url="{{ route('public.wishlist.remove', $product->id) }}"><i class="icon-cross"></i></a></td>
                                     <td data-label="{{ __('Product') }}">
                                         <div class="ps-product--cart">
                                             <div class="ps-product__thumbnail"><a href="{{ $product->original_product->url }}"><img src="{{ RvMedia::getImageUrl($product->image, 'thumb', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}"></a></div>
                                             <div class="ps-product__content">
                                                 <a href="{{ $product->original_product->url }}">{{ $product->name }}</a>
                                                 @if (EcommerceHelper::isReviewEnabled())
-                                                    @php $countRating = get_count_reviewed_of_product($product->id); @endphp
+                                                    @php $countRating = $product->reviews()->count(); @endphp
                                                     @if ($countRating > 0)
                                                         <div class="rating_wrap">
                                                             <div class="rating">
-                                                                <div class="product_rate" style="width: {{ get_average_star_of_product($product->id) * 20 }}%"></div>
+                                                                <div class="product_rate" style="width: {{ $product->reviews()->avg('star') * 20 }}%"></div>
                                                             </div>
                                                             <span class="rating_num">({{ $countRating }})</span>
                                                         </div>
@@ -74,7 +74,7 @@
                                     </td>
                                     <td class="price" data-label="{{ __('Price') }}"><span>{{ format_price($product->front_sale_price_with_taxes) }}</span> @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</td>
                                     @if (EcommerceHelper::isCartEnabled())
-                                        <td data-label="{{ __('Action') }}"><a class="ps-btn add-to-cart-button" data-id="{{ $product->id }}" href="{{ route('public.cart.add-to-cart') }}">{{ __('Add to cart') }}</a></td>
+                                        <td data-label="{{ __('Action') }}"><a class="ps-btn add-to-cart-button" data-id="{{ $product->id }}" href="#" data-url="{{ route('public.cart.add-to-cart') }}">{{ __('Add to cart') }}</a></td>
                                     @endif
                                 </tr>
                             @endforeach

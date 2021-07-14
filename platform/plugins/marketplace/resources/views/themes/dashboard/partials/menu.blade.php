@@ -16,9 +16,14 @@
             'name'  => __('Orders')
         ],
         [
+            'key'   => 'marketplace.vendor.discounts.index',
+            'icon'  => 'icon-gift',
+            'name'  => __('Coupons')
+        ],
+        [
             'key'   => 'marketplace.vendor.withdrawals.index',
             'icon'  => 'icon-bag-dollar',
-            'name'  => 'Yêu cầu rút tiền'
+            'name'  => __('Withdrawals')
         ],
         [
             'key'   => 'marketplace.vendor.settings',
@@ -36,5 +41,5 @@
             </a>
         </li>
     @endforeach
-    <li><a href="{{ route('customer.overview') }}"><i class="icon-user"></i> Tài khoản</a></li>
+    <li><a href="{{ route('customer.overview') }}"><i class="icon-user"></i>{{ __('Customer dashboard') }}</a></li>
 </ul>

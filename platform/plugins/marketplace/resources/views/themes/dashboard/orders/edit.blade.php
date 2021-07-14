@@ -359,7 +359,7 @@
                     @if (!$order->shipment->id)
                         <div class="shipment-create-wrap hidden"></div>
                     @else
-                        @include('plugins/ecommerce::orders.shipment-detail', ['shipment' => $order->shipment])
+                        @include('plugins/marketplace::themes.dashboard.orders.shipment-detail', ['shipment' => $order->shipment])
                     @endif
                 </div>
                 <div class="mt20 mb20">

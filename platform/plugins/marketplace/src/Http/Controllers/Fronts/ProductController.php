@@ -295,7 +295,8 @@ class ProductController extends BaseController
             $product = $this->productRepository->findById($id);
         }
 
-        $dataUrl = route('marketplace.vendor.products.get-list-product-for-search', ['product_id' => $product ? $product->id : 0]);
+        $dataUrl = route('marketplace.vendor.products.get-list-product-for-search',
+            ['product_id' => $product ? $product->id : 0]);
 
         return $response->setData(view('plugins/ecommerce::products.partials.extras',
             compact('product', 'dataUrl'))->render());

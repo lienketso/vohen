@@ -17,9 +17,9 @@ class WithdrawalRequest extends Request
     public function rules()
     {
         return [
-            'images'        => 'nullable|array',
-            'status'        => Rule::in(WithdrawalStatusEnum::values()),
-            'description'   => 'nullable|max:400',
+            'images'      => 'nullable|array',
+            'status'      => Rule::in(WithdrawalStatusEnum::values()),
+            'description' => 'nullable|max:400',
         ];
     }
 }

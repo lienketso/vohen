@@ -9,7 +9,7 @@ if (!function_exists('get_product_categories')) {
      * @param array $with
      * @param array $withCount
      * @param bool $parentOnly
-     * @return array
+     * @return array|\Illuminate\Support\Collection
      */
     function get_product_categories(
         array $conditions = [],
@@ -17,33 +17,8 @@ if (!function_exists('get_product_categories')) {
         array $withCount = [],
         bool $parentOnly = false
     ) {
-        $repo = app(ProductCategoryInterface::class);
-        $categories = $repo->getModel();
-
-        if (!empty($conditions)) {
-            $categories = $categories->where($conditions);
-        }
-
-        if (!empty($with)) {
-            $categories = $categories->with($with);
-        }
-
-        if (!empty($withCount)) {
-            $categories = $categories->withCount($withCount);
-        }
-
-        if ($parentOnly) {
-            $categories = $categories->where(function ($query) {
-                $query->whereNull('parent_id')
-                    ->orWhere('parent_id', 0)
-                    ->orWhere('parent_id', '');
-            });
-        }
-
-        $categories = $categories
-            ->orderBy('order', 'ASC')
-            ->orderBy('created_at', 'DESC')
-            ->get();
+        $categories = app(ProductCategoryInterface::class)
+            ->getProductCategories($conditions, $with, $withCount, $parentOnly);
 
         $categories = sort_item_with_children($categories);
 
@@ -59,20 +34,18 @@ if (!function_exists('get_product_categories_with_children')) {
      */
     function get_product_categories_with_children(array $options = [])
     {
-        $options = array_merge([
-            'status' => null,
-        ], $options);
+        $params = [
+            'order_by' => [
+                'order' => 'ASC',
+                'created_at' => 'DESC',
+            ],
+        ];
 
-        $categories = app(ProductCategoryInterface::class)->getModel();
-
-        if ($options['status'] !== null) {
-            $categories = $categories->where('status', $options['status']);
+        if (!empty($options['status'])) {
+            $params['condition'] = ['status' => $options['status']];
         }
 
-        $categories = $categories
-            ->orderBy('order', 'ASC')
-            ->orderBy('created_at', 'DESC')
-            ->get();
+        $categories = app(ProductCategoryInterface::class)->advancedGet($params);
 
         /**
          * @var SortItemsWithChildrenHelper $sortHelper

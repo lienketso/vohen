@@ -595,6 +595,10 @@ body[dir=rtl] {
   direction: ltr;
 }
 
+.ps-block--store-banner .ps-block__user p i {
+  display: inline-block;
+}
+
 @media screen and (max-width: 1365px) {
   .ps-product--detail .ps-product__shopping figure, .ps-product--detail .ps-product__shopping .ps-btn {
     margin-right: 0;
@@ -632,5 +636,11 @@ body[dir=rtl] {
   }
   .ps-block--site-features .ps-block__item:first-child {
     padding-left: 0;
+  }
+}
+@media (min-width: 768px) {
+  .ps-block--store-banner .ps-block__user .ps-block__user-content {
+    padding-left: 0;
+    padding-right: 30px;
   }
 }

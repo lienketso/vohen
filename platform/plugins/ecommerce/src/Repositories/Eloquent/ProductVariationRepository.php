@@ -15,9 +15,8 @@ class ProductVariationRepository extends RepositoriesAbstract implements Product
     public function getVariationByAttributes($configurableProductId, array $attributes)
     {
         $allRelatedVariations = $this->model
-            ->where('ec_product_variations.configurable_product_id', $configurableProductId)
+            ->where('configurable_product_id', $configurableProductId)
             ->distinct()
-            ->select('ec_product_variations.*')
             ->with('variationItems')
             ->get();
 
@@ -28,10 +27,9 @@ class ProductVariationRepository extends RepositoriesAbstract implements Product
                 $items = array_unique($items);
 
                 return array_equal($attributes, $items);
-            })
-            ->first();
+            });
 
-        return $matchedVariation;
+        return $this->applyBeforeExecuteQuery($matchedVariation, true)->first();
     }
 
     /**

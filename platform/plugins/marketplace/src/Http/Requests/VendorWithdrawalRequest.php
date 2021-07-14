@@ -2,9 +2,7 @@
 
 namespace Botble\Marketplace\Http\Requests;
 
-use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Support\Http\Requests\Request;
-use Illuminate\Validation\Rule;
 
 class VendorWithdrawalRequest extends Request
 {
@@ -19,8 +17,8 @@ class VendorWithdrawalRequest extends Request
         $fee = get_marketplace_setting('fee_withdrawal', 0);
 
         return [
-            'amount'        => 'required|numeric|min:1|max:' . (auth('customer')->user()->balance - $fee),
-            'description'   => 'nullable|max:400'
+            'amount'      => 'required|numeric|min:1|max:' . (auth('customer')->user()->balance - $fee),
+            'description' => 'nullable|max:400',
         ];
     }
 

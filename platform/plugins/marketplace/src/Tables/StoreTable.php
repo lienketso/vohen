@@ -5,7 +5,6 @@ namespace Botble\Marketplace\Tables;
 use Auth;
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
-use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -69,14 +68,12 @@ class StoreTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return $this->getOperations('marketplace.store.edit', 'marketplace.store.destroy', $item);
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -84,18 +81,15 @@ class StoreTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'mp_stores.id',
-            'mp_stores.logo',
-            'mp_stores.name',
-            'mp_stores.created_at',
-            'mp_stores.status',
-        ];
+        $query = $this->repository->getModel()->select([
+            'id',
+            'logo',
+            'name',
+            'created_at',
+            'status',
+        ]);
 
-        $query = $model->select($select);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -105,27 +99,22 @@ class StoreTable extends TableAbstract
     {
         return [
             'id'         => [
-                'name'  => 'mp_stores.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
             ],
             'logo'       => [
-                'name'  => 'mp_stores.logo',
                 'title' => trans('plugins/marketplace::store.forms.logo'),
                 'width' => '70px',
             ],
             'name'       => [
-                'name'  => 'mp_stores.name',
                 'title' => trans('core/base::tables.name'),
                 'class' => 'text-left',
             ],
             'created_at' => [
-                'name'  => 'mp_stores.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
             ],
             'status'     => [
-                'name'  => 'mp_stores.status',
                 'title' => trans('core/base::tables.status'),
                 'width' => '100px',
             ],
@@ -137,9 +126,7 @@ class StoreTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('marketplace.store.create'), 'marketplace.store.create');
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, Store::class);
+        return $this->addCreateButton(route('marketplace.store.create'), 'marketplace.store.create');
     }
 
     /**
@@ -152,31 +139,23 @@ class StoreTable extends TableAbstract
     }
 
     /**
-     * @return array
-     */
-    public function getFilters(): array
-    {
-        return $this->getBulkChanges();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getBulkChanges(): array
     {
         return [
-            'mp_stores.name'       => [
+            'name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'mp_stores.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
             ],
-            'mp_stores.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

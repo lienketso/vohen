@@ -394,6 +394,10 @@ body, .form-control, .btn {
     }
 }
 
+.checkout-button-group {
+    margin-bottom: 40px;
+}
+
 @media screen and (min-width: 992px) {
     .left {
         border-right: 1px solid #c8c8c8;
@@ -406,10 +410,28 @@ body, .form-control, .btn {
     }
 }
 
+@media screen and (max-width: 992px) {
+    .checkout-button-group {
+        margin-bottom: 10px;
+    }
+
+    .back-to-cart-button-group {
+        margin-bottom: 40px;
+        text-align: center;
+    }
+}
+
 @media screen and (max-width: 768px) {
     .left, .right {
         padding: 0 15px;
         height: auto;
+    }
+    .order-1, .order-md-2 {
+        order: initial;
+    }
+
+    .checkout-logo {
+        margin-top: 20px;
     }
 }
 

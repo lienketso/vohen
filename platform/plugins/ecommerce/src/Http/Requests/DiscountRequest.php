@@ -2,7 +2,9 @@
 
 namespace Botble\Ecommerce\Http\Requests;
 
+use Botble\Ecommerce\Enums\DiscountTypeOptionEnum;
 use Botble\Support\Http\Requests\Request;
+use Illuminate\Validation\Rule;
 
 class DiscountRequest extends Request
 {
@@ -15,10 +17,14 @@ class DiscountRequest extends Request
     public function rules()
     {
         return [
-            'title'  => 'nullable|required_if:type,promotion|max:255',
-            'code'   => 'nullable|required_if:type,coupon|max:20|unique:ec_discounts,code',
-            'value'  => 'required|numeric|min:0',
-            'target' => 'required',
+            'title'       => 'nullable|required_if:type,promotion|max:255',
+            'code'        => 'nullable|required_if:type,coupon|max:20|unique:ec_discounts,code',
+            'value'       => 'required|numeric|min:0',
+            'target'      => 'required',
+            'type_option' => 'required|' . Rule::in(DiscountTypeOptionEnum::values()),
+            'quantity'    => 'required_without:is_unlimited|numeric|min:1',
+            'start_date'  => 'nullable|date|date_format:d-m-Y',
+            'end_date'    => 'nullable|date|date_format:d-m-Y|after:start_date',
         ];
     }
 

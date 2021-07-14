@@ -151,6 +151,10 @@ class PublicCheckoutController
             abort(404);
         }
 
+        if (!EcommerceHelper::isEnabledGuestCheckout() && !auth('customer')->check()) {
+            return $response->setNextUrl(route('customer.login'));
+        }
+
         if ($token !== session('tracked_start_checkout')) {
             $order = $this->orderRepository->getFirstBy(['token' => $token, 'is_finished' => false]);
             if (!$order) {
@@ -240,10 +244,10 @@ class PublicCheckoutController
                     if (empty($discount)) {
                         $removeCouponService->execute();
                     } else {
-                        $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_ship') ? 0 : $shippingAmount;
+                        $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_shipping') ? 0 : $shippingAmount;
                     }
                 } else {
-                    $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_ship') ? 0 : $shippingAmount;
+                    $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_shipping') ? 0 : $shippingAmount;
                 }
             }
         }
@@ -350,7 +354,15 @@ class PublicCheckoutController
                 'token'           => $token,
             ]);
 
-            $order = $this->orderRepository->createOrUpdate($request->input());
+
+            $order = $this->orderRepository->getFirstBy(compact('token'));
+
+            if ($order) {
+                $order->fill($request->input());
+                $order = $this->orderRepository->createOrUpdate($order);
+            } else {
+                $order = $this->orderRepository->createOrUpdate($request->input());
+            }
 
             $sessionData['created_order'] = true;
             $sessionData['created_order_id'] = $order->id;
@@ -358,7 +370,13 @@ class PublicCheckoutController
 
         $address = null;
 
-        if (auth('customer')->check() && !Arr::get($sessionData, 'address_id')) {
+        if ($request->input('address.address_id') && $request->input('address.address_id') !== 'new') {
+            $address = $this->addressRepository->findById($request->input('address.address_id'));
+            if (!empty($address)) {
+                $sessionData['address_id'] = $address->id;
+                $sessionData['created_order_address_id'] = $address->id;
+            }
+        } elseif (auth('customer')->check() && !Arr::get($sessionData, 'address_id')) {
             $address = $this->addressRepository->getFirstBy([
                 'customer_id' => auth('customer')->id(),
                 'is_default'  => true,
@@ -366,12 +384,6 @@ class PublicCheckoutController
 
             if ($address) {
                 $sessionData['address_id'] = $address->id;
-            }
-        } elseif ($request->input('address.address_id') && $request->input('address.address_id') !== 'new') {
-            $address = $this->addressRepository->findById($request->input('address.address_id'));
-            if (!empty($address)) {
-                $sessionData['address_id'] = $address->id;
-                $sessionData['created_order_address_id'] = $address->id;
             }
         }
 
@@ -400,13 +412,11 @@ class PublicCheckoutController
 
         if ($addressData && !empty($addressData['name']) && !empty($addressData['phone']) && !empty($addressData['address'])) {
             if (!isset($sessionData['created_order_address'])) {
-                if ($addressData) {
-                    $createdOrderAddress = $this->createOrderAddress($addressData,
-                        Arr::get($addressData, 'created_order_id'));
-                    if ($createdOrderAddress) {
-                        $sessionData['created_order_address'] = true;
-                        $sessionData['created_order_address_id'] = $createdOrderAddress->id;
-                    }
+                $createdOrderAddress = $this->createOrderAddress($addressData,
+                    Arr::get($addressData, 'created_order_id'));
+                if ($createdOrderAddress) {
+                    $sessionData['created_order_address'] = true;
+                    $sessionData['created_order_address_id'] = $createdOrderAddress->id;
                 }
             } elseif (!empty($sessionData['created_order_id'])) {
                 $this->createOrderAddress($addressData,
@@ -564,10 +574,24 @@ class PublicCheckoutController
             abort(404);
         }
 
+        if (!EcommerceHelper::isEnabledGuestCheckout() && !auth('customer')->check()) {
+            return $response->setNextUrl(route('customer.login'));
+        }
+
         if (!Cart::instance('cart')->count()) {
             return $response
                 ->setError()
                 ->setMessage(__('No products in cart'));
+        }
+
+        if (EcommerceHelper::getMinimumOrderAmount() > Cart::instance('cart')->rawSubTotal()) {
+            return $response
+                ->setError()
+                ->setMessage(__('Minimum order amount is :amount, you need to buy more :more to place an order!', [
+                    'amount' => format_price(EcommerceHelper::getMinimumOrderAmount()),
+                    'more'   => format_price(EcommerceHelper::getMinimumOrderAmount() - Cart::instance('cart')
+                            ->rawSubTotal()),
+                ]));
         }
 
         $sessionData = OrderHelper::getOrderSessionData($token);
@@ -576,8 +600,15 @@ class PublicCheckoutController
 
         if (is_plugin_active('marketplace')) {
             $products = Cart::instance('cart')->products();
-            return apply_filters(HANDLE_PROCESS_POST_CHECKOUT_ORDER_DATA_ECOMMERCE, $products, $request, $token,
-                $sessionData, $response);
+
+            return apply_filters(
+                HANDLE_PROCESS_POST_CHECKOUT_ORDER_DATA_ECOMMERCE,
+                $products,
+                $request,
+                $token,
+                $sessionData,
+                $response
+            );
         }
 
         $weight = 0;
@@ -620,7 +651,7 @@ class PublicCheckoutController
             if (empty($discount)) {
                 $removeCouponService->execute();
             } else {
-                $shippingAmount = Arr::get($sessionData, 'is_free_ship') ? 0 : $shippingAmount;
+                $shippingAmount = Arr::get($sessionData, 'is_free_shipping') ? 0 : $shippingAmount;
             }
         }
 
@@ -648,6 +679,7 @@ class PublicCheckoutController
         ]);
 
         $order = $this->orderRepository->getFirstBy(compact('token'));
+
         if ($order) {
             $order->fill($request->input());
             $order = $this->orderRepository->createOrUpdate($order);
@@ -656,7 +688,6 @@ class PublicCheckoutController
         }
 
         if ($order) {
-
             $this->orderHistoryRepository->createOrUpdate([
                 'action'      => 'create_order_from_payment_page',
                 'description' => __('Order is created from checkout page'),
@@ -848,9 +879,12 @@ class PublicCheckoutController
         if (!EcommerceHelper::isCartEnabled()) {
             abort(404);
         }
+        $result = [
+            'error'   => false,
+            'message' => ''
+        ];
         if (is_plugin_active('marketplace')) {
-            $products = Cart::instance('cart')->products();
-            $result = apply_filters(HANDLE_POST_APPLY_COUPON_CODE_ECOMMERCE, $products, $request);
+            $result = apply_filters(HANDLE_POST_APPLY_COUPON_CODE_ECOMMERCE, $result, $request);
         } else {
             $result = $handleApplyCouponService->execute($request->input('coupon_code'));
         }
@@ -977,15 +1011,18 @@ class PublicCheckoutController
     /**
      * @param string $token
      * @param Request $request
+     * @param BaseHttpResponse $response
      * @param HandleShippingFeeService $shippingFeeService
      * @param HandleApplyCouponService $applyCouponService
      * @param HandleRemoveCouponService $removeCouponService
      * @param HandleApplyPromotionsService $applyPromotionsService
-     * @return Application|Factory|View
+     * @return BaseHttpResponse|Application|Factory|View
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function getCheckoutRecover(
         $token,
         Request $request,
+        BaseHttpResponse $response,
         HandleShippingFeeService $shippingFeeService,
         HandleApplyCouponService $applyCouponService,
         HandleRemoveCouponService $removeCouponService,
@@ -993,6 +1030,10 @@ class PublicCheckoutController
     ) {
         if (!EcommerceHelper::isCartEnabled()) {
             abort(404);
+        }
+
+        if (!EcommerceHelper::isEnabledGuestCheckout() && !auth('customer')->check()) {
+            return $response->setNextUrl(route('customer.login'));
         }
 
         if (is_plugin_active('marketplace')) {
@@ -1103,10 +1144,10 @@ class PublicCheckoutController
                 if (empty($discount)) {
                     $removeCouponService->execute();
                 } else {
-                    $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_ship') ? 0 : $shippingAmount;
+                    $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_shipping') ? 0 : $shippingAmount;
                 }
             } else {
-                $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_ship') ? 0 : $shippingAmount;
+                $shippingAmount = Arr::get($sessionCheckoutData, 'is_free_shipping') ? 0 : $shippingAmount;
             }
         }
 

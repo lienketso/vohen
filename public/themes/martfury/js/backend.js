@@ -179,6 +179,7 @@ var __webpack_exports__ = {};
           slider.slick({
             slidesToShow: slider.data('item'),
             slidesToScroll: 1,
+            rtl: $('body').prop('dir') === 'rtl',
             infinite: false,
             arrows: slider.data('arrow'),
             focusOnSelect: true,
@@ -204,6 +205,7 @@ var __webpack_exports__ = {};
             primary.slick({
               slidesToShow: 1,
               slidesToScroll: 1,
+              rtl: $('body').prop('dir') === 'rtl',
               asNavFor: '.ps-product__variants',
               fade: true,
               dots: false,
@@ -224,6 +226,7 @@ var __webpack_exports__ = {};
             second.slick({
               slidesToShow: second.data('item'),
               slidesToScroll: 1,
+              rtl: $('body').prop('dir') === 'rtl',
               infinite: false,
               arrows: second.data('arrow'),
               focusOnSelect: true,
@@ -265,8 +268,13 @@ var __webpack_exports__ = {};
         $(window).trigger('resize');
 
         if (product.length > 0) {
-          product.find('.ps-product__gallery').data('lightGallery').destroy(true);
-          product.find('.ps-product__gallery').lightGallery({
+          var $gallery = product.find('.ps-product__gallery');
+
+          if ($gallery.data('lightGallery')) {
+            $gallery.data('lightGallery').destroy(true);
+          }
+
+          $gallery.lightGallery({
             selector: '.item a',
             thumbnail: true,
             share: false,
@@ -614,7 +622,7 @@ var __webpack_exports__ = {};
       _self.addClass('button-loading');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         method: 'POST',
         success: function success(res) {
           if (res.error) {
@@ -644,7 +652,7 @@ var __webpack_exports__ = {};
       _self.addClass('button-loading');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         method: 'DELETE',
         success: function success(res) {
           if (res.error) {
@@ -676,7 +684,7 @@ var __webpack_exports__ = {};
       _self.addClass('button-loading');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         method: 'POST',
         success: function success(res) {
           if (res.error) {
@@ -708,7 +716,7 @@ var __webpack_exports__ = {};
       _self.text(buttonText + '...');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         method: 'DELETE',
         success: function success(res) {
           if (res.error) {
@@ -740,7 +748,7 @@ var __webpack_exports__ = {};
       _self.prop('disabled', true).addClass('button-loading');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         method: 'POST',
         data: {
           id: _self.data('id')
@@ -786,7 +794,7 @@ var __webpack_exports__ = {};
       _self.closest('.ps-product--cart-mobile').addClass('content-loading');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         method: 'GET',
         success: function success(res) {
           _self.closest('.ps-product--cart-mobile').removeClass('content-loading');
@@ -810,6 +818,45 @@ var __webpack_exports__ = {};
         },
         error: function error(res) {
           _self.closest('.ps-product--cart-mobile').removeClass('content-loading');
+
+          window.showAlert('alert-danger', res.message);
+        }
+      });
+    });
+    $(document).on('click', '.remove-cart-button', function (event) {
+      event.preventDefault();
+
+      var _self = $(this);
+
+      _self.closest('.ps-table--shopping-cart').addClass('content-loading');
+
+      $.ajax({
+        url: _self.data('url'),
+        method: 'GET',
+        success: function success(res) {
+          if (res.error) {
+            window.showAlert('alert-danger', res.message);
+            return false;
+          }
+
+          $('.ps-shopping-cart').load(window.location.href + ' .ps-shopping-cart > *', function () {
+            _self.closest('.ps-table--shopping-cart').removeClass('content-loading');
+
+            window.showAlert('alert-success', res.message);
+          });
+          $.ajax({
+            url: window.siteUrl + '/ajax/cart',
+            method: 'GET',
+            success: function success(response) {
+              if (!response.error) {
+                $('.ps-cart--mobile').html(response.data.html);
+                $('.btn-shopping-cart span i').text(response.data.count);
+              }
+            }
+          });
+        },
+        error: function error(res) {
+          _self.closest('.ps-table--shopping-cart').removeClass('content-loading');
 
           window.showAlert('alert-danger', res.message);
         }
@@ -1128,7 +1175,7 @@ var __webpack_exports__ = {};
       _self.addClass('button-loading');
 
       $.ajax({
-        url: _self.prop('href'),
+        url: _self.data('url'),
         type: 'GET',
         success: function success(res) {
           if (!res.error) {
@@ -1136,6 +1183,7 @@ var __webpack_exports__ = {};
             $('.ps-product--quickview .ps-product__images').slick({
               slidesToShow: 1,
               slidesToScroll: 1,
+              rtl: $('body').prop('dir') === 'rtl',
               fade: true,
               dots: false,
               arrows: true,

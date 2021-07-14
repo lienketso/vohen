@@ -11,18 +11,17 @@
         <div class="ps-product__meta">
             <p>{{ __('Brand') }}: <a href="{{ $product->brand->url }}">{{ $product->brand->name }}</a></p>
             @if (EcommerceHelper::isReviewEnabled())
-                @php $countRating = get_count_reviewed_of_product($product->id) @endphp
-                @if ($countRating > 0)
+                @if ($product->reviews_count > 0)
                     <div class="rating_wrap">
                         <div class="rating">
-                            <div class="product_rate" style="width: {{ get_average_star_of_product($product->id) * 20 }}%"></div>
+                            <div class="product_rate" style="width: {{ $product->reviews_avg * 20 }}%"></div>
                         </div>
-                        <span class="rating_num">({{ $countRating }} {{ __('reviews') }})</span>
+                        <span class="rating_num">({{ $product->reviews_count }} {{ __('reviews') }})</span>
                     </div>
                 @endif
             @endif
         </div>
-        <h4 class="ps-product__price @if ($product->front_sale_price !== $product->price) sale @endif">{{ format_price($product->front_sale_price_with_taxes) }} @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</h4>
+        <h4 class="ps-product__price @if ($product->front_sale_price !== $product->price) sale @endif"><span>{{ format_price($product->front_sale_price_with_taxes) }}</span> @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</h4>
         <div class="ps-product__desc">
             <div class="ps-list--dot">
                 {!! clean($product->description) !!}
@@ -49,8 +48,8 @@
                     @endif
                 @endif
                 <div class="ps-product__actions">
-                    <a class="js-add-to-wishlist-button" href="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i></a>
-                    <a class="js-add-to-compare-button" href="{{ route('public.compare.add', $product->id) }}"><i class="icon-chart-bars"></i></a>
+                    <a class="js-add-to-wishlist-button" href="#" data-url="{{ route('public.wishlist.add', $product->id) }}"><i class="icon-heart"></i></a>
+                    <a class="js-add-to-compare-button" href="#" data-url="{{ route('public.compare.add', $product->id) }}"><i class="icon-chart-bars"></i></a>
                 </div>
             </div>
         </form>

@@ -6,10 +6,18 @@
 
     <div class="col-md-4">
         <div class="form-group @if ($errors->has('sku')) has-error @endif">
-            <label
-                    class="text-title-field">{{ trans('plugins/ecommerce::products.sku') }}</label>
+            <label class="text-title-field">{{ trans('plugins/ecommerce::products.sku') }}</label>
             {!! Form::text('sku', old('sku', $product ? $product->sku : null), ['class' => 'next-input', 'id' => 'sku', 'data-counter' => 30]) !!}
         </div>
+        @if (($isVariation && !$product) || ($product && $product->is_variation && !$product->sku))
+            <div class="form-group">
+                <label class="text-title-field">
+                    <input type="hidden" name="auto_generate_sku" value="0">
+                    <input type="checkbox" name="auto_generate_sku" class="hrv-checkbox" value="1">
+                    &nbsp;{{ trans('plugins/ecommerce::products.form.auto_generate_sku') }}
+                </label>
+            </div>
+        @endif
     </div>
 
     <div class="col-md-4">

@@ -4,7 +4,7 @@
 
 <div class="ps-post--detail sidebar">
     <div class="ps-post__header">
-        <p>{{ $post->created_at->format('M d, Y') }} @if ($post->author) / {{ __('By') }} {{ $post->author->getFullName() }} @endif / {{ __('in') }} @foreach($post->categories as $category) <a href="{{ $category->url }}">{{ $category->name }}</a> @if (!$loop->last) , @endif @endforeach</p>
+        <p>{{ $post->created_at->translatedFormat('M d, Y') }} @if ($post->author) / {{ __('By') }} {{ $post->author->name }} @endif / {{ __('in') }} @foreach($post->categories as $category) <a href="{{ $category->url }}">{{ $category->name }}</a> @if (!$loop->last) , @endif @endforeach</p>
     </div>
     <div class="ps-post__content" style="padding-top: 0;">
         {!! clean($post->content, 'youtube') !!}
@@ -50,7 +50,7 @@
                                     <a class="ps-post__title" href="{{ $post->url }}">{{ $post->name }}</a>
                                 </div>
                                 <div class="ps-post__bottom">
-                                    <p>{{ $post->created_at->format('M d, Y') }} @if ($post->author) {{ __('by') }} {{ $post->author->getFullName() }} @endif</p>
+                                    <p>{{ $post->created_at->translatedFormat('M d, Y') }} @if ($post->author) {{ __('by') }} {{ $post->author->name }} @endif</p>
                                 </div>
                             </div>
                         </div>

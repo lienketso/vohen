@@ -17,14 +17,14 @@ class StoreRequest extends Request
     public function rules()
     {
         return [
-            'name'        => 'required',
-            'customer_id' => 'required',
-            'description' => 'max:400',
-            'status'      => Rule::in(BaseStatusEnum::values()),
-            'bank_info.name'          => 'max:120',
-            'bank_info.number'        => 'max:60',
-            'bank_info.full_name'     => 'max:120',
-            'bank_info.description'   => 'max:500',
+            'name'                  => 'required',
+            'customer_id'           => 'required',
+            'description'           => 'max:400',
+            'status'                => Rule::in(BaseStatusEnum::values()),
+            'bank_info.name'        => 'max:120',
+            'bank_info.number'      => 'max:60',
+            'bank_info.full_name'   => 'max:120',
+            'bank_info.description' => 'max:500',
         ];
     }
 }

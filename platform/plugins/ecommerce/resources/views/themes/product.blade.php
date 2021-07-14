@@ -46,11 +46,11 @@
                             <div class="product-rating">
                                 <div class="star-rating" itemprop="reviewRating" itemscope=""
                                      itemtype="http://schema.org/Rating"
-                                     title="Rated {{ get_average_star_of_product($product->id) }} out of 5">
-                                    <span style="width: {{ get_average_star_of_product($product->id) * 20 }}%"></span>
+                                     title="Rated {{ $product->reviews_avg }} out of 5">
+                                    <span style="width: {{ $product->reviews_avg * 20 }}%"></span>
                                 </div>
                                     <div class="product-rating-count"><a href="#list-reviews">( <span
-                                                    class="count">{{ get_count_reviewed_of_product($product->id) }}</span>
+                                                    class="count">{{ $product->reviews_count }}</span>
                                             {{ __('Reviews') }} )</a>
                                     </div>
                             </div>
@@ -134,7 +134,7 @@
                 @if (EcommerceHelper::isReviewEnabled())
                     <li class="nav-item">
                         <a class="" href="#tab_reviews" role="tab" data-toggle="tab">{{ __('Reviews') }}
-                            (<span> {{ get_count_reviewed_of_product($product->id) }}</span>)</a>
+                            (<span> {{ $product->reviews_count }}</span>)</a>
                     </li>
                 @endif
                 <li class="nav-item">
@@ -177,17 +177,8 @@
                     <div id="tab_reviews" role="tabpanel" class="tab-pane fade">
                     <!-- Accordion Title -->
                     <h6 class="product-collapse-title" data-toggle="collapse" data-target="#tab_reviews-coll">{{ __('Reviews') }}
-                        ({{ get_count_reviewed_of_product($product->id) }})</h6>
-                    <!-- End Accordion Title -->
-                    <!-- Accordion Content -->
-                    <div id="tab_reviews-coll" class=" product-collapse collapse container">
-                        <div class="row">
-                            <div class="review-form-wrapper col-md-12">
-                                {!! render_review_form($product->id) !!}
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End Accordion Content -->
+                        ({{ $product->reviews_count }})
+                    </h6>
                 </div>
                 @endif
 

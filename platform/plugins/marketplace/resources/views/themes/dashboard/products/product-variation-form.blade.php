@@ -21,7 +21,7 @@
         @endforeach
     </div>
 
-    @include('plugins/ecommerce::products.partials.general', compact('product', 'originalProduct'))
+    @include('plugins/ecommerce::products.partials.general', ['product' => $product, 'originalProduct' => $originalProduct, 'isVariation' => true])
     <div class="variation-images">
         {!! Form::customImages('images', isset($product) ? $product->images : []) !!}
     </div>

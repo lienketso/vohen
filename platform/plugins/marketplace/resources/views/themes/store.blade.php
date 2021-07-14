@@ -4,12 +4,13 @@
             <aside class="ps-block--store-banner">
                 <div class="ps-block__user">
                     <div class="ps-block__user-avatar">
-                        <img src="{{ RvMedia::getImageUrl($store->logo, 'small', false, RvMedia::getDefaultImage()) }}" alt="{{ $store->name }}">
+                        <img src="{{ $store->logo_url }}" alt="{{ $store->name }}">
                         @if (EcommerceHelper::isReviewEnabled())
                             <div class="rating_wrap">
                                 <div class="rating">
-                                    <div class="product_rate" style="width: {{ 4 * 20 }}%"></div>
+                                    <div class="product_rate" style="width: {{ $reviewsAvg * 20 }}%"></div>
                                 </div>
+                                <span class="rating_num">({{ $reviewsCount }})</span>
                             </div>
                         @endif
                     </div>
@@ -73,7 +74,7 @@
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
             </div>
         </div>
     </section>

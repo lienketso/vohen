@@ -13,8 +13,11 @@ use Botble\Marketplace\Http\Requests\WithdrawalRequest;
 use Botble\Marketplace\Repositories\Interfaces\WithdrawalInterface;
 use Botble\Marketplace\Tables\WithdrawalTable;
 use Exception;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Throwable;
 
 class WithdrawalController extends BaseController
 {
@@ -33,8 +36,8 @@ class WithdrawalController extends BaseController
 
     /**
      * @param WithdrawalTable $table
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @throws \Throwable
+     * @return Factory|View
+     * @throws Throwable
      */
     public function index(WithdrawalTable $table)
     {
@@ -71,10 +74,10 @@ class WithdrawalController extends BaseController
         $withdrawal = $this->withdrawalRepository->findOrFail($id);
 
         $withdrawal->fill([
-            'status'        => $request->input('status'),
-            'images'        => array_filter($request->input('images')),
-            'user_id'       => Auth::user()->getKey(),
-            'description'   => $request->input('description'),
+            'status'      => $request->input('status'),
+            'images'      => array_filter($request->input('images')),
+            'user_id'     => Auth::user()->getKey(),
+            'description' => $request->input('description'),
         ]);
 
         $this->withdrawalRepository->createOrUpdate($withdrawal);

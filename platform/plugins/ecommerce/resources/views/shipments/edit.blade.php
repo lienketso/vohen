@@ -32,9 +32,9 @@
                                             $product = get_products([
                                                 'condition' => [
                                                     'ec_products.status' => \Botble\Base\Enums\BaseStatusEnum::PUBLISHED,
-                                                    'ec_products.id' => $orderProduct->product_id,
+                                                    'ec_products.id'     => $orderProduct->product_id,
                                                 ],
-                                                'take' => 1,
+                                                'take'   => 1,
                                                 'select' => [
                                                     'ec_products.id',
                                                     'ec_products.images',
@@ -61,17 +61,9 @@
                                                         </div>
                                                         <div class="flexbox-content">
                                                             <a class="wordwrap hide-print" href="{{ route('products.edit', $product->original_product->id) }}" title="{{ $orderProduct->product_name }}">{{ $orderProduct->product_name }}</a>
-                                                            <span>
-                                                            @php $attributes = get_product_attributes($product->id) @endphp
-                                                                @if (!empty($attributes))
-                                                                    @foreach ($attributes as $attr)
-                                                                        {{ $attr->title }}
-                                                                        @if (!$loop->last)
-                                                                            /
-                                                                        @endif
-                                                                    @endforeach
-                                                                @endif
-                                                        </span>
+                                                            <p class="mb-0">
+                                                                <small>{{ $product->variation_attributes }}</small>
+                                                            </p>
                                                             <p>{{ trans('plugins/ecommerce::shipping.sku') }} : <span>{{ $product->sku }}</span></p>
                                                         </div>
                                                     </div>
@@ -93,14 +85,16 @@
                                     <div class="flexbox-content">
                                         <table>
                                             <tbody>
-                                            <tr>
-                                                <td colspan="3" class="text-right p-sm-r border-none">
-                                                    {{ trans('plugins/ecommerce::shipping.cash_on_delivery') }}:
-                                                </td>
-                                                <td class="text-right p-sm-r border-none">
-                                                    <span>{{ format_price($shipment->cod_amount) }}</span>
-                                                </td>
-                                            </tr>
+                                            @if ((float)$shipment->cod_amount)
+                                                <tr>
+                                                    <td colspan="3" class="text-right p-sm-r border-none">
+                                                        {{ trans('plugins/ecommerce::shipping.cash_on_delivery') }}:
+                                                    </td>
+                                                    <td class="text-right p-sm-r border-none">
+                                                        <span>{{ format_price($shipment->cod_amount) }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endif
                                             <tr>
                                                 <td colspan="3" class="text-right p-sm-r border-none">
                                                     {{ trans('plugins/ecommerce::shipping.shipping_fee') }}:
@@ -137,7 +131,7 @@
                                 </div>
                             </div>
                         </div>
-                        @if ($shipment->cod_amount)
+                        @if ((float)$shipment->cod_amount)
                             <div class="dropdown btn-group p-l10">
                                 <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                     <span class="mr5">{{ trans('plugins/ecommerce::shipping.update_cod_status') }}</span>
@@ -212,14 +206,16 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="flexbox-grid-form flexbox-grid-form-no-outside-padding mb10">
-                            <div class="flexbox-grid-form-item">
-                                {{ trans('plugins/ecommerce::shipping.cod_status') }}
+                        @if ((float)$shipment->cod_amount)
+                            <div class="flexbox-grid-form flexbox-grid-form-no-outside-padding mb10">
+                                <div class="flexbox-grid-form-item">
+                                    {{ trans('plugins/ecommerce::shipping.cod_status') }}
+                                </div>
+                                <div class="flexbox-grid-form-item text-right">
+                                    <label class="label codstatus_2">{{ $shipment->cod_status->label() }}</label>
+                                </div>
                             </div>
-                            <div class="flexbox-grid-form-item text-right">
-                                <label class="label codstatus_2">{{ $shipment->cod_status->label() }}</label>
-                            </div>
-                        </div>
+                        @endif
                         <div class="flexbox-grid-form flexbox-grid-form-no-outside-padding mb10">
                             <div class="flexbox-grid-form-item">
                                 {{ trans('plugins/ecommerce::shipping.shipping_status') }}

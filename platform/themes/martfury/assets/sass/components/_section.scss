@@ -178,6 +178,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 16px 20px;
+        background-color: #f4f4f4;
         border-bottom: 1px solid #e3e3e3;
 
         h3 {
@@ -240,6 +241,7 @@
 
         .ps-product {
             margin-bottom: 4px;
+
             .ps-product__badge {
                 top: 5px;
                 right: 5px;
@@ -257,8 +259,6 @@
 
             .col-12 {
                 padding: 0;
-                //max-width: 33.333%;
-                //flex-basis: 33.3333%;
             }
         }
     }
@@ -344,6 +344,10 @@
     }
 }
 
+.show-admin-bar .ps-layout--shop .ps-filter__header {
+    margin-top: 40px;
+}
+
 .ps-layout--shop {
     padding-bottom: 90px;
     display: flex;
@@ -366,6 +370,34 @@
         .owl-slider {
             max-width: 100%;
         }
+
+        #products-filter-sidebar {
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5em;
+            width: 100%;
+        }
+    }
+
+    .ps-tabs {
+        position: relative;
+
+        .loading {
+            position: absolute;
+            background: rgba(0, 0, 0, .1);
+            left: -15px;
+            top: 0;
+            right: -15px;
+            bottom: -15px;
+            z-index: 10;
+            display: none;
+
+            .half-circle-spinner {
+                margin: 50px auto;
+            }
+        }
     }
 
     @include media('<lg') {
@@ -382,6 +414,118 @@
     }
     @include media('<sm') {
         padding-bottom: 45px;
+    }
+    @include media('<lg') {
+        .ps-layout__left {
+            visibility: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 99999;
+            display: unset;
+
+            .ps-layout__left-container {
+                @include transform(translateX(-100%));
+                transition: all .5s cubic-bezier(0.7, 0, .3, 1) 0s;
+            }
+
+            .ps-layout__left-container {
+                height: 100%;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                width: 100%;
+                max-width: 18em;
+                background-color: #ffffff;
+            }
+
+            &.active {
+                visibility: visible;
+
+                .ps-layout__left-container {
+                    @include transform(translateX(0));
+                }
+
+                .screen-darken {
+                    position: absolute;
+                    height: 100%;
+                    width: 100%;
+                    z-index: -1;
+                    background-color: rgba(34, 34, 34, 0.4);
+                    transition: opacity .2s linear, visibility 0.2s, width 2s ease-in;
+                }
+            }
+
+            .widget_shop {
+                background-color: #ffffff;
+                padding: 0;
+
+                .widget-title {
+                    padding-bottom: 0;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    font-size: 16px;
+
+                    &:before {
+                        display: none;
+                    }
+                }
+
+                .form-group--select {
+                    .form-control {
+                        @include border-radius(0);
+                    }
+                }
+
+                &.widget_filter {
+                    text-align: center;
+
+                    .widget-title {
+                        text-align: left;
+                    }
+
+                    .ps-slider {
+                        margin-bottom: 2rem;
+                    }
+
+                    .ps-btn--black {
+                        padding: 8px 35px;
+                        font-weight: 600;
+                        text-transform: none;
+                    }
+                }
+            }
+
+            .ps-filter__header {
+                position: relative;
+                padding: 15px 20px;
+                background-color: #f5f5f5;
+
+                h3 {
+                    margin-bottom: 0;
+                    font-weight: 600;
+                    font-size: 1.6rem;
+                    line-height: 20px;
+                    text-transform: capitalize;
+                }
+
+                .ps-btn--close {
+                    @include vertical-align();
+                    right: 10px;
+
+                    &:before, &:after {
+                        background-color: $color-heading;
+                    }
+                }
+            }
+
+            .ps-layout__left-content {
+                display: block;
+                padding: 2rem;
+            }
+        }
     }
 }
 
@@ -1715,7 +1859,7 @@
     grid-gap: 15px;
     grid-template-columns: repeat(
         4,
-        minmax(200px, 1fr)
+            minmax(200px, 1fr)
     ); /* [2] Make columns adjust according to the available viewport */
     grid-auto-rows: 100%;
 
@@ -1874,6 +2018,7 @@
 
 .ps-store-list {
     padding-top: 60px;
+
     .ps-block--store-2 {
         margin-bottom: 30px;
     }
@@ -2018,8 +2163,10 @@
 
 .ps-section--account {
     padding: 60px 0;
+
     .ps-section__header {
         padding-bottom: 30px;
+
         h3 {
             font-weight: 600;
         }
@@ -2029,6 +2176,7 @@
 .ps-section--account-setting {
     .ps-table {
         border: 1px solid #eaeaea;
+
         thead {
             tr {
                 th {
@@ -2041,6 +2189,7 @@
                 }
             }
         }
+
         tr {
             td {
                 padding: 10px 15px;
@@ -2051,9 +2200,11 @@
 
 .ps-shop-by-brand {
     padding: 50px 0;
+
     .ps-section__header {
         text-align: center;
         padding-bottom: 50px;
+
         h3 {
             font-weight: 600;
             font-size: 30px;
@@ -2065,6 +2216,7 @@
         display: flex;
         flex-flow: row wrap;
         margin-bottom: 50px;
+
         a {
             display: flex;
             justify-content: center;
@@ -2076,6 +2228,7 @@
             height: 50px;
             font-weight: 600;
             text-transform: uppercase;
+
             &.active, &:hover {
                 background-color: $color-1st;
                 color: #ffffff;
@@ -2086,10 +2239,12 @@
     .ps-section__items {
         display: flex;
         flex-flow: row wrap;
+
         > * {
             flex-basis: 100%;
             max-width: 50%;
         }
+
         a {
             display: inline-block;
             margin-bottom: 10px;
@@ -2099,6 +2254,7 @@
     .ps-section__content {
         figure {
             margin-bottom: 50px;
+
             figcaption {
                 display: block;
                 padding-bottom: 20px;

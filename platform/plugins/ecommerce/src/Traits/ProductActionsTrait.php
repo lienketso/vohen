@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use RvMedia;
 use Throwable;
 
@@ -119,13 +120,13 @@ trait ProductActionsTrait
                 $productRelatedToVariation->is_variation = 1;
 
                 $productRelatedToVariation->sku = Arr::get($version, 'sku');
-                if (!$productRelatedToVariation->sku) {
-                    $productRelatedToVariation->sku = $product->sku ?? time();
+                if (!$productRelatedToVariation->sku && Arr::get($version, 'auto_generate_sku')) {
+                    $productRelatedToVariation->sku = $product->sku;
                     if (isset($version['attribute_sets']) && is_array($version['attribute_sets'])) {
                         foreach ($version['attribute_sets'] as $attributeId) {
                             $attribute = $this->productAttributeRepository->findById($attributeId);
                             if ($attribute) {
-                                $productRelatedToVariation->sku .= '-' . $attribute->slug;
+                                $productRelatedToVariation->sku .= '-' . Str::upper($attribute->slug);
                             }
                         }
                     }
@@ -164,10 +165,12 @@ trait ProductActionsTrait
 
                 $productRelatedToVariation = $this->productRepository->createOrUpdate($productRelatedToVariation);
 
-                if ($isNew) {
-                    event(new CreatedContentEvent(PRODUCT_MODULE_SCREEN_NAME, request(), $productRelatedToVariation));
-                } else {
-                    event(new UpdatedContentEvent(PRODUCT_MODULE_SCREEN_NAME, request(), $productRelatedToVariation));
+                if (!$productRelatedToVariation->is_variation) {
+                    if ($isNew) {
+                        event(new CreatedContentEvent(PRODUCT_MODULE_SCREEN_NAME, request(), $productRelatedToVariation));
+                    } else {
+                        event(new UpdatedContentEvent(PRODUCT_MODULE_SCREEN_NAME, request(), $productRelatedToVariation));
+                    }
                 }
 
                 $variation->product_id = $productRelatedToVariation->id;
@@ -225,6 +228,7 @@ trait ProductActionsTrait
 
                 $variation = $result['variation']->toArray();
                 $variation['variation_default_id'] = $variation['id'];
+                $variation['auto_generate_sku'] = true;
 
                 $this->postSaveAllVersions([$variation['id'] => $variation], $variationRepository, $id, $response);
             }
@@ -423,7 +427,6 @@ trait ProductActionsTrait
      * @param ProductVariationInterface $productVariation
      * @param BaseHttpResponse $response
      * @param ProductAttributeSetInterface $productAttributeSetRepository
-     * @param ProductAttributeInterface $productAttributeRepository
      * @param ProductVariationItemInterface $productVariationItemRepository
      * @return BaseHttpResponse
      */
@@ -433,7 +436,6 @@ trait ProductActionsTrait
         ProductVariationInterface $productVariation,
         BaseHttpResponse $response,
         ProductAttributeSetInterface $productAttributeSetRepository,
-        ProductAttributeInterface $productAttributeRepository,
         ProductVariationItemInterface $productVariationItemRepository
     ) {
         $product = null;
@@ -502,8 +504,12 @@ trait ProductActionsTrait
                 ]);
             }
 
-            $this->postSaveAllVersions([$variation->id => $request->input()], $productVariation, $variation->product_id,
-                $response);
+            $this->postSaveAllVersions(
+                [$variation->id => $request->input()],
+                $productVariation,
+                $variation->configurable_product_id,
+                $response
+            );
 
             $productVariation->deleteBy(['product_id' => null]);
 

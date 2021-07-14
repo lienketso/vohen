@@ -22,25 +22,25 @@ class ProductCategoryRepository extends RepositoriesAbstract implements ProductC
             'num'         => null,
         ], $param);
 
-        $data = $this->model->select('ec_product_categories.*');
+        $data = $this->model;
 
         if ($param['active']) {
-            $data = $data->where('ec_product_categories.status', BaseStatusEnum::PUBLISHED);
+            $data = $data->where('status', BaseStatusEnum::PUBLISHED);
         }
 
         if ($param['is_child'] !== null) {
             if ($param['is_child'] === true) {
-                $data = $data->where('ec_product_categories.parent_id', '<>', 0);
+                $data = $data->where('parent_id', '<>', 0);
             } else {
-                $data = $data->where('ec_product_categories.parent_id', 0);
+                $data = $data->where('parent_id', 0);
             }
         }
 
         if ($param['is_featured']) {
-            $data = $data->where('ec_product_categories.is_featured', $param['is_featured']);
+            $data = $data->where('is_featured', $param['is_featured']);
         }
 
-        $data = $data->orderBy('ec_product_categories.order', $param['order_by']);
+        $data = $data->orderBy('order', $param['order_by']);
 
         if ($param['num'] !== null) {
             $data = $data->limit($param['num']);
@@ -55,9 +55,8 @@ class ProductCategoryRepository extends RepositoriesAbstract implements ProductC
     public function getDataSiteMap()
     {
         $data = $this->model
-            ->where('ec_product_categories.status', BaseStatusEnum::PUBLISHED)
-            ->select('ec_product_categories.*')
-            ->orderBy('ec_product_categories.created_at', 'desc');
+            ->where('status', BaseStatusEnum::PUBLISHED)
+            ->orderBy('created_at', 'desc');
 
         return $this->applyBeforeExecuteQuery($data)->get();
     }
@@ -69,16 +68,15 @@ class ProductCategoryRepository extends RepositoriesAbstract implements ProductC
     {
         $data = $this->model
             ->where([
-                'ec_product_categories.status'      => BaseStatusEnum::PUBLISHED,
-                'ec_product_categories.is_featured' => 1,
+                'status'      => BaseStatusEnum::PUBLISHED,
+                'is_featured' => 1,
             ])
             ->select([
-                'ec_product_categories.id',
-                'ec_product_categories.name',
-                'ec_product_categories.icon',
+                'id',
+                'name',
+                'icon',
             ])
-            ->orderBy('ec_product_categories.order', 'asc')
-            ->select('ec_product_categories.*')
+            ->orderBy('order')
             ->limit($limit);
 
         return $this->applyBeforeExecuteQuery($data)->get();
@@ -89,10 +87,48 @@ class ProductCategoryRepository extends RepositoriesAbstract implements ProductC
      */
     public function getAllCategories($active = true)
     {
-        $data = $this->model->select('ec_product_categories.*');
+        $data = $this->model;
         if ($active) {
-            $data = $data->where(['ec_product_categories.status' => BaseStatusEnum::PUBLISHED]);
+            $data = $data->where(['status' => BaseStatusEnum::PUBLISHED]);
         }
+
+        return $this->applyBeforeExecuteQuery($data)->get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProductCategories(
+        array $conditions = [],
+        array $with = [],
+        array $withCount = [],
+        bool $parentOnly = false
+    ) {
+        $data = $this->model;
+
+        if (!empty($conditions)) {
+            $data = $data->where($conditions);
+        }
+
+        if (!empty($with)) {
+            $data = $data->with($with);
+        }
+
+        if (!empty($withCount)) {
+            $data = $data->withCount($withCount);
+        }
+
+        if ($parentOnly) {
+            $data = $data->where(function ($query) {
+                $query->whereNull('parent_id')
+                    ->orWhere('parent_id', 0)
+                    ->orWhere('parent_id', '');
+            });
+        }
+
+        $data = $data
+            ->orderBy('order', 'ASC')
+            ->orderBy('created_at', 'DESC');
 
         return $this->applyBeforeExecuteQuery($data)->get();
     }

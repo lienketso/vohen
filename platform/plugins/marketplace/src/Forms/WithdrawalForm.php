@@ -2,8 +2,8 @@
 
 namespace Botble\Marketplace\Forms;
 
-use Botble\Marketplace\Enums\WithdrawalStatusEnum;
 use Botble\Base\Forms\FormAbstract;
+use Botble\Marketplace\Enums\WithdrawalStatusEnum;
 use Botble\Marketplace\Http\Requests\WithdrawalRequest;
 use Botble\Marketplace\Models\Withdrawal;
 
@@ -44,10 +44,9 @@ class WithdrawalForm extends FormAbstract
             ])
             ->add('bankInfo', 'html', [
                 'html' => view('plugins/marketplace::withdrawals.bank-info', [
-                        'bankInfo'  => $this->getModel()->bank_info,
-                        'title'     => __('Bank information')
-                    ])
-                    ->render(),
+                    'bankInfo' => $this->getModel()->bank_info,
+                    'title'    => __('Bank information'),
+                ])->render(),
             ])
             ->add('images[]', 'mediaImages', [
                 'label'      => trans('plugins/ecommerce::products.form.image'),

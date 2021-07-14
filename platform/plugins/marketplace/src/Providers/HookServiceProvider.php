@@ -6,17 +6,19 @@ use BaseHelper;
 use Botble\Base\Forms\FormAbstract;
 use Botble\Base\Models\BaseModel;
 use Botble\Ecommerce\Models\Customer;
+use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\Product;
+use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
+use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
 use Html;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 use Yajra\DataTables\EloquentDataTable;
-use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
-use Botble\Marketplace\Models\Store;
 
 class HookServiceProvider extends ServiceProvider
 {
@@ -29,15 +31,42 @@ class HookServiceProvider extends ServiceProvider
 
             add_action(BASE_ACTION_AFTER_UPDATE_CONTENT, [$this, 'saveAdditionalData'], 128, 3);
 
-            add_filter(IS_IN_ADMIN_FILTER, [$this, 'setInAdmin'], 20, 0);
+            add_filter(IS_IN_ADMIN_FILTER, [$this, 'setInAdmin'], 128);
 
-            add_filter(BASE_FILTER_GET_LIST_DATA, [$this, 'addColumnToCustomerTable'], 153, 2);
-            add_filter(BASE_FILTER_TABLE_HEADINGS, [$this, 'addHeadingToCustomerTable'], 153, 2);
-            add_filter(BASE_FILTER_TABLE_QUERY, [$this, 'modifyQueryInCustomerTable'], 153, 3);
+            add_filter(BASE_FILTER_GET_LIST_DATA, [$this, 'addColumnToEcommerceTable'], 153, 2);
+            add_filter(BASE_FILTER_TABLE_HEADINGS, [$this, 'addHeadingToEcommerceTable'], 153, 2);
+            add_filter(BASE_FILTER_TABLE_QUERY, [$this, 'modifyQueryInCustomerTable'], 153);
 
             add_filter(BASE_FILTER_REGISTER_CONTENT_TABS, [$this, 'addBankInfoTab'], 55, 3);
             add_filter(BASE_FILTER_REGISTER_CONTENT_TAB_INSIDE, [$this, 'addBankInfoContent'], 55, 3);
+
+            if (function_exists('theme_option')) {
+                add_action(RENDERING_THEME_OPTIONS_PAGE, [$this, 'addThemeOptions'], 55);
+            }
         });
+    }
+
+    public function addThemeOptions()
+    {
+        theme_option()
+            ->setSection([
+                'title'      => trans('plugins/marketplace::marketplace.theme_options.name'),
+                'desc'       => trans('plugins/marketplace::marketplace.theme_options.description'),
+                'id'         => 'opt-text-subsection-marketplace',
+                'subsection' => true,
+                'icon'       => 'fa fa-shopping-cart',
+                'fields'     => [
+                    [
+                        'id'         => 'logo_vendor_dashboard',
+                        'type'       => 'mediaImage',
+                        'label'      => trans('plugins/marketplace::marketplace.theme_options.logo_vendor_dashboard'),
+                        'attributes' => [
+                            'name'  => 'logo_vendor_dashboard',
+                            'value' => null,
+                        ],
+                    ],
+                ],
+            ]);
     }
 
     /**
@@ -64,6 +93,8 @@ class HookServiceProvider extends ServiceProvider
                     'default_value' => false,
                 ]);
         }
+
+        return $form;
     }
 
     /**
@@ -86,20 +117,22 @@ class HookServiceProvider extends ServiceProvider
             if ($object->is_vendor && !$object->vendorInfo->id) {
                 $this->app->make(VendorInfoInterface::class)
                     ->createOrUpdate([
-                        'customer_id'   => $object->id,
+                        'customer_id' => $object->id,
                     ]);
             }
 
             $object->save();
         }
+
+        return true;
     }
 
     /**
      * @return bool
      */
-    public function setInAdmin(): bool
+    public function setInAdmin($isInAdmin): bool
     {
-        return in_array(request()->segment(1), ['vendor', BaseHelper::getAdminPrefix()]);
+        return request()->segment(1) === 'vendor' || $isInAdmin;
     }
 
     /**
@@ -107,9 +140,9 @@ class HookServiceProvider extends ServiceProvider
      * @param string|Model $model
      * @return EloquentDataTable
      */
-    public function addColumnToCustomerTable($data, $model)
+    public function addColumnToEcommerceTable($data, $model)
     {
-        if (!$model) {
+        if (!$model || !is_in_admin(true)) {
             return $data;
         }
 
@@ -123,6 +156,10 @@ class HookServiceProvider extends ServiceProvider
                 return $data->addColumn('store', function ($item) use ($model) {
                     return $item->store->name ?: '&mdash;';
                 });
+            case Discount::class:
+                return $data->addColumn('store', function ($item) use ($model) {
+                    return $item->store->name ?: '&mdash;';
+                });
             default:
                 return $data;
         }
@@ -133,9 +170,9 @@ class HookServiceProvider extends ServiceProvider
      * @param string|Model $model
      * @return array
      */
-    public function addHeadingToCustomerTable($headings, $model)
+    public function addHeadingToEcommerceTable($headings, $model)
     {
-        if (!$model) {
+        if (!$model || !is_in_admin(true)) {
             return $headings;
         }
 
@@ -157,6 +194,14 @@ class HookServiceProvider extends ServiceProvider
                         'class' => 'text-center',
                     ],
                 ]);
+            case Discount::class:
+                return array_merge($headings, [
+                    'store' => [
+                        'name'  => 'ec_discounts.store_id',
+                        'title' => trans('plugins/marketplace::store.forms.store'),
+                        'class' => 'text-center',
+                    ],
+                ]);
             default:
                 return $headings;
         }
@@ -164,26 +209,23 @@ class HookServiceProvider extends ServiceProvider
 
     /**
      * @param Builder $query
-     * @param Model $model
-     * @param array $selectedColumns
      * @return mixed
      */
-    public function modifyQueryInCustomerTable($query, $model, array $selectedColumns = [])
+    public function modifyQueryInCustomerTable($query)
     {
-        if (!$model) {
-            return $query;
+        $model = null;
+
+        if ($query instanceof Builder || $query instanceof EloquentBuilder) {
+            $model = $query->getModel();
         }
 
         switch (get_class($model)) {
             case Customer::class:
-                return $query->select(array_merge($selectedColumns, [
-                    'ec_customers.is_vendor',
-                ]));
+                return $query->addSelect('ec_customers.is_vendor');
+
             case Order::class:
-                $query->select(array_merge($selectedColumns, [
-                    'ec_orders.store_id',
-                ]))->with(['store']);
-                return $query;
+                return $query->addSelect('ec_orders.store_id')->with(['store']);
+
             default:
                 return $query;
         }
@@ -203,7 +245,7 @@ class HookServiceProvider extends ServiceProvider
                 return $tabs . view('plugins/marketplace::customers.bank-info-tab')->render();
             }
         }
-        
+
         return $tabs;
     }
 
@@ -217,9 +259,11 @@ class HookServiceProvider extends ServiceProvider
         if (!empty($data) && get_class($data) == Store::class) {
             $customer = $data->customer;
             if ($customer->is_vendor) {
-                return $tabs . view('plugins/marketplace::customers.bank-info-content', ['model' => $customer])->render();
+                return $tabs . view('plugins/marketplace::customers.bank-info-content', ['model' => $customer])
+                        ->render();
             }
         }
+
         return $tabs;
     }
 }

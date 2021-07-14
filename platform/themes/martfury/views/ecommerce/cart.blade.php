@@ -56,7 +56,7 @@
                                                         <div class="product__price @if ($product->front_sale_price != $product->price) sale @endif">
                                                             <span>{{ format_price($cartItem->price) }}</span>
                                                             @if ($product->front_sale_price != $product->price)
-                                                                <small><del>{{ format_price($product->price_with_taxes) }}</del></small>
+                                                                <small><del>{{ format_price($product->price) }}</del></small>
                                                             @endif
                                                         </div>
                                                     </td>
@@ -68,7 +68,7 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-center">{{ format_price($cartItem->price * $cartItem->qty) }}</td>
-                                                    <td><a href="{{ route('public.cart.remove', $cartItem->rowId) }}" class="remove-cart-button"><i class="icon-cross"></i></a></td>
+                                                    <td><a href="#" data-url="{{ route('public.cart.remove', $cartItem->rowId) }}" class="remove-cart-button"><i class="icon-cross"></i></a></td>
                                                 </tr>
                                                 @endif
                                         @endforeach

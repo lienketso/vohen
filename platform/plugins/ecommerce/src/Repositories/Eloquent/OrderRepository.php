@@ -38,8 +38,8 @@ class OrderRepository extends RepositoriesAbstract implements OrderInterface
     {
         $data = $this->model
             ->join('payments', 'payments.id', '=', 'ec_orders.payment_id')
-            ->where('payments.created_at', '>=', $startDate)
-            ->where('payments.created_at', '<=', $endDate)
+            ->whereDate('payments.created_at', '>=', $startDate)
+            ->whereDate('payments.created_at', '<=', $endDate)
             ->where('payments.status', PaymentStatusEnum::COMPLETED);
 
         return $this

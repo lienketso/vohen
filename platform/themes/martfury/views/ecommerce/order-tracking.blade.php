@@ -36,7 +36,7 @@
                             <strong>{{ get_order_code($order->id) }}</strong>
                         </p>
                         <p>
-                            <span>{{ __('Time') }}:</span> <strong>{{ $order->created_at->format('h:m d/m/Y') }}</strong>
+                            <span>{{ __('Time') }}:</span> <strong>{{ $order->created_at->translatedFormat('M d, Y h:m') }}</strong>
                         </p>
                         <p>
                             <span>{{ __('Order status') }}:</span> <strong>{{ $order->status->label() }}</strong>

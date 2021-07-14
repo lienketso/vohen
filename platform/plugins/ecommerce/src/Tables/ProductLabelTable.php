@@ -79,17 +79,14 @@ class ProductLabelTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_product_labels.id',
-            'ec_product_labels.name',
-            'ec_product_labels.created_at',
-            'ec_product_labels.status',
-        ];
+        $query = $this->repository->getModel()->select([
+            'id',
+            'name',
+            'created_at',
+            'status',
+        ]);
 
-        $query = $model->select($select);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -99,22 +96,18 @@ class ProductLabelTable extends TableAbstract
     {
         return [
             'id'         => [
-                'name'  => 'ec_product_labels.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
             ],
             'name'       => [
-                'name'  => 'ec_product_labels.name',
                 'title' => trans('core/base::tables.name'),
                 'class' => 'text-left',
             ],
             'created_at' => [
-                'name'  => 'ec_product_labels.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
             ],
             'status'     => [
-                'name'  => 'ec_product_labels.status',
                 'title' => trans('core/base::tables.status'),
                 'width' => '100px',
             ],
@@ -143,18 +136,18 @@ class ProductLabelTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_product_labels.name'       => [
+            'name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_product_labels.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
             ],
-            'ec_product_labels.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

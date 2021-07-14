@@ -34,7 +34,7 @@ class MartfuryController extends PublicController
     public function ajaxGetProducts(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $withCount = [];
@@ -80,7 +80,7 @@ class MartfuryController extends PublicController
     public function getFeaturedProductCategories(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $categories = get_featured_product_categories();
@@ -96,7 +96,7 @@ class MartfuryController extends PublicController
     public function ajaxGetTrendingProducts(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $withCount = [];
@@ -138,7 +138,7 @@ class MartfuryController extends PublicController
     public function ajaxGetFeaturedBrands(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $brands = get_featured_brands();
@@ -154,7 +154,7 @@ class MartfuryController extends PublicController
     public function ajaxGetFeaturedProducts(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $data = [];
@@ -197,7 +197,7 @@ class MartfuryController extends PublicController
     public function ajaxGetTopRatedProducts(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $withCount = [];
@@ -235,7 +235,7 @@ class MartfuryController extends PublicController
     public function ajaxGetOnSaleProducts(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $withCount = [];
@@ -277,7 +277,7 @@ class MartfuryController extends PublicController
     public function ajaxCart(Request $request, BaseHttpResponse $response)
     {
         if (!$request->ajax()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         return $response->setData([
@@ -295,7 +295,17 @@ class MartfuryController extends PublicController
     public function getQuickView(Request $request, $id, BaseHttpResponse $response)
     {
         if (!$request->ajax()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
+        }
+
+        $withCount = [];
+        if (EcommerceHelper::isReviewEnabled()) {
+            $withCount = [
+                'reviews',
+                'reviews as reviews_avg' => function ($query) {
+                    $query->select(DB::raw('avg(star)'));
+                },
+            ];
         }
 
         $product = get_products([
@@ -310,10 +320,11 @@ class MartfuryController extends PublicController
                 'tags',
                 'tags.slugable',
             ],
+            'withCount' => $withCount,
         ]);
 
         if (!$product) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $productImages = $product->images;
@@ -324,7 +335,7 @@ class MartfuryController extends PublicController
                 $productImages = $product->images;
             }
         } else {
-            $selectedAttrs = $product->defaultVariation->productAttributes->pluck('id')->all();
+            $selectedAttrs = $product->defaultVariation->productAttributes;
         }
 
         Theme::asset()->remove('app-js');
@@ -341,7 +352,7 @@ class MartfuryController extends PublicController
     public function ajaxGetFeaturedPosts(Request $request, BaseHttpResponse $response, PostInterface $postRepository)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $posts = $postRepository->getFeatured(3);
@@ -365,7 +376,7 @@ class MartfuryController extends PublicController
         ProductInterface $productRepository
     ) {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $product = $productRepository->findOrFail($id);
@@ -394,7 +405,7 @@ class MartfuryController extends PublicController
         ReviewInterface $reviewRepository
     ) {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $reviews = $reviewRepository->advancedGet([
@@ -420,7 +431,7 @@ class MartfuryController extends PublicController
     public function ajaxSearchProducts(Request $request, BaseHttpResponse $response, GetProductService $productService)
     {
         if (!$request->ajax()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $request->merge(['num' => 10]);
@@ -446,7 +457,7 @@ class MartfuryController extends PublicController
 
         $products = $productService->getProduct($request, null, null, $with, $withCount);
 
-        $query = $request->get('q');
+        $query = $request->input('q');
 
         return $response->setData(Theme::partial('ajax-search-results', compact('products', 'query')));
     }
@@ -461,7 +472,7 @@ class MartfuryController extends PublicController
     public function ajaxSendDownloadAppLinks(SendDownloadAppLinksRequest $request, BaseHttpResponse $response)
     {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         EmailHandler::setModule(Theme::getThemeName())
@@ -480,7 +491,7 @@ class MartfuryController extends PublicController
         ProductInterface $productRepository
     ) {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $categoryId = $request->input('category_id');
@@ -504,6 +515,7 @@ class MartfuryController extends PublicController
                 'by'       => 'id',
                 'value_in' => [$categoryId],
             ],
+            'take'       => 10,
             'withCount'  => $withCount,
         ]);
 
@@ -528,7 +540,7 @@ class MartfuryController extends PublicController
     ) {
 
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $categoryIds = $request->input('categories', []);
@@ -561,7 +573,7 @@ class MartfuryController extends PublicController
         FlashSaleInterface $flashSaleRepository
     ) {
         if (!$request->ajax() || !$request->wantsJson()) {
-            abort(404);
+            return $response->setNextUrl(route('public.index'));
         }
 
         $flashSale = $flashSaleRepository->getModel()

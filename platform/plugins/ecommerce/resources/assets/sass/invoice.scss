@@ -1,72 +1,111 @@
-.invoice-box {
-    max-width: 1000px;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #eeeeee;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .15);
-    font-size: 16px;
-    line-height: 24px;
+body {
+    font-size: 15px;
     font-family: 'DejaVu Sans', Helvetica, Arial, sans-serif;
-    color: #555555;
 }
 
-.invoice-box table {
-    text-align: left;
+table {
     width: 100%;
+    border-collapse: collapse;
 }
 
-.invoice-box table td {
-    padding: 5px;
-    vertical-align: top;
+table tr td {
+    padding: 0;
 }
 
-.invoice-box table tr td:nth-child(2) {
+table tr td:last-child {
     text-align: right;
 }
 
-.invoice-box table tr.top table td {
-    padding-bottom: 20px;
-}
-
-.invoice-box table tr.information table td {
-    padding-bottom: 40px;
-}
-
-.invoice-box table tr.heading td {
-    background: #eeeeee;
-    border-bottom: 1px solid #dddddd;
+.bold {
     font-weight: bold;
 }
 
-.invoice-box table tr.details td {
-    padding-bottom: 20px;
+.right {
+    text-align: right;
 }
 
-.invoice-box table tr.item td {
-    border-bottom: 1px solid #eeeeee;
+.large {
+    font-size: 1.75em;
 }
 
-.invoice-box table tr.item.last td {
-    border-bottom: none;
-}
-
-.invoice-box table tr.total td:nth-child(2) {
-    border-top: 2px solid #eeeeee;
+.total {
     font-weight: bold;
+    color: #fb7578;
 }
 
-@media only screen and (max-width: 600px) {
-    .invoice-box table tr.top table td {
-        width: 100%;
-        display: block;
-        text-align: center;
-    }
+.logo-container {
+    margin: 20px 0 50px 0;
+}
 
-    .invoice-box table tr.information table td {
-        width: 100%;
-        display: block;
-        text-align: center;
-    }
+.invoice-info-container {
+    font-size: 0.875em;
+}
+
+.invoice-info-container td {
+    padding: 4px 0;
+}
+
+.client-name {
+    font-size: 1.2em;
+    vertical-align: top;
+}
+
+.line-items-container {
+    margin: 70px 0;
+    font-size: 0.875em;
+}
+
+.line-items-container th {
+    text-align: left;
+    color: #999;
+    border-bottom: 2px solid #ddd;
+    padding: 10px 0 15px 0;
+    font-size: 0.75em;
+    text-transform: uppercase;
+}
+
+.line-items-container th:last-child {
+    text-align: right;
+}
+
+.line-items-container td {
+    padding: 10px 0;
+}
+
+.line-items-container tbody tr:first-child td {
+    padding-top: 25px;
+}
+
+.line-items-container.has-bottom-border tbody tr:last-child td {
+    padding-bottom: 25px;
+    border-bottom: 2px solid #ddd;
+}
+
+.line-items-container.has-bottom-border {
+    margin-bottom: 0;
+}
+
+.line-items-container th.heading-quantity {
+    width: 50px;
+}
+
+.line-items-container th.heading-price {
+    text-align: right;
+    width: 100px;
+}
+
+.line-items-container th.heading-subtotal {
+    width: 100px;
+}
+
+.payment-info {
+    width: 38%;
+    font-size: 0.875em;
+    line-height: 1.5;
+}
+
+small {
+    font-size: 80%;
 }
 
 /** RTL **/
@@ -79,6 +118,18 @@
     text-align: right;
 }
 
-.rtl table tr td:nth-child(2) {
+.rtl .right {
+    text-align: left;
+}
+
+.rtl .line-items-container th.heading-price {
+    text-align: left;
+}
+
+.rtl .line-items-container th:last-child {
+    text-align: left;
+}
+
+.rtl table tr td:last-child {
     text-align: left;
 }

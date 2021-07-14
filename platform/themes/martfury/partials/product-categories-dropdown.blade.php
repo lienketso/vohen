@@ -7,7 +7,7 @@
                 @foreach($category->children as $childCategory)
                     <div class="mega-menu__column">
                         @if ($childCategory->children->count())
-                            <h4>{{ $childCategory->name }}<span class="sub-toggle"></span></h4>
+                            <a href="{{ $childCategory->url }}"><h4>{{ $childCategory->name }}<span class="sub-toggle"></span></h4></a>
                             <ul class="mega-menu__list">
                                 @foreach($childCategory->children as $item)
                                     <li><a href="{{ $item->url }}">{{ $item->name }}</a></li>

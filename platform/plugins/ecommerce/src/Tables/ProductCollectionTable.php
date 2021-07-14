@@ -92,19 +92,16 @@ class ProductCollectionTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_product_collections.id',
-            'ec_product_collections.name',
-            'ec_product_collections.image',
-            'ec_product_collections.slug',
-            'ec_product_collections.created_at',
-            'ec_product_collections.status',
-        ];
+        $query = $this->repository->getModel()->select([
+            'id',
+            'name',
+            'image',
+            'slug',
+            'created_at',
+            'status',
+        ]);
 
-        $query = $model->select($select);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -114,35 +111,29 @@ class ProductCollectionTable extends TableAbstract
     {
         return [
             'id'         => [
-                'name'  => 'ec_product_collections.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
                 'class' => 'text-left',
             ],
             'image'      => [
-                'name'  => 'ec_product_collections.image',
                 'title' => trans('core/base::tables.image'),
                 'width' => '70px',
                 'class' => 'text-left',
             ],
             'name'       => [
-                'name'  => 'ec_product_collections.name',
                 'title' => trans('core/base::tables.name'),
                 'class' => 'text-left',
             ],
             'slug'       => [
-                'name'  => 'ec_product_collections.slug',
                 'title' => trans('core/base::forms.slug'),
                 'class' => 'text-left',
             ],
             'created_at' => [
-                'name'  => 'ec_product_collections.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
                 'class' => 'text-left',
             ],
             'status'     => [
-                'name'  => 'ec_product_collections.status',
                 'title' => trans('core/base::tables.status'),
                 'width' => '100px',
                 'class' => 'text-left',
@@ -173,18 +164,18 @@ class ProductCollectionTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_product_collections.name'       => [
+            'name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_product_collections.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
             ],
-            'ec_product_collections.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

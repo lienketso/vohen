@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Throwable;
 
@@ -74,7 +75,7 @@ class ReportController extends BaseController
             ->whereDate('ec_orders.created_at', now()->toDateString())
             ->join('payments', 'payments.order_id', '=', 'ec_orders.id')
             ->where('payments.status', PaymentStatusEnum::COMPLETED)
-            ->sum('sub_total');
+            ->sum(DB::raw('COALESCE(payments.amount, 0) - COALESCE(payments.refunded_amount, 0)'));
 
         $count['orders'] = $this->orderRepository
             ->getModel()
@@ -106,7 +107,7 @@ class ReportController extends BaseController
 
         $now = now();
 
-        switch ($request->input('filter', 'week')) {
+        switch ($request->input('filter', 'month')) {
             case 'date':
                 $startDate = $now->startOfDay()->toDateString();
                 $endDate = now()->toDateString();
@@ -142,8 +143,7 @@ class ReportController extends BaseController
             view('plugins/ecommerce::reports.partials.revenue', compact(
                 'chartTime',
                 'defaultRange'
-            ))
-                ->render()
+            ))->render()
         );
     }
 
@@ -169,16 +169,16 @@ class ReportController extends BaseController
 
         $processingOrders = $this->orderRepository
             ->getModel()
-            ->where(['status' => OrderStatusEnum::PENDING])
-            ->where('created_at', '>=', $startOfMonth)
-            ->where('created_at', '<=', $today)
+            ->where('status', OrderStatusEnum::PENDING)
+            ->whereDate('created_at', '>=', $startOfMonth)
+            ->whereDate('created_at', '<=', $today)
             ->count();
 
         $completedOrders = $this->orderRepository
             ->getModel()
-            ->where(['status' => OrderStatusEnum::COMPLETED])
-            ->where('created_at', '>=', $startOfMonth)
-            ->where('created_at', '<=', $today)
+            ->where('status', OrderStatusEnum::COMPLETED)
+            ->whereDate('created_at', '>=', $startOfMonth)
+            ->whereDate('created_at', '<=', $today)
             ->count();
 
         $revenue = $this->orderRepository->countRevenueByDateRange($startOfMonth, $today);
@@ -206,8 +206,7 @@ class ReportController extends BaseController
                         'outOfStockProducts',
                         'lowStockProducts'
                     )
-                )
-                    ->render()
+                )->render()
             );
     }
 }

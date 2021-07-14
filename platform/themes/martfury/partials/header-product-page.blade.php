@@ -10,7 +10,7 @@
                         <ul class="ps-tab-list">
                             <li class="active"><a href="#tab-description">{{ __('Description') }}</a></li>
                             @if (EcommerceHelper::isReviewEnabled())
-                                <li><a href="#tab-reviews">{{ __('Reviews') }} ({{ $countRating }})</a></li>
+                                <li><a href="#tab-reviews">{{ __('Reviews') }} ({{ $product->reviews_count }})</a></li>
                             @endif
                         </ul>
                     </div>

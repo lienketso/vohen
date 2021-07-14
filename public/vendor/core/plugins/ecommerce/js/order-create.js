@@ -1200,8 +1200,8 @@ __webpack_require__.r(__webpack_exports__);
       $event.preventDefault();
 
       if (this.customer) {
-        $($event.target).addClass('button-loading');
         var $modal = $(event.target).closest('.modal-dialog');
+        $($event.target).find('.btn-primary').addClass('button-loading');
         this.child_customer_address.name = $modal.find('.customer-address-name').val();
         this.child_customer_address.email = $modal.find('.customer-address-email').val();
         this.child_customer_address.phone = $modal.find('.customer-address-phone').val();
@@ -1209,10 +1209,12 @@ __webpack_require__.r(__webpack_exports__);
         this.child_customer_address.city = $modal.find('.customer-address-city').val();
         this.child_customer_address.state = $modal.find('.customer-address-state').val();
         this.child_customer_address.country = $modal.find('.customer-address-country').val();
-        this.child_customer_address.zip_code = $modal.find('.customer-address-zip-code').val(); // this.loadCountries();
-
-        this.$root.$emit('bv::hide::modal', 'edit-address');
-        $($event.target).removeClass('button-loading');
+        this.child_customer_address.zip_code = $modal.find('.customer-address-zip-code').val();
+        var context = this;
+        setTimeout(function () {
+          $($event.target).find('.btn-primary').removeClass('button-loading');
+          context.$root.$emit('bv::hide::modal', 'edit-address');
+        }, 500);
       }
     },
     createNewCustomer: function createNewCustomer($event) {
@@ -8921,7 +8923,7 @@ var render = function() {
                                   attrs: {
                                     "data-placement": "top",
                                     "data-toggle": "tooltip",
-                                    "data-original-title": "Chỉnh sửa email"
+                                    "data-original-title": "Edit email"
                                   }
                                 },
                                 [
@@ -10225,9 +10227,29 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.child_customer_address.name,
+                      expression: "child_customer_address.name"
+                    }
+                  ],
                   staticClass: "next-input customer-address-name",
                   attrs: { type: "text" },
-                  domProps: { value: _vm.child_customer_address.name }
+                  domProps: { value: _vm.child_customer_address.name },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.child_customer_address,
+                        "name",
+                        $event.target.value
+                      )
+                    }
+                  }
                 })
               ]),
               _vm._v(" "),
@@ -10237,9 +10259,29 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.child_customer_address.phone,
+                      expression: "child_customer_address.phone"
+                    }
+                  ],
                   staticClass: "next-input customer-address-phone",
                   attrs: { type: "text" },
-                  domProps: { value: _vm.child_customer_address.phone }
+                  domProps: { value: _vm.child_customer_address.phone },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.child_customer_address,
+                        "phone",
+                        $event.target.value
+                      )
+                    }
+                  }
                 })
               ])
             ]),
@@ -10251,9 +10293,29 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.child_customer_address.address,
+                      expression: "child_customer_address.address"
+                    }
+                  ],
                   staticClass: "next-input customer-address-address",
                   attrs: { type: "text" },
-                  domProps: { value: _vm.child_customer_address.address }
+                  domProps: { value: _vm.child_customer_address.address },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.child_customer_address,
+                        "address",
+                        $event.target.value
+                      )
+                    }
+                  }
                 })
               ]),
               _vm._v(" "),
@@ -10263,9 +10325,29 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.child_customer_address.email,
+                      expression: "child_customer_address.email"
+                    }
+                  ],
                   staticClass: "next-input customer-address-email",
                   attrs: { type: "text" },
-                  domProps: { value: _vm.child_customer_address.email }
+                  domProps: { value: _vm.child_customer_address.email },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.child_customer_address,
+                        "email",
+                        $event.target.value
+                      )
+                    }
+                  }
                 })
               ])
             ]),
@@ -10288,7 +10370,7 @@ var render = function() {
                           expression: "child_customer_address.country"
                         }
                       ],
-                      staticClass: "ui-select",
+                      staticClass: "ui-select customer-address-country",
                       on: {
                         change: function($event) {
                           var $$selectedVal = Array.prototype.filter
@@ -10348,9 +10430,29 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.child_customer_address.state,
+                      expression: "child_customer_address.state"
+                    }
+                  ],
                   staticClass: "next-input customer-address-state",
                   attrs: { type: "text" },
-                  domProps: { value: _vm.child_customer_address.state }
+                  domProps: { value: _vm.child_customer_address.state },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.child_customer_address,
+                        "state",
+                        $event.target.value
+                      )
+                    }
+                  }
                 })
               ]),
               _vm._v(" "),
@@ -10360,9 +10462,29 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.child_customer_address.city,
+                      expression: "child_customer_address.city"
+                    }
+                  ],
                   staticClass: "next-input customer-address-city",
                   attrs: { type: "text" },
-                  domProps: { value: _vm.child_customer_address.city }
+                  domProps: { value: _vm.child_customer_address.city },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(
+                        _vm.child_customer_address,
+                        "city",
+                        $event.target.value
+                      )
+                    }
+                  }
                 })
               ])
             ]),
@@ -10375,9 +10497,29 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.child_customer_address.zip_code,
+                          expression: "child_customer_address.zip_code"
+                        }
+                      ],
                       staticClass: "next-input customer-address-zip-code",
                       attrs: { type: "text" },
-                      domProps: { value: _vm.child_customer_address.zip_code }
+                      domProps: { value: _vm.child_customer_address.zip_code },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.child_customer_address,
+                            "zip_code",
+                            $event.target.value
+                          )
+                        }
+                      }
                     })
                   ])
                 ])
@@ -10392,8 +10534,8 @@ var render = function() {
           attrs: {
             id: "make-paid",
             title: "Create a new order",
-            "ok-title": "Create order",
-            "cancel-title": "Close"
+            "ok-title": _vm.__("Create order"),
+            "cancel-title": _vm.__("Close")
           },
           on: {
             ok: function($event) {
@@ -10499,8 +10641,8 @@ var render = function() {
           attrs: {
             id: "make-pending",
             title: "Create a new order",
-            "ok-title": "Create order",
-            "cancel-title": "Close"
+            "ok-title": _vm.__("Create order"),
+            "cancel-title": _vm.__("Close")
           },
           on: {
             ok: function($event) {

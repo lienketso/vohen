@@ -26,4 +26,12 @@ return [
     'create_discount_validate_code_required_if'        => 'Please enter the promotion code',
     'create_discount_validate_value_required'          => 'Amount must be greater than 0',
     'create_discount_validate_target_required'         => 'No object selected for promotion',
+    'enums'                                            => [
+        'type-options' => [
+            'amount'     => 'Amount - Fixed',
+            'percentage' => 'Discount %',
+            'shipping'   => 'Free shipping',
+            'same-price' => 'Same price',
+        ]
+    ]
 ];

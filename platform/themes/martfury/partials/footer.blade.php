@@ -8,7 +8,7 @@
                         <h3>{{ theme_option('hotline') }}</h3>
                         <p>{{ theme_option('address') }} <br><a href="mailto:{{ theme_option('email') }}">{{ theme_option('email') }}</a></p>
                         <ul class="ps-list--social">
-                            @for($i = 1; $i <= 5; $i++)
+                            @for($i = 1; $i <= 10; $i++)
                                 @if(theme_option('social-name-' . $i) && theme_option('social-url-' . $i) && theme_option('social-icon-' . $i))
                                     <li>
                                         <a href="{{ theme_option('social-url-' . $i) }}"
@@ -23,9 +23,11 @@
                 </aside>
                 {!! dynamic_sidebar('footer_sidebar') !!}
             </div>
-            <div class="ps-footer__links" id="footer-links">
-                {!! dynamic_sidebar('bottom_footer_sidebar') !!}
-            </div>
+            @if (Widget::group('bottom_footer_sidebar')->getWidgets())
+                <div class="ps-footer__links" id="footer-links">
+                    {!! dynamic_sidebar('bottom_footer_sidebar') !!}
+                </div>
+            @endif
             <div class="ps-footer__copyright">
                 <p>{{ theme_option('copyright') }}</p>
                 <p>

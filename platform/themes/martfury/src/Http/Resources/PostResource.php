@@ -23,7 +23,7 @@ class PostResource extends JsonResource
             'url'         => $this->url,
             'description' => Str::words($this->description, 35),
             'image'       => RvMedia::getImageUrl($this->image, 'small', false, RvMedia::getDefaultImage()),
-            'created_at'  => $this->created_at->format('d M, Y'),
+            'created_at'  => $this->created_at->translatedFormat('M d, Y'),
             'views'       => number_format($this->views) . ' ' . __('Views'),
         ];
     }

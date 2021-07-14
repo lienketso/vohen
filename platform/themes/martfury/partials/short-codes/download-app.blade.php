@@ -11,7 +11,12 @@
                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12 ">
                         <div class="ps-block__content">
                             <h3>{!! clean($title) !!}</h3>
-                            <p>{!! clean($description) !!}</p>
+                            @if ($description)
+                                <p>{!! clean($description) !!}</p>
+                            @endif
+                            @if ($subtitle)
+                                <p>{!! clean($subtitle) !!}</p>
+                            @endif
                             <form class="ps-form--download-app" action="{{ route('public.ajax.send-download-app-links') }}" method="post">
                                 @csrf
                                 <div class="form-group--nest">

@@ -50,4 +50,34 @@ class OrderProduct extends BaseModel
     {
         return $this->belongsTo(Product::class)->withDefault();
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function order()
+    {
+        return $this->belongsTo(Order::class)->withDefault();
+    }
+
+    /**
+     * @return string
+     */
+    public function getAmountFormatAttribute()
+    {
+        if ($this->order && $this->order->currency) {
+            return format_price($this->price, $this->order->currency);
+        }
+        return human_price_text($this->price, null);
+    }
+
+    /**
+     * @return string
+     */
+    public function getTotalFormatAttribute()
+    {
+        if ($this->order && $this->order->currency) {
+            return format_price($this->price, $this->order->currency);
+        }
+        return human_price_text($this->price * $this->qty, null);
+    }
 }

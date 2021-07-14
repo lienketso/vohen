@@ -112,16 +112,14 @@
                                                                             <span class="black">{{ trans('plugins/ecommerce::order.shipping') }} </span>
                                                                             <a class="text-underline bold-light" target="_blank" title="{{ $order->shipping_method_name }}" href="{{ route('ecommerce.shipments.edit', $order->shipment->id) }}">{{ $order->shipping_method_name }}</a>
                                                                         </li>
-                                                                        <li class="ws-nm">
-                                                                            <span class="bull">↳</span>
-                                                                            @if (is_plugin_active('marketplace') && $order->store->name)
+
+                                                                        @if (is_plugin_active('marketplace') && $order->store->name)
+                                                                            <li class="ws-nm">
+                                                                                <span class="bull">↳</span>
                                                                                 <span class="black">{{ trans('plugins/marketplace::store.store') }}</span>
-                                                                                <span class="bold-light">{{ $order->store->name }}</span>
-                                                                            @else
-                                                                                <span class="black">{{ trans('plugins/ecommerce::order.warehouse') }}</span>
-                                                                                <span class="bold-light">{{ $order->shipment->store->name ?? $defaultStore->name }}</span>
-                                                                            @endif
-                                                                        </li>
+                                                                                <a href="{{ $order->store->url }}" class="bold-light" target="_blank">{{ $order->store->name }}</a>
+                                                                            </li>
+                                                                        @endif
                                                                     </ul>
                                                                 </li>
                                                             </ul>
@@ -553,27 +551,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="wrapper-content bg-gray-white mb20">
-                            <div class="pd-all-20">
-                                <div class="p-b10">
-                                    @if (is_plugin_active('marketplace') && $order->store->name)
+                        @if (is_plugin_active('marketplace') && $order->store->name)
+                            <div class="wrapper-content bg-gray-white mb20">
+                                <div class="pd-all-20">
+                                    <div class="p-b10">
                                         <strong>{{ trans('plugins/marketplace::store.store') }}</strong>
                                         <ul class="p-sm-r mb-0">
                                             <li class="ws-nm">
-                                                <span class="ww-bw text-no-bold">{{ $order->store->name }}</span>
+                                                <a href="{{ $order->store->url }}" class="ww-bw text-no-bold" target="_blank">{{ $order->store->name }}</a>
                                             </li>
                                         </ul>
-                                    @else
-                                        <strong>{{ trans('plugins/ecommerce::order.warehouse') }}</strong>
-                                        <ul class="p-sm-r mb-0">
-                                            <li class="ws-nm">
-                                                <span class="ww-bw text-no-bold">{{ $defaultStore->name ?? trans('plugins/ecommerce::order.default_store') }}</span>
-                                            </li>
-                                        </ul>
-                                    @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endif
 
                         <div class="wrapper-content bg-gray-white mb20">
                             <div class="pd-all-20">

@@ -94,7 +94,14 @@ if (is_plugin_active('ads')) {
         ->registerLocation('product-sidebar', __('Product sidebar'));
 }
 
-function hex_to_rgba(string $color, $opacity = 1) {
-    list($r, $g, $b) = sscanf($color, "#%02x%02x%02x");
+/**
+ * @param string $color
+ * @param int $opacity
+ * @return string
+ */
+function hex_to_rgba(string $color, $opacity = 1)
+{
+    [$r, $g, $b] = sscanf($color, "#%02x%02x%02x");
+
     return 'rgba(' . $r . ',' . $g . ',' . ($b === null ? 0 : $b) . ', ' . $opacity . ')';
 }

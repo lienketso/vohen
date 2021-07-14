@@ -20,7 +20,7 @@ if (!function_exists('get_discount_description')) {
                     $description = __('Free shipping for all orders');
                 }
 
-                $description .= ' ' . __('when shipping free less than or equal') . ' ' . format_price($discount->value);
+                $description .= ' ' . __('when shipping fee less than or equal') . ' ' . format_price($discount->value);
                 break;
             case 'same-price':
                 $description = __('Same fee') . ' ' . format_price($discount->value) . ' ';

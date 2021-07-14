@@ -174,4 +174,26 @@ class Order extends BaseModel
     {
         return $this->belongsTo(Currency::class, 'currency_id')->withDefault();
     }
+
+    /**
+     * @return string
+     */
+    public function getAmountFormatAttribute()
+    {
+        if ($this->currency) {
+            return format_price($this->amount, $this->currency);
+        }
+        return human_price_text($this->amount, null);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDiscountAmountFormatAttribute()
+    {
+        if ($this->currency) {
+            return format_price($this->shipping_amount, $this->currency);
+        }
+        return human_price_text($this->shipping_amount, null);
+    }
 }

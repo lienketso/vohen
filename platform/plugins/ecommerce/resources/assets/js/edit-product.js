@@ -113,7 +113,7 @@ class EcommerceProduct {
             $('#delete-variations-modal').modal('show');
         });
 
-        $('#delete-selected-variations-button').on('click', event => {
+        $('#delete-selected-variations-button').off('click').on('click', event => {
             event.preventDefault();
 
             let $current = $(event.currentTarget);
@@ -366,21 +366,22 @@ class EcommerceProduct {
         $(document).on('click', '.btn-trigger-add-new-product-variation', event => {
             event.preventDefault();
             let $current = $(event.currentTarget);
-            let buttonText = $current.text();
+
+            $('#add-new-product-variation-modal .modal-body .loading-spinner').show();
+            $('#add-new-product-variation-modal .modal-body .variation-form-wrapper').remove();
+            $('#add-new-product-variation-modal').modal('show');
+
             $.ajax({
                 url: $current.data('load-form'),
                 type: 'GET',
-                beforeSend: () => {
-                    $current.text($current.data('processing'));
-                },
                 success: res => {
                     if (res.error) {
                         Botble.showError(res.message);
                     } else {
-                        $('#add-new-product-variation-modal .modal-body').html(res.data);
+                        $('#add-new-product-variation-modal .modal-body .loading-spinner').hide();
+                        $('#add-new-product-variation-modal .modal-body').append(res.data);
                         _self.initElements();
                         Botble.initResources();
-                        $('#add-new-product-variation-modal').modal('show');
                         $('#store-product-variation-button').data('target', $current.data('target'));
 
                         $('.list-gallery-media-images').each((index, item) => {
@@ -391,13 +392,8 @@ class EcommerceProduct {
                             $current.sortable();
                         });
                     }
-                    $current.text(buttonText);
-                },
-                complete: () => {
-                    $current.text(buttonText);
                 },
                 error: data => {
-                    $current.text(buttonText);
                     Botble.handleError(data);
                 },
             })
@@ -407,20 +403,22 @@ class EcommerceProduct {
             event.preventDefault();
             $('#update-product-variation-button').data('target', $(event.currentTarget).data('target'));
             let $current = $(event.currentTarget);
+
+            $('#edit-product-variation-modal .modal-body .loading-spinner').show();
+            $('#edit-product-variation-modal .modal-body .variation-form-wrapper').remove();
+            $('#edit-product-variation-modal').modal('show');
+
             $.ajax({
                 url: $current.data('load-form'),
                 type: 'GET',
-                beforeSend: () => {
-                    $current.addClass('button-loading');
-                },
                 success: res => {
                     if (res.error) {
                         Botble.showError(res.message);
                     } else {
-                        $('#edit-product-variation-modal .modal-body').html(res.data);
+                        $('#edit-product-variation-modal .modal-body .loading-spinner').hide();
+                        $('#edit-product-variation-modal .modal-body').append(res.data);
                         _self.initElements();
                         Botble.initResources();
-                        $('#edit-product-variation-modal').modal('show');
                         $('.list-gallery-media-images').each((index, item) => {
                             let $current = $(item);
                             if ($current.data('ui-sortable')) {
@@ -429,13 +427,8 @@ class EcommerceProduct {
                             $current.sortable();
                         });
                     }
-                    $current.removeClass('button-loading');
-                },
-                complete: () => {
-                    $current.removeClass('button-loading');
                 },
                 error: data => {
-                    $current.removeClass('button-loading');
                     Botble.handleError(data);
                 },
             })
@@ -658,6 +651,8 @@ $(window).on('load', () => {
 
     if (typeof RvMediaStandAlone != 'undefined') {
         new RvMediaStandAlone('.images-wrapper .btn-trigger-edit-product-image', {
+            filter: 'image',
+            view_in: 'all_media',
             onSelectFiles: (files, $el) => {
                 let firstItem = _.first(files);
 

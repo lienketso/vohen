@@ -37,7 +37,7 @@ return [
         'beforeRenderTheme' => function (Theme $theme) {
             // You may use this event to set up your assets.
 
-            $version = '1.0.11';
+            $version = '1.10.1';
 
             $theme->asset()->usePath()->add('linearicons', 'fonts/Linearicons/Linearicons/Font/demo-files/demo.css');
             $theme->asset()->usePath()->add('bootstrap-css', 'plugins/bootstrap/css/bootstrap.min.css');
@@ -54,7 +54,6 @@ return [
             $theme->asset()->usePath()->add('style', 'css/style.css', [], [], $version);
             $theme->asset()->usePath()->add('custom', 'css/custom.css', [], [], $version);
             $theme->asset()->usePath()->add('fix', 'css/fix.css', [], [], $version);
-            $theme->asset()->usePath()->add('responsive', 'css/responsive.css', [], [], $version);
 
             if (BaseHelper::siteLanguageDirection() == 'rtl') {
                 $theme->asset()->usePath()->add('rtl', 'css/rtl.css', [], [], $version);

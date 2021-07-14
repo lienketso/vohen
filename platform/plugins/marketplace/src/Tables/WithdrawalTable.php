@@ -9,8 +9,8 @@ use Botble\Table\Abstracts\TableAbstract;
 use Html;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\DataTables;
 use Illuminate\Validation\Rule;
+use Yajra\DataTables\DataTables;
 
 class WithdrawalTable extends TableAbstract
 {
@@ -53,7 +53,7 @@ class WithdrawalTable extends TableAbstract
     {
         $data = $this->table
             ->eloquent($this->query())
-            ->editColumn('customer', function ($item) {
+            ->editColumn('customer_id', function ($item) {
                 if (!Auth::user()->hasPermission('customer.edit')) {
                     return $item->customer->name;
                 }
@@ -83,19 +83,18 @@ class WithdrawalTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'mp_customer_withdrawals.id',
-            'mp_customer_withdrawals.customer_id',
-            'mp_customer_withdrawals.amount',
-            'mp_customer_withdrawals.currency',
-            'mp_customer_withdrawals.created_at',
-            'mp_customer_withdrawals.status',
-        ];
+        $query = $this->repository->getModel()
+            ->select([
+                'id',
+                'customer_id',
+                'amount',
+                'currency',
+                'created_at',
+                'status',
+            ])
+            ->with(['customer']);
 
-        $query = $model->select($select)->with(['customer']);
-
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -104,33 +103,27 @@ class WithdrawalTable extends TableAbstract
     public function columns()
     {
         return [
-            'id'          => [
-                'name'  => 'mp_customer_withdrawals.id',
+            'id'         => [
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
             ],
-            'customer'    => [
-                'name'  => 'mp_customer_withdrawals.customer_id',
+            'customer_id'   => [
                 'title' => trans('plugins/marketplace::withdrawal.vendor'),
                 'class' => 'text-left',
             ],
-            'amount'      => [
-                'name'  => 'mp_customer_withdrawals.amount',
+            'amount'     => [
                 'title' => trans('plugins/marketplace::withdrawal.amount'),
                 'class' => 'text-left',
             ],
-            'currency'      => [
-                'name'  => 'mp_customer_withdrawals.currency',
+            'currency'   => [
                 'title' => trans('plugins/marketplace::withdrawal.currency'),
                 'class' => 'text-left',
             ],
-            'created_at'  => [
-                'name'  => 'mp_customer_withdrawals.created_at',
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
             ],
-            'status'      => [
-                'name'  => 'mp_customer_withdrawals.status',
+            'status'     => [
                 'title' => trans('core/base::tables.status'),
                 'width' => '100px',
             ],
@@ -147,20 +140,12 @@ class WithdrawalTable extends TableAbstract
     }
 
     /**
-     * @return array
-     */
-    public function getFilters(): array
-    {
-        return $this->getBulkChanges();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getBulkChanges(): array
     {
         return [
-            'mp_customer_withdrawals.status'     => [
+            'status' => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => WithdrawalStatusEnum::labels(),

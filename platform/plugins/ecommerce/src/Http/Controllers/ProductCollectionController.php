@@ -2,6 +2,10 @@
 
 namespace Botble\Ecommerce\Http\Controllers;
 
+use Botble\Base\Events\BeforeEditContentEvent;
+use Botble\Base\Events\CreatedContentEvent;
+use Botble\Base\Events\DeletedContentEvent;
+use Botble\Base\Events\UpdatedContentEvent;
 use Botble\Base\Forms\FormBuilder;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
@@ -68,6 +72,8 @@ class ProductCollectionController extends BaseController
 
         $productCollection = $this->productCollectionRepository->createOrUpdate($productCollection);
 
+        event(new CreatedContentEvent(PRODUCT_COLLECTION_MODULE_SCREEN_NAME, $request, $productCollection));
+
         return $response
             ->setPreviousUrl(route('product-collections.index'))
             ->setNextUrl(route('product-collections.edit', $productCollection->id))
@@ -77,11 +83,15 @@ class ProductCollectionController extends BaseController
     /**
      * @param int $id
      * @param FormBuilder $formBuilder
+     * @param Request $request
      * @return string
      */
-    public function edit($id, FormBuilder $formBuilder)
+    public function edit($id, FormBuilder $formBuilder, Request $request)
     {
         $productCollection = $this->productCollectionRepository->findOrFail($id);
+
+        event(new BeforeEditContentEvent($request, $productCollection));
+
         page_title()->setTitle(trans('plugins/ecommerce::product-collections.edit') . ' "' . $productCollection->name . '"');
 
         return $formBuilder
@@ -101,7 +111,9 @@ class ProductCollectionController extends BaseController
         $productCollection = $this->productCollectionRepository->findOrFail($id);
         $productCollection->fill($request->input());
 
-        $this->productCollectionRepository->createOrUpdate($productCollection);
+        $productCollection = $this->productCollectionRepository->createOrUpdate($productCollection);
+
+        event(new UpdatedContentEvent(PRODUCT_COLLECTION_MODULE_SCREEN_NAME, $request, $productCollection));
 
         return $response
             ->setPreviousUrl(route('product-collections.index'))
@@ -111,14 +123,17 @@ class ProductCollectionController extends BaseController
     /**
      * @param int $id
      * @param BaseHttpResponse $response
+     * @param Request $request
      * @return BaseHttpResponse
      */
-    public function destroy($id, BaseHttpResponse $response)
+    public function destroy($id, BaseHttpResponse $response, Request $request)
     {
         $productCollection = $this->productCollectionRepository->findOrFail($id);
 
         try {
             $this->productCollectionRepository->delete($productCollection);
+
+            event(new DeletedContentEvent(PRODUCT_COLLECTION_MODULE_SCREEN_NAME, $request, $productCollection));
 
             return $response->setMessage(trans('core/base::notices.delete_success_message'));
         } catch (Exception $exception) {
@@ -146,6 +161,7 @@ class ProductCollectionController extends BaseController
         foreach ($ids as $id) {
             $productCollection = $this->productCollectionRepository->findOrFail($id);
             $this->productCollectionRepository->delete($productCollection);
+            event(new DeletedContentEvent(PRODUCT_COLLECTION_MODULE_SCREEN_NAME, $request, $productCollection));
         }
 
         return $response->setMessage(trans('core/base::notices.delete_success_message'));

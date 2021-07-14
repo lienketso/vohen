@@ -32,7 +32,8 @@
 
     <!-- Put translation key to translate in VueJS -->
     <script type="text/javascript">
-        window.trans = JSON.parse('{!! addslashes(json_encode(trans('plugins/member::dashboard'))) !!}');
+        window.trans = Object.assign(window.trans || {}, JSON.parse('{!! addslashes(json_encode(trans('plugins/marketplace::marketplace'))) !!}'));
+
         var BotbleVariables = BotbleVariables || {};
         BotbleVariables.languages = {
             tables: {!! json_encode(trans('core/base::tables'), JSON_HEX_APOS) !!},
@@ -52,13 +53,14 @@
         <button class="ps-drawer-toggle"><i class="icon icon-menu"></i></button>
     </div>
     <div class="header__center">
-        <a class="ps-logo" href="/">
-            @if (theme_option('logo'))
-                <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}">
+        <a class="ps-logo" href="{{ route('public.index') }}">
+            @php $logo = theme_option('logo_vendor_dashboard', theme_option('logo')); @endphp
+            @if ($logo)
+                <img src="{{ RvMedia::getImageUrl($logo) }}" alt="{{ theme_option('site_title') }}">
             @endif
         </a>
     </div>
-    <div class="header__right"><a class="header__site-link" href="#"><i class="icon-exit-right"></i></a></div>
+    <div class="header__right"><a class="header__site-link" href="{{ route('customer.logout') }}"><i class="icon-exit-right"></i></a></div>
 </header>
 <aside class="ps-drawer--mobile">
     <div class="ps-drawer__header">
@@ -75,7 +77,9 @@
         <div class="ps-sidebar">
             <div class="ps-sidebar__top">
                 <div class="ps-block--user-wellcome">
-                    <div class="ps-block__left"><img src="{{ auth('customer')->user()->avatar_url }}" alt="{{ auth('customer')->user()->name }}" width="80" /></div>
+                    <div class="ps-block__left">
+                        <img src="{{ auth('customer')->user()->store->logo_url }}" alt="{{ auth('customer')->user()->store->name }}" width="80" />
+                    </div>
                     <div class="ps-block__right">
                         <p>{{ __('Hello') }}, {{ auth('customer')->user()->name }}</p>
                         <small>{{ __('Joined on :date', ['date' => auth('customer')->user()->created_at->format('M d, Y')]) }}</small>
@@ -92,8 +96,9 @@
                 </div>
                 <div class="ps-sidebar__footer">
                     <div class="ps-copyright">
-                        @if (theme_option('logo'))
-                            <img src="{{ RvMedia::getImageUrl(theme_option('logo')) }}" alt="{{ theme_option('site_title') }}">
+                        @php $logo = theme_option('logo_vendor_dashboard', theme_option('logo')); @endphp
+                        @if ($logo)
+                            <img src="{{ RvMedia::getImageUrl($logo)}}" alt="{{ theme_option('site_title') }}">
                         @endif
                         <p>{{ theme_option('copyright') }}</p>
                     </div>
@@ -101,7 +106,7 @@
             </div>
         </div>
     </div>
-    <div class="ps-main__wrapper">
+    <div class="ps-main__wrapper" id="vendor-dashboard">
         <header class="header--dashboard">
             <div class="header__left">
                 <h3>{{ page_title()->getTitle(false) }}</h3>
@@ -114,25 +119,28 @@
         @yield('content')
     </div>
 </main>
+
+@stack('pre-footer')
+
 @if (session()->has('status') || session()->has('success_msg') || session()->has('error_msg') || (isset($errors) && $errors->count() > 0) || isset($error_msg))
     <script type="text/javascript">
         window.noticeMessages = [];
         @if (session()->has('success_msg'))
-        noticeMessages.push({'type': 'success', 'message': "{!! addslashes(session('success_msg')) !!}"});
+            noticeMessages.push({'type': 'success', 'message': "{!! addslashes(session('success_msg')) !!}"});
         @endif
         @if (session()->has('status'))
-        noticeMessages.push({'type': 'success', 'message': "{!! addslashes(session('status')) !!}"});
+            noticeMessages.push({'type': 'success', 'message': "{!! addslashes(session('status')) !!}"});
         @endif
         @if (session()->has('error_msg'))
-        noticeMessages.push({'type': 'error', 'message': "{!! addslashes(session('error_msg')) !!}"});
+            noticeMessages.push({'type': 'error', 'message': "{!! addslashes(session('error_msg')) !!}"});
         @endif
         @if (isset($error_msg))
-        noticeMessages.push({'type': 'error', 'message': "{!! addslashes($error_msg) !!}"});
+            noticeMessages.push({'type': 'error', 'message': "{!! addslashes($error_msg) !!}"});
         @endif
         @if (isset($errors))
-        @foreach ($errors->all() as $error)
-        noticeMessages.push({'type': 'error', 'message': "{!! addslashes($error) !!}"});
-        @endforeach
+            @foreach ($errors->all() as $error)
+                noticeMessages.push({'type': 'error', 'message': "{!! addslashes($error) !!}"});
+            @endforeach
         @endif
     </script>
 @endif
@@ -149,18 +157,18 @@
     <script type="text/javascript">
         $(document).ready(function () {
             @if (session()->has('success_msg'))
-            Botble.showSuccess('{{ session('success_msg') }}');
+                Botble.showSuccess('{{ session('success_msg') }}');
             @endif
             @if (session()->has('error_msg'))
-            Botble.showError('{{ session('error_msg') }}');
+                Botble.showError('{{ session('error_msg') }}');
             @endif
             @if (isset($error_msg))
-            Botble.showError('{{ $error_msg }}');
+                Botble.showError('{{ $error_msg }}');
             @endif
             @if (isset($errors))
-            @foreach ($errors->all() as $error)
-            Botble.showError('{{ $error }}');
-            @endforeach
+                @foreach ($errors->all() as $error)
+                    Botble.showError('{{ $error }}');
+                @endforeach
             @endif
         });
     </script>

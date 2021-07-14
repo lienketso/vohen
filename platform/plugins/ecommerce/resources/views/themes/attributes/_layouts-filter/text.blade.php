@@ -1,5 +1,5 @@
 <li class="text-swatches-wrapper" data-type="text">
-    <h6 class="widget-title">{{ $set->title }}</h6>
+    <h6 class="widget-title" data-title="{{ $set->title }}">{{ $set->title }}</h6>
     <div class="attribute-values">
         <ul class="text-swatch">
             @foreach($attributes->where('attribute_set_id', $set->id) as $attribute)

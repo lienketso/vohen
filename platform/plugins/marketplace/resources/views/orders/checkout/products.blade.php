@@ -6,6 +6,11 @@
     @php
         $cartItems = $grouped['products']->pluck('cartItem');
         $store = $grouped['store'];
+        if (!$store->exists) {
+            $store->id = 0;
+            $store->name = theme_option('site_title');
+            $store->logo = theme_option('logo');
+        }
         $storeId = $store->id;
         $sessionData = Arr::get($sessionCheckoutData, 'marketplace.' . $storeId, []);
         $shipping = Arr::get($sessionData, 'shipping', []);
@@ -14,7 +19,7 @@
         $promotionDiscountAmount = Arr::get($sessionData, 'promotion_discount_amount', 0);
         $couponDiscountAmount = Arr::get($sessionData, 'coupon_discount_amount', 0);
         $shippingAmount = Arr::get($sessionData, 'shipping_amount', 0);
-        $isFreeShip = Arr::get($sessionData, 'is_free_ship', 0);
+        $isFreeShipping = Arr::get($sessionData, 'is_free_shipping', 0);
         $rawTotal = Cart::rawTotalByItems($cartItems);
         $shippingCurrent = Arr::get($shipping, $defaultShippingMethod . '.' . $defaultShippingOption, []);
     @endphp
@@ -58,7 +63,7 @@
                     </div>
                     <div class="col-6 text-right">
                         <p class="price-text">
-                            @if (Arr::get($shippingCurrent, 'price') && $isFreeShip)
+                            @if (Arr::get($shippingCurrent, 'price') && $isFreeShipping)
                                 <span class="font-italic" style="text-decoration-line: line-through;">{{ format_price(Arr::get($shippingCurrent, 'price')) }}</span>
                                 <span class="font-weight-bold">{{ __('Free shipping') }}</span>
                             @else

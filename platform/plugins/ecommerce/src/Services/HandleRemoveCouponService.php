@@ -49,7 +49,7 @@ class HandleRemoveCouponService
         $sessionData = OrderHelper::getOrderSessionData($token);
 
         if ($discount && $discount->type_option === 'shipping') {
-            Arr::set($sessionData, $prefix . 'is_free_ship', false);
+            Arr::set($sessionData, $prefix . 'is_free_shipping', false);
         }
 
         Arr::set($sessionData, $prefix . 'coupon_discount_amount', 0);

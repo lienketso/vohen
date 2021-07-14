@@ -17,7 +17,7 @@
         </div>
         <div class="flexbox-grid-form flexbox-grid-form-no-outside-padding rps-form-767 pt10">
             <div class="flexbox-grid-form-item ws-nm">
-                <span>{{ trans('plugins/ecommerce::shipping.warehouse') }}:</span> <span><i>{{ $shipment->store->name }}</i></span>
+                <span>{{ trans('plugins/ecommerce::shipping.updated_at') }}:</span> <span><i>{{ $shipment->updated_at }}</i></span>
             </div>
             <div class="flexbox-grid-form-item ws-nm rps-no-pd-none-r">
                 <span>{{ trans('plugins/ecommerce::shipping.cod_amount') }}:</span>

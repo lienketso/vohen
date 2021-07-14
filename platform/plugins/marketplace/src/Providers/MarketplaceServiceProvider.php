@@ -2,37 +2,39 @@
 
 namespace Botble\Marketplace\Providers;
 
+use Botble\Base\Models\BaseModel;
 use Botble\Base\Supports\Helper;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Ecommerce\Models\Customer;
+use Botble\Ecommerce\Models\Discount;
 use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\Product;
 use Botble\Marketplace\Http\Middleware\RedirectIfNotVendor;
 use Botble\Marketplace\Models\Revenue;
 use Botble\Marketplace\Models\Store;
-use Botble\Marketplace\Models\Withdrawal;
 use Botble\Marketplace\Models\VendorInfo;
+use Botble\Marketplace\Models\Withdrawal;
 use Botble\Marketplace\Repositories\Caches\RevenueCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\StoreCacheDecorator;
-use Botble\Marketplace\Repositories\Caches\WithdrawalCacheDecorator;
 use Botble\Marketplace\Repositories\Caches\VendorInfoCacheDecorator;
+use Botble\Marketplace\Repositories\Caches\WithdrawalCacheDecorator;
 use Botble\Marketplace\Repositories\Eloquent\RevenueRepository;
 use Botble\Marketplace\Repositories\Eloquent\StoreRepository;
-use Botble\Marketplace\Repositories\Eloquent\WithdrawalRepository;
 use Botble\Marketplace\Repositories\Eloquent\VendorInfoRepository;
+use Botble\Marketplace\Repositories\Eloquent\WithdrawalRepository;
 use Botble\Marketplace\Repositories\Interfaces\RevenueInterface;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
-use Botble\Marketplace\Repositories\Interfaces\WithdrawalInterface;
 use Botble\Marketplace\Repositories\Interfaces\VendorInfoInterface;
+use Botble\Marketplace\Repositories\Interfaces\WithdrawalInterface;
 use EmailHandler;
 use Event;
 use Form;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use MacroableModels;
 use SeoHelper;
 use SlugHelper;
-use MacroableModels;
 
 class MarketplaceServiceProvider extends ServiceProvider
 {
@@ -85,7 +87,7 @@ class MarketplaceServiceProvider extends ServiceProvider
                 ->loadAndPublishTranslations()
                 ->loadAndPublishViews()
                 ->publishAssets()
-                ->loadRoutes(['base', 'fronts', 'product', 'order']);
+                ->loadRoutes(['base', 'fronts', 'product', 'order', 'discount']);
 
             Event::listen(RouteMatched::class, function () {
                 dashboard_menu()
@@ -154,34 +156,38 @@ class MarketplaceServiceProvider extends ServiceProvider
                     return $model->hasOne(VendorInfo::class, 'customer_id')->withDefault();
                 });
 
+                Discount::resolveRelationUsing('store', function ($model) {
+                    return $model->belongsTo(Store::class, 'store_id')->withDefault();
+                });
+
                 MacroableModels::addMacro(Customer::class, 'getBalanceAttribute', function () {
                     /**
-                     * @var BaseModel $this
                      * @return float
+                     * @var BaseModel $this
                      */
                     return $this->vendorInfo ? $this->vendorInfo->balance : 0;
                 });
 
                 MacroableModels::addMacro(Customer::class, 'getBankInfoAttribute', function () {
                     /**
-                     * @var BaseModel $this
                      * @return float
+                     * @var BaseModel $this
                      */
                     return $this->vendorInfo ? $this->vendorInfo->bank_info : [];
                 });
 
                 MacroableModels::addMacro(Customer::class, 'getTotalFeeAttribute', function () {
                     /**
-                     * @var BaseModel $this
                      * @return float
+                     * @var BaseModel $this
                      */
                     return $this->vendorInfo ? $this->vendorInfo->total_fee : 0;
                 });
 
                 MacroableModels::addMacro(Customer::class, 'getTotalRevenueAttribute', function () {
                     /**
-                     * @var BaseModel $this
                      * @return float
+                     * @var BaseModel $this
                      */
                     return $this->vendorInfo ? $this->vendorInfo->total_revenue : 0;
                 });

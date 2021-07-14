@@ -21,7 +21,7 @@
                             <p><span>{{ __('Order number') }}:</span> <span
                                     class="order-detail-value">{{ get_order_code($order->id) }}</span></p>
                             <span>{{ __('Time') }}:</span> <span
-                                class="order-detail-value">{{ $order->created_at->format('h:m d/m/Y') }}</span>
+                                class="order-detail-value">{{ $order->created_at->translatedFormat('M d, Y h:m') }}</span>
                         </div>
                     </div>
                 </div>
@@ -55,6 +55,12 @@
                 <div class="col-12">
                     <span>{{ __('Shipping fee') }}:</span> <span
                         class="order-detail-value">  {{ format_price($order->shipping_amount, $order->currency_id) }} </span>
+                </div>
+
+                <div class="col-12">
+                    @if ($order->description)
+                        <span>{{ __('Note') }}:</span> <span class="order-detail-value text-warning">{{ $order->description }} </span>&nbsp;
+                    @endif
                 </div>
                 <br>
                 <h6>{{ __('Customer information') }}</h6>

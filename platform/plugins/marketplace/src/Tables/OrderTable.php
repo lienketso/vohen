@@ -4,7 +4,6 @@ namespace Botble\Marketplace\Tables;
 
 use BaseHelper;
 use Botble\Ecommerce\Enums\OrderStatusEnum;
-use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Repositories\Interfaces\OrderInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use EcommerceHelper;
@@ -75,16 +74,16 @@ class OrderTable extends TableAbstract
             });
         }
 
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+        $data = $data
             ->addColumn('operations', function ($item) {
                 return view('plugins/marketplace::themes.dashboard.table.actions', [
                     'edit'   => 'marketplace.vendor.orders.edit',
                     'delete' => 'marketplace.vendor.orders.destroy',
                     'item'   => $item,
                 ])->render();
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -92,26 +91,23 @@ class OrderTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_orders.id',
-            'ec_orders.status',
-            'ec_orders.user_id',
-            'ec_orders.created_at',
-            'ec_orders.amount',
-            'ec_orders.tax_amount',
-            'ec_orders.currency_id',
-            'ec_orders.shipping_amount',
-            'ec_orders.payment_id',
-        ];
-
-        $query = $model
-            ->select($select)
+        $query = $this->repository->getModel()
+            ->select([
+                'id',
+                'status',
+                'user_id',
+                'created_at',
+                'amount',
+                'tax_amount',
+                'currency_id',
+                'shipping_amount',
+                'payment_id',
+            ])
             ->with(['user', 'payment'])
-            ->where('ec_orders.is_finished', 1)
-            ->where('ec_orders.store_id', auth('customer')->user()->store->id);
+            ->where('is_finished', 1)
+            ->where('store_id', auth('customer')->user()->store->id);
 
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -121,18 +117,15 @@ class OrderTable extends TableAbstract
     {
         $columns = [
             'id'      => [
-                'name'  => 'ec_orders.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
                 'class' => 'text-left',
             ],
             'user_id' => [
-                'name'  => 'ec_orders.user_id',
                 'title' => trans('plugins/ecommerce::order.customer_label'),
                 'class' => 'text-left',
             ],
             'amount'  => [
-                'name'  => 'ec_orders.amount',
                 'title' => trans('plugins/ecommerce::order.amount'),
                 'class' => 'text-center',
             ],
@@ -140,7 +133,6 @@ class OrderTable extends TableAbstract
 
         if (EcommerceHelper::isTaxEnabled()) {
             $columns['tax_amount'] = [
-                'name'  => 'ec_orders.amount',
                 'title' => trans('plugins/ecommerce::order.tax_amount'),
                 'class' => 'text-center',
             ];
@@ -148,27 +140,24 @@ class OrderTable extends TableAbstract
 
         $columns += [
             'shipping_amount' => [
-                'name'  => 'ec_orders.shipping_amount',
                 'title' => trans('plugins/ecommerce::order.shipping_amount'),
                 'class' => 'text-center',
             ],
             'payment_method'  => [
-                'name'  => 'ec_orders.id',
+                'name'  => 'payment_id',
                 'title' => trans('plugins/ecommerce::order.payment_method'),
                 'class' => 'text-center',
             ],
             'payment_status'  => [
-                'name'  => 'ec_orders.id',
+                'name'  => 'payment_id',
                 'title' => trans('plugins/ecommerce::order.payment_status_label'),
                 'class' => 'text-center',
             ],
             'status'          => [
-                'name'  => 'ec_orders.status',
                 'title' => trans('core/base::tables.status'),
                 'class' => 'text-center',
             ],
             'created_at'      => [
-                'name'  => 'ec_orders.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
                 'class' => 'text-left',
@@ -176,14 +165,6 @@ class OrderTable extends TableAbstract
         ];
 
         return $columns;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buttons()
-    {
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, [], Order::class);
     }
 
     /**
@@ -200,13 +181,13 @@ class OrderTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_orders.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => OrderStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', OrderStatusEnum::values()),
             ],
-            'ec_orders.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

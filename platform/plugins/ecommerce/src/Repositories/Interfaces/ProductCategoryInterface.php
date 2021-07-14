@@ -27,7 +27,7 @@ interface ProductCategoryInterface extends RepositoryInterface
     public function getDataSiteMap();
 
     /**
-     * @param $limit
+     * @param int $limit
      */
     public function getFeaturedCategories($limit);
 
@@ -36,4 +36,18 @@ interface ProductCategoryInterface extends RepositoryInterface
      * @return mixed
      */
     public function getAllCategories($active = true);
+
+    /**
+     * @param array $conditions
+     * @param array $with
+     * @param array $withCount
+     * @param bool $parentOnly
+     * @return \Illuminate\Support\Collection
+     */
+    public function getProductCategories(
+        array $conditions = [],
+        array $with = [],
+        array $withCount = [],
+        bool $parentOnly = false
+    );
 }

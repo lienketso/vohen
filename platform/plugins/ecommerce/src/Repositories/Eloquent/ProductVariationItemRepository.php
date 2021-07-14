@@ -12,7 +12,7 @@ class ProductVariationItemRepository extends RepositoriesAbstract implements Pro
      */
     public function getVariationsInfo(array $versionIds)
     {
-        $result = $this->model
+        $data = $this->model
             ->join('ec_product_attributes', 'ec_product_attributes.id', '=', 'ec_product_variation_items.attribute_id')
             ->join('ec_product_attribute_sets', 'ec_product_attribute_sets.id', '=',
                 'ec_product_attributes.attribute_set_id')
@@ -23,12 +23,9 @@ class ProductVariationItemRepository extends RepositoriesAbstract implements Pro
                 'ec_product_attributes.*',
                 'ec_product_attribute_sets.title as attribute_set_title',
                 'ec_product_attribute_sets.slug as attribute_set_slug',
-            ])
-            ->get();
+            ]);
 
-        $this->resetModel();
-
-        return $result;
+        return $this->applyBeforeExecuteQuery($data)->get();
     }
 
     /**
@@ -36,7 +33,7 @@ class ProductVariationItemRepository extends RepositoriesAbstract implements Pro
      */
     public function getProductAttributes($productId)
     {
-        $result = $this->model
+        $data = $this->model
             ->join('ec_product_attributes', 'ec_product_attributes.id', '=', 'ec_product_variation_items.attribute_id')
             ->join('ec_product_attribute_sets', 'ec_product_attribute_sets.id', '=',
                 'ec_product_attributes.attribute_set_id')
@@ -47,11 +44,8 @@ class ProductVariationItemRepository extends RepositoriesAbstract implements Pro
                 'ec_product_attributes.*',
                 'ec_product_attribute_sets.title as attribute_set_title',
                 'ec_product_attribute_sets.slug as attribute_set_slug',
-            ])
-            ->get();
+            ]);
 
-        $this->resetModel();
-
-        return $result;
+        return $this->applyBeforeExecuteQuery($data)->get();
     }
 }

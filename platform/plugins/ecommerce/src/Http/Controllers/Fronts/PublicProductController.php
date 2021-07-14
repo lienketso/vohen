@@ -204,6 +204,16 @@ class PublicProductController
             Arr::forget($condition, 'ec_products.status');
         }
 
+        $withCount = [];
+        if (EcommerceHelper::isReviewEnabled()) {
+            $withCount = [
+                'reviews',
+                'reviews as reviews_avg' => function ($query) {
+                    $query->select(DB::raw('avg(star)'));
+                },
+            ];
+        }
+
         $product = get_products([
             'condition' => $condition,
             'take'      => 1,
@@ -215,6 +225,7 @@ class PublicProductController
                 'categories',
                 'categories.slugable',
             ],
+            'withCount' => $withCount,
         ]);
 
         if (!$product) {
@@ -260,8 +271,7 @@ class PublicProductController
         Theme::breadcrumb()->add($product->name, $product->url);
 
         admin_bar()
-            ->registerLink(trans('plugins/ecommerce::products.edit_this_product'),
-                route('products.edit', $product->id));
+            ->registerLink(trans('plugins/ecommerce::products.edit_this_product'), route('products.edit', $product->id));
 
         do_action(BASE_ACTION_PUBLIC_RENDER_SINGLE, PRODUCT_CATEGORY_MODULE_SCREEN_NAME, $product);
 
@@ -469,6 +479,7 @@ class PublicProductController
                 },
             ];
         }
+
         $with = [
             'slugable',
             'variations',
@@ -477,12 +488,12 @@ class PublicProductController
             'promotions',
             'latestFlashSales',
         ];
+
         if (is_plugin_active('marketplace')) {
             $with = array_merge($with, ['store', 'store.slugable']);
         }
 
-        $products = $getProductService->getProduct($request, $category->id, null,
-            $with, $withCount);
+        $products = $getProductService->getProduct($request, $category->id, null, $with, $withCount);
 
         if ($request->ajax()) {
             $total = $products->total();
@@ -598,7 +609,6 @@ class PublicProductController
                 }
             }
             $originalProduct = $product->original_product;
-            $variationProductAttributes = $product->variationProductAttributes;
         } else {
             $originalProduct = $this->productRepository->advancedGet([
                 'condition' => [
@@ -629,9 +639,9 @@ class PublicProductController
                         'thumb',
                     ]);
                 }
-            }
 
-            $originalProduct->errorMessage = __('Please select attributes');
+                $originalProduct->errorMessage = __('Please select attributes');
+            }
         }
 
         if (!$originalProduct) {
@@ -640,22 +650,24 @@ class PublicProductController
 
         $productAttributes = $this->productRepository->getRelatedProductAttributes($originalProduct)->sortBy('order');
 
-        $variationProductAttributes = $productAttributes;
-
         $attributeSets = $this->productRepository->getRelatedProductAttributeSets($originalProduct);
 
         $productVariations = app(ProductVariationInterface::class)->allBy([
             'configurable_product_id' => $originalProduct->id,
         ]);
 
-        $productVariationsInfo = app(ProductVariationItemInterface::class)->getVariationsInfo($productVariations->pluck('id')->toArray());
+        $productVariationsInfo = app(ProductVariationItemInterface::class)
+            ->getVariationsInfo($productVariations->pluck('id')->toArray());
+
         $variationInfo = $productVariationsInfo;
 
         $unavailableAttributeIds = [];
         $variationNextIds = [];
         foreach($attributeSets as $key => $set) {
             if ($key != 0) {
-                $variationInfo = $productVariationsInfo->where('attribute_set_id', $set->id)->whereIn('variation_id', $variationNextIds);
+                $variationInfo = $productVariationsInfo
+                    ->where('attribute_set_id', $set->id)
+                    ->whereIn('variation_id', $variationNextIds);
             }
             [$variationNextIds, $unavailableAttributeIds] = handle_next_attributes_in_product(
                 $productAttributes->where('attribute_set_id', $set->id),
@@ -671,7 +683,9 @@ class PublicProductController
         if (!$product) {
             $product = $originalProduct;
         }
+
         $product->unavailableAttributeIds = $unavailableAttributeIds;
+
         return $response
             ->setData(new ProductVariationResource($product));
     }

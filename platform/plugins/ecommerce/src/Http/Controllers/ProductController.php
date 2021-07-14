@@ -149,13 +149,8 @@ class ProductController extends BaseController
 
             $variation['variation_default_id'] = $variation['id'];
 
-            $variation['sku'] = $product->sku ?? time();
-            foreach ($addedAttributes as $attributeId) {
-                $attribute = $this->productAttributeRepository->findById($attributeId);
-                if ($attribute) {
-                    $variation['sku'] .= '-' . $attribute->slug;
-                }
-            }
+            $variation['sku'] = $product->sku;
+            $variation['auto_generate_sku'] = true;
 
             $variation['images'] = $request->input('images', []);
 
@@ -236,13 +231,8 @@ class ProductController extends BaseController
 
             $product->productAttributeSets()->sync(array_keys($addedAttributes));
 
-            $variation['sku'] = $product->sku ?? time();
-            foreach (array_keys($addedAttributes) as $attributeId) {
-                $attribute = $this->productAttributeRepository->findById($attributeId);
-                if ($attribute) {
-                    $variation['sku'] .= '-' . $attribute->slug;
-                }
-            }
+            $variation['sku'] = $product->sku;
+            $variation['auto_generate_sku'] = true;
 
             $this->postSaveAllVersions([$variation['id'] => $variation], $variationRepository, $product->id, $response);
         } elseif ($product->variations()->count() === 0) {

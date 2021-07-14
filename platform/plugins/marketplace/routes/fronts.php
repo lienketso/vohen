@@ -79,7 +79,7 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
                     'create',
                     'store',
                     'edit',
-                    'update'
+                    'update',
                 ]);
 
             Route::group(['prefix' => 'withdrawals'], function () {

@@ -12,6 +12,8 @@ class EcommerceProductAttribute {
 
     handleChooseImage() {
         new RvMediaStandAlone('.image-box .btn-images', {
+            filter: 'image',
+            view_in: 'all_media',
             onSelectFiles: (files, $el) => {
                 let firstItem = _.first(files);
                 if (firstItem) {

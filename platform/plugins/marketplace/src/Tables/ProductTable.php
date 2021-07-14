@@ -5,7 +5,6 @@ namespace Botble\Marketplace\Tables;
 use BaseHelper;
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Ecommerce\Exports\ProductExport;
-use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use Html;
@@ -87,18 +86,16 @@ class ProductTable extends TableAbstract
             })
             ->editColumn('status', function ($item) {
                 return $item->status->toHtml();
-            });
-
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
+            })
             ->addColumn('operations', function ($item) {
                 return view('plugins/marketplace::themes.dashboard.table.actions', [
                     'edit'   => 'marketplace.vendor.products.edit',
                     'delete' => 'marketplace.vendor.products.destroy',
                     'item'   => $item,
                 ])->render();
-            })
-            ->escapeColumns([])
-            ->make(true);
+            });
+
+        return $this->toJson($data);
     }
 
     /**
@@ -106,30 +103,27 @@ class ProductTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'ec_products.id',
-            'ec_products.name',
-            'ec_products.order',
-            'ec_products.created_at',
-            'ec_products.status',
-            'ec_products.sku',
-            'ec_products.images',
-            'ec_products.price',
-            'ec_products.sale_price',
-            'ec_products.sale_type',
-            'ec_products.start_date',
-            'ec_products.end_date',
-            'ec_products.quantity',
-            'ec_products.with_storehouse_management',
-        ];
-
-        $query = $model
-            ->select($select)
+        $query = $this->repository->getModel()
+            ->select([
+                'id',
+                'name',
+                'order',
+                'created_at',
+                'status',
+                'sku',
+                'images',
+                'price',
+                'sale_price',
+                'sale_type',
+                'start_date',
+                'end_date',
+                'quantity',
+                'with_storehouse_management',
+            ])
             ->where('is_variation', 0)
             ->where('store_id', auth('customer')->user()->store->id);
 
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -139,50 +133,42 @@ class ProductTable extends TableAbstract
     {
         return [
             'id'         => [
-                'name'  => 'ec_products.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
             ],
             'image'      => [
-                'name'  => 'ec_products.images',
+                'name'  => 'images',
                 'title' => trans('plugins/ecommerce::products.image'),
                 'width' => '100px',
                 'class' => 'text-center',
             ],
             'name'       => [
-                'name'  => 'ec_products.name',
                 'title' => trans('core/base::tables.name'),
                 'class' => 'text-left',
             ],
             'price'      => [
-                'name'  => 'ec_products.price',
                 'title' => trans('plugins/ecommerce::products.price'),
                 'class' => 'text-left',
             ],
             'quantity'   => [
-                'name'  => 'ec_products.quantity',
                 'title' => trans('plugins/ecommerce::products.quantity'),
                 'class' => 'text-left',
             ],
             'sku'        => [
-                'name'  => 'ec_products.sku',
                 'title' => trans('plugins/ecommerce::products.sku'),
                 'class' => 'text-left',
             ],
             'order'      => [
-                'name'  => 'ec_products.order',
                 'title' => trans('core/base::tables.order'),
                 'width' => '50px',
                 'class' => 'text-center',
             ],
             'created_at' => [
-                'name'  => 'ec_products.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'width' => '100px',
                 'class' => 'text-center',
             ],
             'status'     => [
-                'name'  => 'ec_products.status',
                 'title' => trans('core/base::tables.status'),
                 'width' => '100px',
                 'class' => 'text-center',
@@ -195,9 +181,7 @@ class ProductTable extends TableAbstract
      */
     public function buttons()
     {
-        $buttons = $this->addCreateButton(route('marketplace.vendor.products.create'));
-
-        return apply_filters(BASE_FILTER_TABLE_BUTTONS, $buttons, Product::class);
+        return $this->addCreateButton(route('marketplace.vendor.products.create'));
     }
 
     /**
@@ -214,23 +198,23 @@ class ProductTable extends TableAbstract
     public function getBulkChanges(): array
     {
         return [
-            'ec_products.name'       => [
+            'name'       => [
                 'title'    => trans('core/base::tables.name'),
                 'type'     => 'text',
                 'validate' => 'required|max:120',
             ],
-            'ec_products.order'      => [
+            'order'      => [
                 'title'    => trans('core/base::tables.order'),
                 'type'     => 'number',
                 'validate' => 'required|min:0',
             ],
-            'ec_products.status'     => [
+            'status'     => [
                 'title'    => trans('core/base::tables.status'),
                 'type'     => 'select',
                 'choices'  => BaseStatusEnum::labels(),
                 'validate' => 'required|in:' . implode(',', BaseStatusEnum::values()),
             ],
-            'ec_products.created_at' => [
+            'created_at' => [
                 'title' => trans('core/base::tables.created_at'),
                 'type'  => 'date',
             ],

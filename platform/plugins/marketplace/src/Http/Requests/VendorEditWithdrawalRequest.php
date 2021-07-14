@@ -2,9 +2,7 @@
 
 namespace Botble\Marketplace\Http\Requests;
 
-use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Support\Http\Requests\Request;
-use Illuminate\Validation\Rule;
 
 class VendorEditWithdrawalRequest extends Request
 {
@@ -17,7 +15,7 @@ class VendorEditWithdrawalRequest extends Request
     public function rules()
     {
         return [
-            'description'   => 'nullable|max:400'
+            'description' => 'nullable|max:400',
         ];
     }
 }

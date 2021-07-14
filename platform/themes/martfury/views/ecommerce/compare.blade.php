@@ -37,7 +37,7 @@
                             <tr>
                                 <td class="heading" rowspan="2">{{ __('Product') }}</td>
                                 @foreach(Cart::instance('compare')->content() as $item)
-                                    <td><a class="js-remove-from-compare-button" href="{{ route('public.compare.remove', $item->id) }}">{{ __('Remove') }}</a></td>
+                                    <td><a class="js-remove-from-compare-button" href="#" data-url="{{ route('public.compare.remove', $item->id) }}">{{ __('Remove') }}</a></td>
                                 @endforeach
                             </tr>
 
@@ -179,7 +179,7 @@
                             <tr>
                                 <td class="heading"></td>
                                 @foreach(Cart::instance('compare')->content() as $item)
-                                    <td><a class="ps-btn add-to-cart-button" data-id="{{ $item->id }}" href="{{ route('public.cart.add-to-cart') }}">{{ __('Add To Cart') }}</a></td>
+                                    <td><a class="ps-btn add-to-cart-button" data-id="{{ $item->id }}" href="#" data-url="{{ route('public.cart.add-to-cart') }}">{{ __('Add To Cart') }}</a></td>
                                 @endforeach
                             </tr>
                         @endif

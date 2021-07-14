@@ -48,11 +48,7 @@ class CurrencySupport
             }
 
             if (!$currency) {
-                if ($this->currencies && $this->currencies instanceof Collection) {
-                    $currency = $this->currencies->where('is_default', 1)->first();
-                } else {
-                    $currency = app(CurrencyInterface::class)->getFirstBy(['is_default' => 1]);
-                }
+                return $this->getDefaultCurrency();
             }
 
             if (!$currency) {
@@ -79,5 +75,17 @@ class CurrencySupport
         }
 
         return $this->currencies;
+    }
+
+    /**
+     * @return Currency
+     */
+    public function getDefaultCurrency()
+    {
+        if ($this->currencies && $this->currencies instanceof Collection) {
+            return $this->currencies->where('is_default', 1)->first();
+        }
+
+        return app(CurrencyInterface::class)->getFirstBy(['is_default' => 1]);
     }
 }

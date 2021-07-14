@@ -2,11 +2,13 @@
 
 namespace Botble\Ecommerce\Services\Products;
 
+use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Ecommerce\Repositories\Interfaces\ProductInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use EcommerceHelper;
 
 class GetProductService
 {
@@ -30,6 +32,7 @@ class GetProductService
      * @param null $brand
      * @param array $with
      * @param array $withCount
+     * @param array $conditions
      * @return LengthAwarePaginator|\Illuminate\Database\Eloquent\Collection|Collection|mixed
      */
     public function getProduct(
@@ -37,8 +40,16 @@ class GetProductService
         $category = null,
         $brand = null,
         array $with = [],
-        array $withCount = []
+        array $withCount = [],
+        array $conditions = []
     ) {
+        $num = (int) $request->input('num');
+        $shows = EcommerceHelper::getShowParams();
+
+        if (!array_key_exists($num, $shows)) {
+            $num = (int)theme_option('number_of_products_per_page', 12);
+        }
+
         $queryVar = [
             'keyword'     => $request->input('q'),
             'brands'      => (array)$request->input('brands', []),
@@ -49,8 +60,7 @@ class GetProductService
             'max_price'   => $request->input('max_price'),
             'min_price'   => $request->input('min_price'),
             'sort_by'     => $request->input('sort-by'),
-            'num'         => $request->input('num') ? (int)$request->input('num') : (int)theme_option('number_of_products_per_page',
-                12),
+            'num'         => $num,
         ];
 
         if ($category) {
@@ -132,6 +142,22 @@ class GetProductService
                 break;
         }
 
+        $params = [
+            'paginate'  => [
+                'per_page'      => $queryVar['num'],
+                'current_paged' => (int)$request->query('page', 1),
+            ],
+            'with'      => $with,
+            'withCount' => $withCount,
+        ];
+
+        if (!empty($conditions)) {
+            $params['condition'] = array_merge([
+                'ec_products.status'       => BaseStatusEnum::PUBLISHED,
+                'ec_products.is_variation' => 0,
+            ], $conditions);
+        }
+
         $products = $this->productRepository->filterProducts(
             [
                 'keyword'                => $queryVar['keyword'],
@@ -145,14 +171,7 @@ class GetProductService
                 'count_attribute_groups' => $countAttributeGroups,
                 'order_by'               => $orderBy,
             ],
-            [
-                'paginate'  => [
-                    'per_page'      => $queryVar['num'],
-                    'current_paged' => (int)$request->query('page', 1),
-                ],
-                'with'      => $with,
-                'withCount' => $withCount,
-            ]
+            $params,
         );
 
         return $products;

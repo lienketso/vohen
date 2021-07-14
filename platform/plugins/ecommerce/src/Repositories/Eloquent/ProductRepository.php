@@ -21,12 +21,11 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
      */
     public function getSearch($query, $paginate = 10)
     {
-        $products = $this->model
-            ->where('ec_products.name', 'LIKE', '%' . $query . '%')
-            ->orWhere('ec_products.sku', 'LIKE', '%' . $query . '%')
-            ->paginate($paginate);
+        $data = $this->model
+            ->where('name', 'LIKE', '%' . $query . '%')
+            ->orWhere('sku', 'LIKE', '%' . $query . '%');
 
-        return $products;
+        return $this->applyBeforeExecuteQuery($data)->paginate($paginate);
     }
 
     /**
@@ -212,7 +211,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
     public function getRelatedProductAttributeSets($product)
     {
         try {
-            return $product->productAttributeSets()->get();
+            return $product->productAttributeSets()->orderBy('order')->get();
         } catch (Exception $exception) {
             return collect([]);
         }
@@ -236,14 +235,17 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
     public function getRelatedProductAttributes($product)
     {
         try {
-            return ProductAttribute::join('ec_product_variation_items', 'ec_product_variation_items.attribute_id', '=',
+            $data = ProductAttribute::join('ec_product_variation_items', 'ec_product_variation_items.attribute_id', '=',
                 'ec_product_attributes.id')
                 ->join('ec_product_variations', 'ec_product_variation_items.variation_id', '=',
                     'ec_product_variations.id')
                 ->where('configurable_product_id', $product->id)
+                ->where('ec_product_attributes.status', BaseStatusEnum::PUBLISHED)
                 ->select('ec_product_attributes.*')
-                ->distinct()
-                ->get();
+                ->distinct();
+
+            return $this->applyBeforeExecuteQuery($data)->get();
+
         } catch (Exception $exception) {
             return collect([]);
         }
@@ -270,20 +272,17 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         $params = array_merge([
             'condition' => [
-                'ec_products.status'       => BaseStatusEnum::PUBLISHED,
-                'ec_products.is_variation' => 0,
+                'status'       => BaseStatusEnum::PUBLISHED,
+                'is_variation' => 0,
             ],
             'order_by'  => [
-                'ec_products.order'      => 'ASC',
-                'ec_products.created_at' => 'DESC',
+                'order'      => 'ASC',
+                'created_at' => 'DESC',
             ],
             'take'      => null,
             'paginate'  => [
                 'per_page'      => null,
                 'current_paged' => 1,
-            ],
-            'select'    => [
-                'ec_products.*',
             ],
             'with'      => [],
             'withCount' => [],
@@ -362,20 +361,17 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         $params = array_merge([
             'condition' => [
-                'ec_products.status'       => BaseStatusEnum::PUBLISHED,
-                'ec_products.is_variation' => 0,
+                'status'       => BaseStatusEnum::PUBLISHED,
+                'is_variation' => 0,
             ],
             'order_by'  => [
-                'ec_products.order'      => 'ASC',
-                'ec_products.created_at' => 'DESC',
+                'order'      => 'ASC',
+                'created_at' => 'DESC',
             ],
             'take'      => null,
             'paginate'  => [
                 'per_page'      => null,
                 'current_paged' => 1,
-            ],
-            'select'    => [
-                'ec_products.*',
             ],
             'with'      => [],
         ], $params);
@@ -391,8 +387,8 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                          * @var Builder $subQuery
                          */
                         return $subQuery
-                            ->where('ec_products.sale_type', 0)
-                            ->where('ec_products.sale_price', '>', 0);
+                            ->where('sale_type', 0)
+                            ->where('sale_price', '>', 0);
                     })
                     ->orWhere(function ($subQuery) {
                         /**
@@ -404,21 +400,21 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                                  * @var Builder $sub
                                  */
                                 return $sub
-                                    ->where('ec_products.sale_type', 1)
-                                    ->where('ec_products.start_date', '<>', null)
-                                    ->where('ec_products.end_date', '<>', null)
-                                    ->where('ec_products.start_date', '<=', now())
-                                    ->where('ec_products.end_date', '>=', Carbon::today());
+                                    ->where('sale_type', 1)
+                                    ->where('start_date', '<>', null)
+                                    ->where('end_date', '<>', null)
+                                    ->where('start_date', '<=', now())
+                                    ->where('end_date', '>=', Carbon::today());
                             })
                             ->orWhere(function ($sub) {
                                 /**
                                  * @var Builder $sub
                                  */
                                 return $sub
-                                    ->where('ec_products.sale_type', 1)
-                                    ->where('ec_products.start_date', '<>', null)
-                                    ->where('ec_products.start_date', '<=', now())
-                                    ->whereNull('ec_products.end_date');
+                                    ->where('sale_type', 1)
+                                    ->where('start_date', '<>', null)
+                                    ->where('start_date', '<=', now())
+                                    ->whereNull('end_date');
                             });
                     });
             });
@@ -523,12 +519,12 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
         $params = array_merge([
             'brand_id'  => null,
             'condition' => [
-                'ec_products.status'       => BaseStatusEnum::PUBLISHED,
-                'ec_products.is_variation' => 0,
+                'status'       => BaseStatusEnum::PUBLISHED,
+                'is_variation' => 0,
             ],
             'order_by'  => [
-                'ec_products.order'      => 'ASC',
-                'ec_products.created_at' => 'DESC',
+                'order'      => 'ASC',
+                'created_at' => 'DESC',
             ],
             'take'      => null,
             'paginate'  => [
@@ -536,7 +532,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                 'current_paged' => 1,
             ],
             'select'    => [
-                'ec_products.*',
+                '*',
             ],
             'with'      => [
 
@@ -690,6 +686,7 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
                 'products_with_final_price.final_price',
             ],
             'with'      => [],
+            'withCount' => [],
         ], $params);
 
         $this->model = $this->originalModel;
@@ -698,7 +695,6 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
 
         $this->model = $this->model
             ->distinct()
-            ->leftJoin('ec_brands', 'ec_products.brand_id', '=', 'ec_brands.id')
             ->join(DB::raw('
                 (
                     SELECT DISTINCT
@@ -832,7 +828,9 @@ class ProductRepository extends RepositoriesAbstract implements ProductInterface
         // Filter product by brands
         $filters['brands'] = array_filter($filters['brands']);
         if ($filters['brands']) {
-            $this->model = $this->model->whereIn('ec_products.brand_id', $filters['brands']);
+            $this->model = $this->model
+                ->leftJoin('ec_brands', 'ec_products.brand_id', '=', 'ec_brands.id')
+                ->whereIn('ec_products.brand_id', $filters['brands']);
         }
 
         // Filter product by attributes

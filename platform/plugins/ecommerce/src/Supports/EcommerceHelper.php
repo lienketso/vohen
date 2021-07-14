@@ -110,4 +110,32 @@ class EcommerceHelper
             'rating_desc'     => __('Rating: high to low'),
         ];
     }
+
+    /**
+     * @return array
+     */
+    public function getShowParams(): array
+    {
+        return [
+            12    => 12,
+            24    => 24,
+            36    => 36,
+        ];
+    }
+
+    /**
+     * @return float
+     */
+    public function getMinimumOrderAmount()
+    {
+        return (float)get_ecommerce_setting('minimum_order_amount', 0) / get_application_currency()->exchange_rate * get_current_exchange_rate() + 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabledGuestCheckout(): bool
+    {
+        return get_ecommerce_setting('enable_guest_checkout', '1') == '1';
+    }
 }

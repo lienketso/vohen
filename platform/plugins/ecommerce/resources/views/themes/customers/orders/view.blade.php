@@ -59,6 +59,12 @@
                     class="order-detail-value">  {{ format_price($order->shipping_amount, $order->currency_id) }} </span>
             </div>
 
+            <div class="col-md-12">
+                @if ($order->description)
+                    <span>{{ __('Note') }}:</span> <span class="order-detail-value text-warning">{{ $order->description }} </span>&nbsp;
+                @endif
+            </div>
+
             <h5>{{ __('Customer information') }}</h5>
 
             <div class="col-md-12">

@@ -16,18 +16,36 @@ if (!function_exists('format_price')) {
      */
     function format_price($price, $currency = null, $withoutCurrency = false, $useSymbol = true): string
     {
-        if (!$currency) {
+        if ($currency) {
+            if (!$currency instanceof Currency) {
+                $currency = app(CurrencyInterface::class)->getFirstBy(['id' => $currency]);
+            }
+
+            if (!$currency) {
+                return human_price_text($price, $currency);
+            }
+
+            if ($currency->id != get_application_currency_id() && $currency->exchange_rate > 0) {
+                $currentCurrency = get_application_currency();
+
+                if ($currentCurrency->is_default) {
+                    $price = $price / $currency->exchange_rate;
+                } else {
+                    $price = $price / $currency->exchange_rate * $currentCurrency->exchange_rate;
+                }
+
+                $currency = $currentCurrency;
+            }
+        } else {
             $currency = get_application_currency();
-        } elseif ($currency != null && !($currency instanceof Currency)) {
-            $currency = app(CurrencyInterface::class)->getFirstBy(['ec_currencies.id' => $currency]);
-        }
 
-        if (!$currency) {
-            return human_price_text($price, $currency);
-        }
+            if (!$currency) {
+                return human_price_text($price, $currency);
+            }
 
-        if (!$currency->is_default && $currency->exchange_rate > 0) {
-            $price = $price * $currency->exchange_rate;
+            if (!$currency->is_default && $currency->exchange_rate > 0) {
+                $price = $price * $currency->exchange_rate;
+            }
         }
 
         if ($useSymbol && $currency->is_prefix_symbol) {
@@ -55,11 +73,11 @@ if (!function_exists('human_price_text')) {
 
         if (config('plugins.ecommerce.general.display_big_money_in_million_billion')) {
             if ($price >= 1000000 && $price < 1000000000) {
-                $price = round($price / 1000000, 2);
+                $price = round($price / 1000000, 2) + 0;
                 $priceUnit = __('million') . ' ' . $priceUnit;
                 $numberAfterDot = strlen(substr(strrchr($price, '.'), 1));
             } elseif ($price >= 1000000000) {
-                $price = round($price / 1000000000, 2);
+                $price = round($price / 1000000000, 2) + 0;
                 $priceUnit = __('billion') . ' ' . $priceUnit;
                 $numberAfterDot = strlen(substr(strrchr($price, '.'), 1));
             }
@@ -71,6 +89,10 @@ if (!function_exists('human_price_text')) {
 
         $price = number_format($price, $numberAfterDot, get_ecommerce_setting('decimal_separator', '.'),
             get_ecommerce_setting('thousands_separator', ','));
+
+        if (is_numeric($price)) {
+            $price = $price + 0;
+        }
 
         return $price . ($priceUnit ?: '');
     }
@@ -85,7 +107,7 @@ if (!function_exists('get_current_exchange_rate')) {
         if (!$currency) {
             $currency = get_application_currency();
         } elseif ($currency != null && !($currency instanceof Currency)) {
-            $currency = app(CurrencyInterface::class)->getFirstBy(['ec_currencies.id' => $currency]);
+            $currency = app(CurrencyInterface::class)->getFirstBy(['id' => $currency]);
         }
 
         if (!$currency->is_default && $currency->exchange_rate > 0) {

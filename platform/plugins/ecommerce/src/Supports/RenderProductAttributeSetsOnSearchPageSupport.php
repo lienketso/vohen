@@ -32,6 +32,12 @@ class RenderProductAttributeSetsOnSearchPageSupport
     {
         $params = array_merge(['view' => 'plugins/ecommerce::themes.attributes.attributes-filter-renderer'], $params);
 
+        $with = ['attributes'];
+
+        if (is_plugin_active('language-advanced')) {
+            $with[] = 'attributes.translations';
+        }
+
         $attributeSets = $this->productAttributeSetRepository
             ->advancedGet([
                 'condition' => [
@@ -41,9 +47,7 @@ class RenderProductAttributeSetsOnSearchPageSupport
                 'order_by'  => [
                     'order' => 'ASC',
                 ],
-                'with'      => [
-                    'attributes',
-                ],
+                'with'      => $with,
             ]);
 
         return view($params['view'], compact('attributeSets'))->render();

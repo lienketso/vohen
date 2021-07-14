@@ -37,76 +37,89 @@ use Validator;
 class OrderHelper
 {
     /**
-     * @param string $orderId
+     * @param string|array $orderIds
      * @param string $chargeId
      * @return BaseModel|bool
      * @throws FileNotFoundException
      * @throws Throwable
      */
-    public function processOrder($orderId, $chargeId = null)
+    public function processOrder($orderIds, $chargeId = null)
     {
-        $order = app(OrderInterface::class)->findById($orderId);
+        $orderIds = (array)$orderIds;
 
-        if (!$order) {
+        $orders = app(OrderInterface::class)->allBy([['id', 'IN', $orderIds]]);
+
+        if (!$orders->count()) {
             return false;
         }
-
-        if ($order->histories()->where('action', 'create_order')->count()) {
-            return false;
+        foreach ($orders as $order) {
+            if ($order->histories()->where('action', 'create_order')->count()) {
+                return false;
+            }
         }
 
         if ($chargeId) {
             $payment = app(PaymentInterface::class)->getFirstBy(['charge_id' => $chargeId]);
 
             if ($payment) {
-                $order->payment_id = $payment->id;
-                $order->save();
+                foreach ($orders as $order) {
+                    $order->payment_id = $payment->id;
+                    $order->save();
+                }
             }
         }
 
         Cart::instance('cart')->destroy();
         session()->forget('applied_coupon_code');
 
-        session(['order_id' => $orderId]);
+        session(['order_id' => Arr::first($orderIds)]);
 
-        $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
-        if ($mailer->templateEnabled('admin_new_order')) {
-            $this->setEmailVariables($order);
-            $mailer->sendUsingTemplate('admin_new_order', setting('admin_email'));
+        if (is_plugin_active('marketplace')) {
+            apply_filters(SEND_MAIL_AFTER_PROCESS_ORDER_MULTI_DATA, $orders);
+        } else {
+            $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
+            if ($mailer->templateEnabled('admin_new_order')) {
+                $this->setEmailVariables($orders->first());
+                $mailer->sendUsingTemplate('admin_new_order', setting('admin_email'));
+            }
+            // Temporarily only send emails with the first order
+            $this->sendOrderConfirmationEmail($orders->first(), true);
         }
 
-        session(['order_id' => $order->id]);
+        session(['order_id' => $orders->first()->id]);
 
-        app(OrderHistoryInterface::class)->createOrUpdate([
-            'action'      => 'create_order',
-            'description' => trans('plugins/ecommerce::order.new_order_from', [
-                'order_id' => get_order_code($order->id),
-                'customer' => $order->user->name ?: $order->address->name,
-            ]),
-            'order_id'    => $order->id,
-        ]);
-
-        $this->sendOrderConfirmationEmail($order, true);
-
-        foreach ($order->products as $orderProduct) {
-            $product = $orderProduct->product->original_product;
-
-            $flashSale = $product->latestFlashSales()->first();
-            if (!$flashSale) {
-                continue;
-            }
-
-            $flashSale->products()->detach([$product->id]);
-            $flashSale->products()->attach([
-                $product->id => [
-                    'price'    => $flashSale->pivot->price,
-                    'quantity' => (int)$flashSale->pivot->quantity,
-                    'sold'     => (int)$flashSale->pivot->sold + $orderProduct->qty,
-                ],
+        foreach ($orders as $order) {
+            app(OrderHistoryInterface::class)->createOrUpdate([
+                'action'      => 'create_order',
+                'description' => trans('plugins/ecommerce::order.new_order_from', [
+                    'order_id' => get_order_code($order->id),
+                    'customer' => $order->user->name ?: $order->address->name,
+                ]),
+                'order_id'    => $order->id,
             ]);
         }
 
-        return $order;
+        foreach ($orders as $order) {
+            foreach ($order->products as $orderProduct) {
+                $product = $orderProduct->product->original_product;
+
+                $flashSale = $product->latestFlashSales()->first();
+                if (!$flashSale) {
+                    continue;
+                }
+
+                $flashSale->products()->detach([$product->id]);
+                $flashSale->products()->attach([
+                    $product->id => [
+                        'price'    => $flashSale->pivot->price,
+                        'quantity' => (int)$flashSale->pivot->quantity,
+                        'sold'     => (int)$flashSale->pivot->sold + $orderProduct->qty,
+                    ],
+                ]);
+            }
+        }
+
+        return $orders;
     }
 
     /**
@@ -590,90 +603,5 @@ class OrderHelper
         ]);
 
         return app(OrderInterface::class)->createOrUpdate($request->input());
-    }
-
-    /**
-     * @param string $orderId
-     * @param string $chargeId
-     * @param bool $paymentDone
-     * @return BaseModel|bool
-     * @throws FileNotFoundException
-     * @throws Throwable
-     */
-    public function processOrderMulti(array $orderIds, $chargeId = null)
-    {
-        $orders = app(OrderInterface::class)->allBy([['id', 'IN', $orderIds]]);
-
-        if (!$orders->count()) {
-            return false;
-        }
-        foreach ($orders as $order) {
-            if ($order->histories()->where('action', 'create_order')->count()) {
-                return false;
-            }
-        }
-
-        if ($chargeId) {
-            $payment = app(PaymentInterface::class)->getFirstBy(['charge_id' => $chargeId]);
-
-            if ($payment) {
-                foreach ($orders as $order) {
-                    $order->payment_id = $payment->id;
-                    $order->save();
-                }
-            }
-        }
-
-        Cart::instance('cart')->destroy();
-        session()->forget('applied_coupon_code');
-
-        session(['order_id' => Arr::first($orderIds)]);
-
-        if (is_plugin_active('marketplace')) {
-            apply_filters(SEND_MAIL_AFTER_PROCESS_ORDER_MULTI_DATA, $orders);
-        } else {
-            $mailer = EmailHandler::setModule(ECOMMERCE_MODULE_SCREEN_NAME);
-            if ($mailer->templateEnabled('admin_new_order')) {
-                $this->setEmailVariables($orders->first());
-                $mailer->sendUsingTemplate('admin_new_order', setting('admin_email'));
-            }
-            // Temporarily only send emails with the first order
-            $this->sendOrderConfirmationEmail($orders->first(), true);
-        }
-
-        session(['order_id' => $orders->first()->id]);
-
-        foreach ($orders as $order) {
-            app(OrderHistoryInterface::class)->createOrUpdate([
-                'action'      => 'create_order',
-                'description' => trans('plugins/ecommerce::order.new_order_from', [
-                    'order_id' => get_order_code($order->id),
-                    'customer' => $order->user->name ?: $order->address->name,
-                ]),
-                'order_id'    => $order->id,
-            ]);
-        }
-
-        foreach ($orders as $order) {
-            foreach ($order->products as $orderProduct) {
-                $product = $orderProduct->product->original_product;
-
-                $flashSale = $product->latestFlashSales()->first();
-                if (!$flashSale) {
-                    continue;
-                }
-
-                $flashSale->products()->detach([$product->id]);
-                $flashSale->products()->attach([
-                    $product->id => [
-                        'price'    => $flashSale->pivot->price,
-                        'quantity' => (int)$flashSale->pivot->quantity,
-                        'sold'     => (int)$flashSale->pivot->sold + $orderProduct->qty,
-                    ],
-                ]);
-            }
-        }
-
-        return $orders;
     }
 }

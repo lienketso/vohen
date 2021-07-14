@@ -8,6 +8,9 @@ use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Marketplace\Http\Requests\SettingRequest;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use RvMedia;
 
 class SettingController
@@ -22,7 +25,7 @@ class SettingController
     }
 
     /**
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return Application|Factory|View
      */
     public function index()
     {

@@ -12,8 +12,7 @@ app()->booted(function () {
             __('Featured Product Categories'),
             function ($shortCode) {
                 return Theme::partial('short-codes.featured-product-categories', [
-                    'title'       => $shortCode->title,
-                    'description' => $shortCode->description,
+                    'title' => $shortCode->title,
                 ]);
             });
 
@@ -118,6 +117,7 @@ app()->booted(function () {
             return Theme::partial('short-codes.newsletter-form', [
                 'title'       => $shortCode->title,
                 'description' => $shortCode->description,
+                'subtitle'    => $shortCode->subtitle,
             ]);
         });
 
@@ -128,6 +128,7 @@ app()->booted(function () {
         return Theme::partial('short-codes.download-app', [
             'title'         => $shortCode->title,
             'description'   => $shortCode->description,
+            'subtitle'      => $shortCode->subtitle,
             'screenshot'    => $shortCode->screenshot,
             'androidAppUrl' => $shortCode->android_app_url,
             'iosAppUrl'     => $shortCode->ios_app_url,

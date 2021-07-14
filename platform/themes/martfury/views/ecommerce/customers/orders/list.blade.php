@@ -20,7 +20,7 @@
                     @foreach ($orders as $order)
                         <tr>
                             <td>{{ get_order_code($order->id) }}</td>
-                            <td>{{ $order->created_at->format('Y/m/d h:m') }}</td>
+                            <td>{{ $order->created_at->translatedFormat('M d, Y h:m') }}</td>
                             <td>{{ format_price($order->amount) }}</td>
                             <td>{!! $order->status->toHtml() !!}</td>
                             <td>

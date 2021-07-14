@@ -185,7 +185,11 @@ class ProductForm extends FormAbstract
                     'general'    => [
                         'title'          => trans('plugins/ecommerce::products.overview'),
                         'content'        => view('plugins/ecommerce::products.partials.general',
-                            ['product' => $productId ? $this->getModel() : null])->render(),
+                            [
+                                'product' => $productId ? $this->getModel() : null,
+                                'isVariation' => false,
+                            ])
+                            ->render(),
                         'before_wrapper' => '<div id="main-manage-product-type">',
                         'priority'       => 2,
                     ],
@@ -237,7 +241,7 @@ class ProductForm extends FormAbstract
      */
     public function getProductAttributes($attributeSetId)
     {
-        $params = ['order_by' => ['ec_product_attributes.order' => 'ASC']];
+        $params = ['order_by' => ['order' => 'ASC']];
 
         if ($attributeSetId) {
             $params['condition'] = [

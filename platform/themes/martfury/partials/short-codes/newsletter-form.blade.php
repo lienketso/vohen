@@ -5,7 +5,12 @@
                 <div class="col-xl-5">
                     <div class="ps-form__left">
                         <h3>{!! clean($title) !!}</h3>
-                        <p>{!! clean($description) !!}</p>
+                        @if ($description)
+                            <p>{!! clean($description) !!}</p>
+                        @endif
+                        @if ($subtitle)
+                            <p>{!! clean($subtitle) !!}</p>
+                        @endif
                     </div>
                 </div>
                 <div class="col-xl-7">

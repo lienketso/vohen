@@ -1,5 +1,5 @@
 <li class="dropdown-swatches-wrapper" data-type="dropdown">
-    <div class="attribute-name">{{ $set->title }}</div>
+    <div class="attribute-name" data-title="{{ $set->title }}">{{ $set->title }}</div>
     <div class="attribute-values">
         <div class="dropdown-swatch">
             <label>

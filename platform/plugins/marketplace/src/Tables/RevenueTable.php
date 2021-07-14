@@ -55,20 +55,19 @@ class RevenueTable extends TableAbstract
             ->editColumn('current_balance', function ($item) {
                 return format_price($item->current_balance);
             })
-            ->editColumn('order', function ($item) {
+            ->editColumn('order_id', function ($item) {
                 if ($item->order) {
                     return Html::link(route('marketplace.vendor.orders.edit', $item->order->id),
                         get_order_code($item->order->id), ['target' => '_blank']);
                 }
+
                 return '&mdash;';
             })
             ->editColumn('created_at', function ($item) {
                 return BaseHelper::formatDate($item->created_at);
             });
 
-        return apply_filters(BASE_FILTER_GET_LIST_DATA, $data, $this->repository->getModel())
-            ->escapeColumns([])
-            ->make(true);
+        return $this->toJson($data);
     }
 
     /**
@@ -76,24 +75,21 @@ class RevenueTable extends TableAbstract
      */
     public function query()
     {
-        $model = $this->repository->getModel();
-        $select = [
-            'mp_customer_revenues.id',
-            'mp_customer_revenues.sub_amount',
-            'mp_customer_revenues.fee',
-            'mp_customer_revenues.amount',
-            'mp_customer_revenues.current_balance',
-            'mp_customer_revenues.currency',
-            'mp_customer_revenues.order_id',
-            'mp_customer_revenues.created_at',
-        ];
-
-        $query = $model
-            ->select($select)
+        $query = $this->repository->getModel()
+            ->select([
+                'id',
+                'sub_amount',
+                'fee',
+                'amount',
+                'current_balance',
+                'currency',
+                'order_id',
+                'created_at',
+            ])
             ->with(['order'])
-            ->where('mp_customer_revenues.customer_id', auth('customer')->user()->id);
+            ->where('customer_id', auth('customer')->id());
 
-        return $this->applyScopes(apply_filters(BASE_FILTER_TABLE_QUERY, $query, $model, $select));
+        return $this->applyScopes($query);
     }
 
     /**
@@ -103,43 +99,35 @@ class RevenueTable extends TableAbstract
     {
         return [
             'id'              => [
-                'name'  => 'mp_customer_revenues.id',
                 'title' => trans('core/base::tables.id'),
                 'width' => '20px',
                 'class' => 'text-left',
             ],
-            'order'           => [
-                'name'  => 'mp_customer_revenues.order_id',
+            'order_id'        => [
                 'title' => trans('plugins/ecommerce::order.order'),
                 'class' => 'text-center',
             ],
             'sub_amount'      => [
-                'name'  => 'mp_customer_revenues.sub_amount',
                 'title' => trans('plugins/ecommerce::order.sub_amount'),
                 'class' => 'text-center',
             ],
             'fee'             => [
-                'name'  => 'mp_customer_revenues.fee',
                 'title' => trans('plugins/ecommerce::shipping.fee'),
                 'class' => 'text-center',
             ],
             'amount'          => [
-                'name'  => 'mp_customer_revenues.amount',
                 'title' => trans('plugins/ecommerce::order.amount'),
                 'class' => 'text-center',
             ],
             'currency'        => [
-                'name'  => 'mp_customer_revenues.currency',
                 'title' => trans('plugins/ecommerce::payment.currency'),
                 'class' => 'text-center',
             ],
             'current_balance' => [
-                'name'  => 'mp_customer_revenues.current_balance',
                 'title' => trans('plugins/marketplace::marketplace.current_balance'),
                 'class' => 'text-center',
             ],
             'created_at'      => [
-                'name'  => 'mp_customer_revenues.created_at',
                 'title' => trans('core/base::tables.created_at'),
                 'class' => 'text-center',
             ],

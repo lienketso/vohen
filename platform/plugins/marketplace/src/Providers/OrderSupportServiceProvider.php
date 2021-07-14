@@ -29,6 +29,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,6 @@ use Illuminate\View\Factory;
 use Log;
 use OrderHelper;
 use Throwable;
-use Illuminate\Support\Facades\DB;
 
 class OrderSupportServiceProvider extends ServiceProvider
 {
@@ -126,16 +126,14 @@ class OrderSupportServiceProvider extends ServiceProvider
 
         $groupedProducts = collect([]);
         foreach ($products as $product) {
-            $store_id = $product->original_product ? $product->original_product->store_id : null;
-            if ($store_id) {
-                if (!Arr::has($groupedProducts, $store_id)) {
-                    $groupedProducts[$store_id] = collect([
-                        'store'    => $product->original_product->store,
-                        'products' => collect([$product]),
-                    ]);
-                } else {
-                    $groupedProducts[$store_id]['products'][] = $product;
-                }
+            $store_id = $product->original_product ? $product->original_product->store_id : 0;
+            if (!Arr::has($groupedProducts, $store_id)) {
+                $groupedProducts[$store_id] = collect([
+                    'store'    => $product->original_product->store,
+                    'products' => collect([$product]),
+                ]);
+            } else {
+                $groupedProducts[$store_id]['products'][] = $product;
             }
         }
 
@@ -160,7 +158,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             'user_id'         => $currentUserId,
             'shipping_method' => $request->input('shipping_method.' . $store->id, ShippingMethodEnum::DEFAULT),
             'shipping_option' => $request->input('shipping_option.' . $store->id),
-            'coupon_code'     => session()->get('applied_coupon_code'),
+            'coupon_code'     => Arr::get($sessionData, 'applied_coupon_code'),
             'token'           => $token,
         ];
 
@@ -216,6 +214,21 @@ class OrderSupportServiceProvider extends ServiceProvider
         $couponCode = session('applied_coupon_code');
 
         $preOrders = collect([]);
+
+        $mpSessionData = Arr::get($sessionCheckoutData, 'marketplace', []);
+
+        if ($couponCode) {
+            $this->processApplyCouponCode([], $request);
+            $sessionCheckoutData = OrderHelper::getOrderSessionData($token);
+            $couponCode = session()->get('applied_coupon_code');
+        } else {
+            foreach ($mpSessionData as &$storeCheckoutData) {
+                Arr::set($storeCheckoutData, 'coupon_discount_amount', 0);
+                Arr::set($storeCheckoutData, 'applied_coupon_code', null);
+                Arr::set($storeCheckoutData, 'is_free_shipping', false);
+            }
+            $sessionCheckoutData = OrderHelper::setOrderSessionData($token, ['marketplace' => $mpSessionData]);
+        }
         $mpSessionData = Arr::get($sessionCheckoutData, 'marketplace', []);
 
         $orderIds = collect($mpSessionData ?: [])->pluck('created_order_id');
@@ -291,7 +304,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             return redirect($checkoutUrl);
         }
 
-        OrderHelper::processOrderMulti($orders->pluck('id')->toArray(), $paymentData['charge_id']);
+        OrderHelper::processOrder($orders->pluck('id')->toArray(), $paymentData['charge_id']);
 
         if ($paymentData['error']) {
             return $response
@@ -314,7 +327,7 @@ class OrderSupportServiceProvider extends ServiceProvider
      * @param int $currentUserId
      * @param OrderModel $order
      * @param int $storeId
-     * @param array $discounts
+     * @param array|Collection $discounts
      * @param HandleApplyPromotionsService $promotionService
      * @param HandleShippingFeeService $shippingFeeService
      * @param HandleApplyCouponService $applyCouponService
@@ -339,6 +352,7 @@ class OrderSupportServiceProvider extends ServiceProvider
         $cartItems = $products['products']->pluck('cartItem');
         $rawTotal = Cart::instance('cart')->rawTotalByItems($cartItems);
         $countCart = Cart::instance('cart')->countByItems($cartItems);
+        $couponCode = Arr::get($sessionStoreData, 'applied_coupon_code');
 
         $weight = 0;
         foreach ($products['products'] as $product) {
@@ -351,7 +365,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             ->execute($token, compact('cartItems', 'rawTotal', 'countCart'), "marketplace.$storeId.");
 
         $couponDiscountAmount = 0;
-        if (session()->has('applied_coupon_code')) {
+        if ($couponCode) {
             $couponDiscountAmount = Arr::get($sessionStoreData, 'coupon_discount_amount', 0);
         }
 
@@ -373,11 +387,13 @@ class OrderSupportServiceProvider extends ServiceProvider
             $shippingAmount = Arr::get(Arr::first($shippingMethod), 'price', 0);
         }
 
-        if (session()->has('applied_coupon_code')) {
-            $discount = $applyCouponService->getCouponData(session('applied_coupon_code'), $sessionStoreData);
+        if ($couponCode) {
+            $discount = $applyCouponService->getCouponData($couponCode, $sessionStoreData);
             if ($discount) {
-                $discounts->push($discount);
-                $shippingAmount = Arr::get($sessionStoreData, 'is_free_ship') ? 0 : $shippingAmount;
+                if (!$discount->store_id || $discount->store_id == $storeId) {
+                    $discounts->push($discount);
+                    $shippingAmount = Arr::get($sessionStoreData, 'is_free_shipping') ? 0 : $shippingAmount;
+                }
             }
         }
 
@@ -386,12 +402,6 @@ class OrderSupportServiceProvider extends ServiceProvider
         } else {
             $orderAmount = $rawTotal + $shippingAmount - $promotionDiscountAmount - $couponDiscountAmount;
         }
-
-        $createdOrderId = Arr::get($sessionStoreData, 'created_order_id');
-
-        // Address Order in here
-        $addressData = array_merge($sessionCheckoutData, ['created_order_id' => $createdOrderId]);
-        OrderHelper::processAddressOrder($currentUserId, $addressData, $request);
 
         $data = array_merge($request->all(), [
             'amount'          => $orderAmount,
@@ -402,7 +412,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             'shipping_amount' => $shippingAmount,
             'tax_amount'      => Cart::instance('cart')->rawTaxByItems($cartItems),
             'sub_total'       => Cart::instance('cart')->rawSubTotalByItems($cartItems),
-            'coupon_code'     => session()->get('applied_coupon_code'),
+            'coupon_code'     => $couponCode,
             'discount_amount' => $promotionDiscountAmount + $couponDiscountAmount,
             'status'          => OrderStatusEnum::PENDING,
             'is_finished'     => true,
@@ -416,6 +426,10 @@ class OrderSupportServiceProvider extends ServiceProvider
             $order = $this->app->make(OrderInterface::class)->createOrUpdate($data);
         }
 
+        // Address Order in here
+        $addressData = array_merge($sessionCheckoutData, ['created_order_id' => $order->id]);
+        OrderHelper::processAddressOrder($currentUserId, $addressData, $request);
+
         $this->app->make(OrderHistoryInterface::class)->createOrUpdate([
             'action'      => 'create_order_from_payment_page',
             'description' => __('Order is created from checkout page'),
@@ -423,18 +437,20 @@ class OrderSupportServiceProvider extends ServiceProvider
         ]);
 
         $sessionCheckoutData['created_order_id'] = $order->id;
-        $sessionCheckoutData = OrderHelper::processOrderProductData($products, $sessionCheckoutData);
+        OrderHelper::processOrderProductData($products, $sessionCheckoutData);
 
         foreach ($cartItems as $cartItem) {
             $productByCartItem = $products['products']->firstWhere('id', $cartItem->id);
 
-            // Can use $productByCartItem
+            $ids = [$productByCartItem->id];
+            if ($productByCartItem->is_variation && $productByCartItem->original_product) {
+                $ids[] = $productByCartItem->original_product->id;
+            }
+
             $this->app->make(ProductInterface::class)
                 ->getModel()
-                ->where([
-                    'id'                         => $cartItem->id,
-                    'with_storehouse_management' => 1,
-                ])
+                ->whereIn('id', $ids)
+                ->where('with_storehouse_management', 1)
                 ->where('quantity', '>=', $cartItem->qty)
                 ->decrement('quantity', $cartItem->qty);
         }
@@ -685,6 +701,23 @@ class OrderSupportServiceProvider extends ServiceProvider
     public function processShippingDiscountOrderData($products, $token, $sessionCheckoutData, $request)
     {
         $groupedProducts = $this->cartGroupByStore($products);
+
+        $mpSessionCheckoutData = Arr::get($sessionCheckoutData, 'marketplace');
+
+        $couponCode = session()->get('applied_coupon_code');
+        if ($couponCode) {
+            $this->processApplyCouponCode([], $request);
+            $sessionCheckoutData = OrderHelper::getOrderSessionData($token);
+            $couponCode = session()->get('applied_coupon_code');
+        } else {
+            foreach ($mpSessionCheckoutData as &$storeCheckoutData) {
+                Arr::set($storeCheckoutData, 'coupon_discount_amount', 0);
+                Arr::set($storeCheckoutData, 'applied_coupon_code', null);
+                Arr::set($storeCheckoutData, 'is_free_shipping', false);
+            }
+            $sessionCheckoutData = OrderHelper::setOrderSessionData($token, ['marketplace' => $mpSessionCheckoutData]);
+        }
+
         $mpSessionCheckoutData = Arr::get($sessionCheckoutData, 'marketplace');
         $discounts = collect([]);
 
@@ -693,6 +726,8 @@ class OrderSupportServiceProvider extends ServiceProvider
         $promotionService = $this->app->make(HandleApplyPromotionsService::class);
         $shippingFeeService = $this->app->make(HandleShippingFeeService::class);
         $applyCouponService = $this->app->make(HandleApplyCouponService::class);
+
+        $shipping = [];
 
         foreach ($groupedProducts as $storeId => $productsByStore) {
             $cartItems = $productsByStore['products']->pluck('cartItem');
@@ -711,7 +746,7 @@ class OrderSupportServiceProvider extends ServiceProvider
                 $prefixPromotion);
 
             $couponDiscountAmount = 0;
-            if (session()->has('applied_coupon_code')) {
+            if ($couponCode) {
                 $couponDiscountAmount = Arr::get($vendorSessionData, 'coupon_discount_amount', 0);
             }
 
@@ -761,16 +796,18 @@ class OrderSupportServiceProvider extends ServiceProvider
 
             OrderHelper::setOrderSessionData($token, ['marketplace' => [$storeId => $vendorSessionData]]);
 
-            if (session()->has('applied_coupon_code')) {
+            if ($couponCode) {
                 if (!$request->input('applied_coupon')) {
-                    $discount = $applyCouponService->getCouponData(session('applied_coupon_code'), $vendorSessionData);
+                    $discount = $applyCouponService->getCouponData($couponCode, $vendorSessionData);
 
                     if ($discount) {
-                        $discounts->push($discount);
-                        $shippingAmount = Arr::get($vendorSessionData, 'is_free_ship') ? 0 : $shippingAmount;
+                        if (!$discount->store_id || $discount->store_id == $storeId) {
+                            $discounts->push($discount);
+                            $shippingAmount = Arr::get($vendorSessionData, 'is_free_shipping') ? 0 : $shippingAmount;
+                        }
                     }
                 } else {
-                    $shippingAmount = Arr::get($vendorSessionData, 'is_free_ship') ? 0 : $shippingAmount;
+                    $shippingAmount = Arr::get($vendorSessionData, 'is_free_shipping') ? 0 : $shippingAmount;
                 }
             }
 
@@ -809,12 +846,13 @@ class OrderSupportServiceProvider extends ServiceProvider
     }
 
     /**
-     * @param Collection $products
+     * @param array $result
      * @param Request $request
      * @return array
      */
-    public function processApplyCouponCode($products, $request)
+    public function processApplyCouponCode($result, $request)
     {
+        $products = Cart::instance('cart')->products();
         $groupedProducts = $this->cartGroupByStore($products);
         $token = OrderHelper::getOrderSessionToken();
         if (!$token) {
@@ -823,6 +861,10 @@ class OrderSupportServiceProvider extends ServiceProvider
         $sessionCheckoutData = OrderHelper::getOrderSessionData($token);
         $sessionMarketplaceData = Arr::get($sessionCheckoutData, 'marketplace', []);
         $results = collect([]);
+        $couponCode = $request->input('coupon_code');
+        if (!$couponCode) {
+            $couponCode = session('applied_coupon_code');
+        }
 
         foreach ($groupedProducts as $storeId => $groupedProduct) {
             $cartItems = $groupedProduct['products']->pluck('cartItem');
@@ -831,7 +873,7 @@ class OrderSupportServiceProvider extends ServiceProvider
             $sessionData = Arr::get($sessionMarketplaceData, $storeId, []);
             $prefix = "marketplace.$storeId.";
             $result = $this->app->make(HandleApplyCouponService::class)
-                ->execute($request->input('coupon_code'), $sessionData, compact('cartItems', 'rawTotal', 'countCart'),
+                ->execute($couponCode, $sessionData, compact('cartItems', 'rawTotal', 'countCart'),
                     $prefix);
             $results[$storeId] = $result;
         }
@@ -841,40 +883,58 @@ class OrderSupportServiceProvider extends ServiceProvider
             'error' => true,
             'data'  => [],
         ];
+
         $sessionCheckoutData = OrderHelper::getOrderSessionData($token);
         $sessionMarketplaceData = Arr::get($sessionCheckoutData, 'marketplace', []);
-        foreach ($results as $result) {
+
+        foreach ($results as $storeId => $result) {
+            $sessionData = Arr::get($sessionMarketplaceData, $storeId, []);
             if (Arr::get($result, 'error')) {
                 $error += 1;
                 $message = Arr::get($result, 'message');
+
+                Arr::set($sessionData, 'coupon_discount_amount', 0);
+                Arr::set($sessionData, 'applied_coupon_code', null);
+                Arr::set($sessionData, 'is_free_shipping', false);
             } else {
-                if (Arr::get($result, 'data.is_free_shipping', false)) {
+                $discount = Arr::get($result, 'data.discount');
+                if ((!$discount->store_id || $discount->store_id == $storeId) &&
+                    (Arr::get($result, 'data.is_free_shipping', false) || Arr::get($result, 'data.discount_amount'))) {
                     $successData = $result;
-                    break;
-                }
-                if (Arr::get($result, 'data.discount_amount')) {
-                    $successData = $result;
-                    break;
+                    Arr::set($sessionData, 'applied_coupon_code', $couponCode);
+                } else {
+                    Arr::set($sessionData, 'coupon_discount_amount', 0);
+                    Arr::set($sessionData, 'applied_coupon_code', null);
+                    Arr::set($sessionData, 'is_free_shipping', false);
+                    $message = __('Coupon code is not valid or does not apply to the products');
+                    $error += 1;
                 }
             }
+
+            Arr::set($sessionMarketplaceData, $storeId, $sessionData);
         }
 
         // return if all are error
         if ($results->count() == $error) {
+            session()->forget('applied_coupon_code');
             return compact('error', 'message');
         }
 
         $isFreeShipping = Arr::get($successData, 'data.is_free_shipping', false);
-        $discountTypeOption = Arr::get($successData, 'data.discount_type_option', null);
+        $discountTypeOption = Arr::get($successData, 'data.discount_type_option');
+
         if (!$isFreeShipping && !in_array($discountTypeOption, ['percentage', 'same-price'])) {
             $validRawTotals = 0;
 
             foreach ($groupedProducts as $storeId => $groupedProduct) {
                 $result = Arr::get($results, $storeId, []);
                 if (!Arr::get($result, 'error') && Arr::get($result, 'data.discount_amount')) {
-                    $cartItems = $groupedProduct['products']->pluck('cartItem');
-                    $rawTotal = Cart::instance('cart')->rawTotalByItems($cartItems);
-                    $validRawTotals += $rawTotal;
+                    $discount = Arr::get($result, 'data.discount');
+                    if ($discount && (!$discount->store_id || $discount->store_id == $storeId)) {
+                        $cartItems = $groupedProduct['products']->pluck('cartItem');
+                        $rawTotal = Cart::instance('cart')->rawTotalByItems($cartItems);
+                        $validRawTotals += $rawTotal;
+                    }
                 }
             }
             $totalDiscountAmount = Arr::get($successData, 'data.discount_amount', 0);
@@ -882,19 +942,28 @@ class OrderSupportServiceProvider extends ServiceProvider
                 foreach ($groupedProducts as $storeId => $groupedProduct) {
                     $result = Arr::get($results, $storeId, []);
                     $sessionData = Arr::get($sessionMarketplaceData, $storeId, []);
+                    $discountAmount = 0;
                     if (Arr::get($result, 'error') || !Arr::get($result, 'data.discount_amount')) {
-                        Arr::set($sessionData, 'coupon_discount_amount', 0);
+                        Arr::set($sessionData, 'coupon_discount_amount', $discountAmount);
+                        Arr::set($sessionData, 'applied_coupon_code', null);
                     } else {
-                        $cartItems = $groupedProduct['products']->pluck('cartItem');
-                        $rawTotal = Cart::instance('cart')->rawTotalByItems($cartItems);
-                        $discount = round($totalDiscountAmount / $validRawTotals * $rawTotal, 2);
-                        Arr::set($sessionData, 'coupon_discount_amount', $discount);
+                        $discount = Arr::get($result, 'data.discount');
+                        if ($discount && (!$discount->store_id || $discount->store_id == $storeId)) {
+                            $cartItems = $groupedProduct['products']->pluck('cartItem');
+                            $rawTotal = Cart::instance('cart')->rawTotalByItems($cartItems);
+                            $discountAmount = round($totalDiscountAmount / $validRawTotals * $rawTotal, 2);
+                            Arr::set($sessionData, 'applied_coupon_code', $couponCode);
+                        } else {
+                            Arr::set($sessionData, 'applied_coupon_code', null);
+                        }
+                        Arr::set($sessionData, 'coupon_discount_amount', $discountAmount);
                     }
                     Arr::set($sessionMarketplaceData, $storeId, $sessionData);
                 }
-                OrderHelper::setOrderSessionData($token, ['marketplace' => $sessionMarketplaceData]);
             }
         }
+
+        OrderHelper::setOrderSessionData($token, ['marketplace' => $sessionMarketplaceData]);
 
         return $successData;
     }
@@ -1027,7 +1096,6 @@ class OrderSupportServiceProvider extends ServiceProvider
      *
      * @param array $rules
      * @return array
-     *
      */
     public function processCheckoutRulesRequest($rules)
     {
@@ -1124,12 +1192,13 @@ class OrderSupportServiceProvider extends ServiceProvider
                     $vendorInfo->save();
 
                     DB::commit();
-                } catch (\Throwable $th) {
-                    throw $th;
+                } catch (Throwable $th) {
                     DB::rollBack();
+
+                    throw $th;
                 }
             }
-            
+
         }
 
         return $order;

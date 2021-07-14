@@ -166,7 +166,7 @@
                         }
                     });
                 }
-                
+
                 let slider = $(document).find('.ps-product--quickview .ps-product__images');
 
                 if (slider.length) {
@@ -182,6 +182,7 @@
                     slider.slick({
                         slidesToShow: slider.data('item'),
                         slidesToScroll: 1,
+                        rtl: $('body').prop('dir') === 'rtl',
                         infinite: false,
                         arrows: slider.data('arrow'),
                         focusOnSelect: true,
@@ -212,6 +213,7 @@
                         primary.slick({
                             slidesToShow: 1,
                             slidesToScroll: 1,
+                            rtl: $('body').prop('dir') === 'rtl',
                             asNavFor: '.ps-product__variants',
                             fade: true,
                             dots: false,
@@ -236,6 +238,7 @@
                         second.slick({
                             slidesToShow: second.data('item'),
                             slidesToScroll: 1,
+                            rtl: $('body').prop('dir') === 'rtl',
                             infinite: false,
                             arrows: second.data('arrow'),
                             focusOnSelect: true,
@@ -287,8 +290,12 @@
                 $(window).trigger('resize');
 
                 if (product.length > 0) {
-                    product.find('.ps-product__gallery').data('lightGallery').destroy(true);
-                    product.find('.ps-product__gallery').lightGallery({
+                    let $gallery = product.find('.ps-product__gallery');
+                    if ($gallery.data('lightGallery')) {
+                        $gallery.data('lightGallery').destroy(true);
+                    }
+
+                    $gallery.lightGallery({
                         selector: '.item a',
                         thumbnail: true,
                         share: false,
@@ -402,7 +409,7 @@
                 e.preventDefault();
                 $layoutShop.find('.ps-layout__left').toggleClass('active');
             });
-    
+
             $('.ps-layout__left .ps-filter__header .ps-btn--close').on(
                 'click',
                 function(e) {
@@ -419,7 +426,7 @@
                 $formSearch.trigger('submit');
             });
         }
-        
+
         const $formSearch = $('#products-filter-form');
         const productListing = '.ps-products-listing';
         const $productListing = $(productListing);
@@ -429,7 +436,7 @@
                 $(this).closest('form').trigger('submit');
             }
         });
-        
+
         function changeInputInSearchForm(parseParams) {
             isReadySubmitTrigger = false;
             $formSearch.find('input, select, textarea').each(function (e, i) {
@@ -502,10 +509,10 @@
                 })
 
                 const nextHref = $form.attr('action') + (uriData && uriData.length ? ('?' + uriData.join('&')) : '');
-    
+
                 // add to params get to popstate not show json
                 data.push({name: '_', value: +new Date()});
-    
+
                 $.ajax({
                     url: $form.attr('action'),
                     type: 'GET',
@@ -582,7 +589,7 @@
                 $ul.find('li').removeClass('current-menu-item');
                 $li.addClass('current-menu-item');
             }
-            
+
             $formSearch.attr('action', href).trigger('submit');
         });
 
@@ -592,7 +599,7 @@
             var decodeRE = /\+/g;  // Regex for replacing addition symbol with a space
             var decode = function (str) {return decodeURIComponent( str.replace(decodeRE, " ") );};
             var params = {}, e;
-            while ( e = re.exec(pairs) ) { 
+            while ( e = re.exec(pairs) ) {
                 var k = decode( e[1] ), v = decode( e[2] );
                 if (k.substring(k.length - 2) == '[]') {
                     if (includeArray) {
@@ -612,7 +619,7 @@
             _self.addClass('button-loading');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 method: 'POST',
                 success: res => {
 
@@ -642,7 +649,7 @@
             _self.addClass('button-loading');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 method: 'DELETE',
                 success: res => {
 
@@ -673,7 +680,7 @@
             _self.addClass('button-loading');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 method: 'POST',
                 success: res => {
 
@@ -704,7 +711,7 @@
             _self.text(buttonText + '...');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 method: 'DELETE',
                 success: res => {
 
@@ -736,7 +743,7 @@
             _self.prop('disabled', true).addClass('button-loading');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 method: 'POST',
                 data: {
                     id: _self.data('id')
@@ -781,7 +788,7 @@
             _self.closest('.ps-product--cart-mobile').addClass('content-loading');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 method: 'GET',
                 success: res => {
                     _self.closest('.ps-product--cart-mobile').removeClass('content-loading');
@@ -805,6 +812,45 @@
                 },
                 error: res => {
                     _self.closest('.ps-product--cart-mobile').removeClass('content-loading');
+                    window.showAlert('alert-danger', res.message);
+                }
+            });
+        });
+
+        $(document).on('click', '.remove-cart-button', function (event) {
+            event.preventDefault();
+            let _self = $(this);
+
+            _self.closest('.ps-table--shopping-cart').addClass('content-loading');
+
+            $.ajax({
+                url: _self.data('url'),
+                method: 'GET',
+                success: function (res) {
+
+                    if (res.error) {
+                        window.showAlert('alert-danger', res.message);
+                        return false;
+                    }
+
+                    $('.ps-shopping-cart').load(window.location.href + ' .ps-shopping-cart > *', function () {
+                        _self.closest('.ps-table--shopping-cart').removeClass('content-loading');
+                        window.showAlert('alert-success', res.message);
+                    });
+
+                    $.ajax({
+                        url: window.siteUrl + '/ajax/cart',
+                        method: 'GET',
+                        success: response => {
+                            if (!response.error) {
+                                $('.ps-cart--mobile').html(response.data.html);
+                                $('.btn-shopping-cart span i').text(response.data.count);
+                            }
+                        }
+                    });
+                },
+                error: res => {
+                    _self.closest('.ps-table--shopping-cart').removeClass('content-loading');
                     window.showAlert('alert-danger', res.message);
                 }
             });
@@ -1115,7 +1161,7 @@
             _self.addClass('button-loading');
 
             $.ajax({
-                url: _self.prop('href'),
+                url: _self.data('url'),
                 type: 'GET',
                 success: res => {
                     if (!res.error) {
@@ -1123,6 +1169,7 @@
                         $('.ps-product--quickview .ps-product__images').slick({
                             slidesToShow: 1,
                             slidesToScroll: 1,
+                            rtl: $('body').prop('dir') === 'rtl',
                             fade: true,
                             dots: false,
                             arrows: true,

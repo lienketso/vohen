@@ -3,7 +3,6 @@
 namespace Botble\Marketplace\Models;
 
 use Botble\Base\Models\BaseModel;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Hash;
 use Exception;
 
@@ -39,17 +38,14 @@ class VendorInfo extends BaseModel
     ];
 
     /**
-     *
      * @return bool
      */
     public function isCheckSignature()
     {
-        return get_marketplace_setting('check_valid_signature',
-            config('plugins.marketplace.general.check_signature_vendor', true));
+        return get_marketplace_setting('check_valid_signature', config('plugins.marketplace.general.check_signature_vendor', true));
     }
 
     /**
-     *
      * @return string
      */
     public function checkSignature()
@@ -58,7 +54,6 @@ class VendorInfo extends BaseModel
     }
 
     /**
-     *
      * @return string
      */
     public function getSignatureKey($isNew = false, $item = null)
@@ -66,9 +61,11 @@ class VendorInfo extends BaseModel
         if (!$item) {
             $item = $this;
         }
+
         $balance = $isNew ? $item->balance : ($item->getOriginal('balance') ?: $item->balance);
         $totalFee = $isNew ? $item->total_fee : ($item->getOriginal('total_fee') ?: $item->total_fee);
         $totalRevenue = $isNew ? $item->total_revenue : ($item->getOriginal('total_revenue') ?: $item->total_revenue);
+
         return "$balance-$totalFee-$totalRevenue-{$item->customer_id}";
     }
 
@@ -83,8 +80,9 @@ class VendorInfo extends BaseModel
             $model = new VendorInfo;
             $vendorInfo->balance = $vendorInfo->balance ?: 0;
             $vendorInfo->total_fee = $vendorInfo->total_fee ?: 0;
+            $vendorInfo->total_revenue = $vendorInfo->total_revenue ?: 0;
             $vendorInfo->signature = Hash::make($model->getSignatureKey(false, $vendorInfo));
-          
+
             return $vendorInfo;
         });
 
@@ -94,15 +92,16 @@ class VendorInfo extends BaseModel
                 $balance = $vendorInfo->balance;
                 $totalFeeOriginal = $vendorInfo->getOriginal('total_fee');
                 $totalFee = $vendorInfo->total_fee;
-                $totalRevenueOriginal = $vendorInfo->getOriginal('total_icome');
-                $totalRevenue = $vendorInfo->total_icome;
+                $totalRevenueOriginal = $vendorInfo->getOriginal('total_revenue');
+                $totalRevenue = $vendorInfo->total_revenue;
                 if ($balanceOriginal != $balance || $totalFeeOriginal != $totalFee || $totalRevenueOriginal != $totalRevenue) {
-//                    if ($vendorInfo->isCheckSignature() && !$vendorInfo->checkSignature()) {
-//                        throw new Exception(__('Invalid signature of vendor info'));
-//                    }
+                    if ($vendorInfo->isCheckSignature() && !$vendorInfo->checkSignature()) {
+                        throw new Exception(__('Invalid signature of vendor info'));
+                    }
                     $vendorInfo->signature = Hash::make($vendorInfo->getSignatureKey(true));
                 }
             }
+
             return $vendorInfo;
         });
     }

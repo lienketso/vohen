@@ -71,11 +71,11 @@ class Withdrawal extends BaseModel
         static::updating(function (&$withdrawal) {
             if ($withdrawal->id) {
                 $statusOriginal = $withdrawal->getOriginal('status')->getValue();
-                $status = $withdrawal->{$withdrawal->getTable() . ".status"} ?: $withdrawal->status->getValue();
+                $status = $withdrawal->{$withdrawal->getTable() . '.status'} ?: $withdrawal->status->getValue();
 
                 if ($statusOriginal != WithdrawalStatusEnum::PENDING) {
                     $withdrawal->status = $statusOriginal;
-                    $withdrawal->{$withdrawal->getTable() . ".status"} = $statusOriginal;
+                    $withdrawal->{$withdrawal->getTable() . '.status'} = $statusOriginal;
                     return $withdrawal;
                 }
                 if ($statusOriginal == WithdrawalStatusEnum::PENDING &&

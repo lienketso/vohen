@@ -29,12 +29,9 @@ class ProductAttributeSetRepository extends RepositoriesAbstract implements Prod
             ->distinct()
             ->with(['attributes'])
             ->select('ec_product_attribute_sets.*', 'ec_product_with_attribute_set.order')
-            ->orderBy('ec_product_with_attribute_set.order', 'ASC')
-            ->get();
+            ->orderBy('ec_product_with_attribute_set.order', 'ASC');
 
-        $this->resetModel();
-
-        return $data;
+        return $this->applyBeforeExecuteQuery($data)->get();
     }
 
     /**
@@ -61,11 +58,8 @@ class ProductAttributeSetRepository extends RepositoriesAbstract implements Prod
             ])
             ->with(['attributes'])
             ->orderBy('ec_product_attribute_sets.order', 'ASC')
-            ->where('status', BaseStatusEnum::PUBLISHED)
-            ->get();
+            ->where('status', BaseStatusEnum::PUBLISHED);
 
-        $this->resetModel();
-
-        return $data;
+        return $this->applyBeforeExecuteQuery($data)->get();
     }
 }

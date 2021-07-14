@@ -68,7 +68,7 @@ class HookServiceProvider extends ServiceProvider
             }, 150);
 
             add_filter(DASHBOARD_FILTER_ADMIN_LIST, function ($widgets, $widgetSettings) {
-                $items = app(OrderInterface::class)->count(['ec_orders.is_finished' => 1]);
+                $items = app(OrderInterface::class)->count(['is_finished' => 1]);
                 return (new DashboardWidgetInstance)
                     ->setType('stats')
                     ->setPermission('orders.index')
@@ -82,9 +82,11 @@ class HookServiceProvider extends ServiceProvider
             }, 2, 2);
 
             add_filter(DASHBOARD_FILTER_ADMIN_LIST, function ($widgets, $widgetSettings) {
-                $items = app(ProductInterface::class)->count(['status'       => BaseStatusEnum::PUBLISHED,
-                                                              'is_variation' => 0,
+                $items = app(ProductInterface::class)->count([
+                    'status'       => BaseStatusEnum::PUBLISHED,
+                    'is_variation' => 0,
                 ]);
+
                 return (new DashboardWidgetInstance)
                     ->setType('stats')
                     ->setPermission('products.index')
@@ -156,7 +158,7 @@ class HookServiceProvider extends ServiceProvider
                         }
                     }
 
-                    return OrderHelper::processOrderMulti($orderIds, $data['charge_id']);
+                    return OrderHelper::processOrder($orderIds, $data['charge_id']);
                 }, 123);
             }
         });
@@ -185,6 +187,18 @@ class HookServiceProvider extends ServiceProvider
                         ],
                     ],
                     [
+                        'id'         => 'number_of_cross_sale_product',
+                        'type'       => 'number',
+                        'label'      => trans('plugins/ecommerce::ecommerce.theme_options.number_of_cross_sale_product'),
+                        'attributes' => [
+                            'name'    => 'number_of_cross_sale_product',
+                            'value'   => 4,
+                            'options' => [
+                                'class' => 'form-control',
+                            ],
+                        ],
+                    ],
+                    [
                         'id'         => 'max_filter_price',
                         'type'       => 'number',
                         'label'      => trans('plugins/ecommerce::ecommerce.theme_options.max_price_filter'),
@@ -194,6 +208,24 @@ class HookServiceProvider extends ServiceProvider
                             'options' => [
                                 'class' => 'form-control',
                             ],
+                        ],
+                    ],
+                    [
+                        'id'         => 'logo_in_the_checkout_page',
+                        'type'       => 'mediaImage',
+                        'label'      => trans('plugins/ecommerce::ecommerce.theme_options.logo_in_the_checkout_page'),
+                        'attributes' => [
+                            'name'  => 'logo_in_the_checkout_page',
+                            'value' => null,
+                        ],
+                    ],
+                    [
+                        'id'         => 'logo_in_invoices',
+                        'type'       => 'mediaImage',
+                        'label'      => trans('plugins/ecommerce::ecommerce.theme_options.logo_in_invoices'),
+                        'attributes' => [
+                            'name'  => 'logo_in_invoices',
+                            'value' => null,
                         ],
                     ],
                 ],
@@ -295,8 +327,8 @@ class HookServiceProvider extends ServiceProvider
     {
         if (!$this->pendingOrders) {
             $this->pendingOrders = $this->app->make(OrderInterface::class)->allBy([
-                'status'                => BaseStatusEnum::PENDING,
-                'ec_orders.is_finished' => 1,
+                'status'      => BaseStatusEnum::PENDING,
+                'is_finished' => 1,
             ], ['address']);
         }
 

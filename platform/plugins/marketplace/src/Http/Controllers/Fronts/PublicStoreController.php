@@ -4,14 +4,20 @@ namespace Botble\Marketplace\Http\Controllers\Fronts;
 
 use Botble\Base\Enums\BaseStatusEnum;
 use Botble\Base\Http\Responses\BaseHttpResponse;
+use Botble\Ecommerce\Models\Product;
+use Botble\Ecommerce\Repositories\Interfaces\ReviewInterface;
+use Botble\Ecommerce\Services\Products\GetProductService;
 use Botble\Marketplace\Http\Requests\CheckStoreUrlRequest;
 use Botble\Marketplace\Models\Store;
 use Botble\Marketplace\Repositories\Interfaces\StoreInterface;
 use Botble\SeoHelper\SeoOpenGraph;
 use Botble\Slug\Repositories\Interfaces\SlugInterface;
+use EcommerceHelper;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Response;
 use RvMedia;
 use SeoHelper;
@@ -64,9 +70,14 @@ class PublicStoreController
     }
 
     /**
-     * @return \Illuminate\Http\RedirectResponse|Response
+     * @param string $slug
+     * @param Request $request
+     * @param GetProductService $productService
+     * @param ReviewInterface $reviewRepository
+     * @return RedirectResponse|Response
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function getStore($slug)
+    public function getStore($slug, Request $request, GetProductService $productService, ReviewInterface $reviewRepository)
     {
         $slug = $this->slugRepository->getFirstBy([
             'key'            => $slug,
@@ -114,9 +125,43 @@ class PublicStoreController
 
         Theme::breadcrumb()->add($store->name, $store->url);
 
-        $products = $store->products()->where('status', BaseStatusEnum::PUBLISHED)->paginate(12);
+        $with = [
+            'slugable',
+            'variations',
+            'productLabels',
+            'variationAttributeSwatchesForProductList',
+            'promotions',
+            'latestFlashSales',
+        ];
 
-        return Theme::scope('marketplace.store', compact('store', 'products'), 'plugins/marketplace::themes.store')
+        if (is_plugin_active('marketplace')) {
+            $with = array_merge($with, ['store', 'store.slugable']);
+        }
+
+        $withCount = [];
+        if (EcommerceHelper::isReviewEnabled()) {
+            $withCount = [
+                'reviews',
+                'reviews as reviews_avg' => function ($query) {
+                    $query->select(DB::raw('avg(star)'));
+                },
+            ];
+        }
+
+        $reviewsAvg = $reviewRepository->getModel()
+            ->join('ec_products', 'ec_products.id', '=', 'ec_reviews.product_id')
+            ->join('mp_stores', 'mp_stores.id', '=', 'ec_products.store_id')
+            ->where('store_id', $store->id)
+            ->avg('star');
+
+        $reviewsCount = $reviewRepository->getModel()
+            ->join('ec_products', 'ec_products.id', '=', 'ec_reviews.product_id')
+            ->join('mp_stores', 'mp_stores.id', '=', 'ec_products.store_id')
+            ->where('store_id', $store->id)
+            ->count();
+        $products = $productService->getProduct($request, null, null, $with, $withCount, ['store_id' => $store->id]);
+
+        return Theme::scope('marketplace.store', compact('store', 'products', 'reviewsCount', 'reviewsAvg'), 'plugins/marketplace::themes.store')
             ->render();
     }
 

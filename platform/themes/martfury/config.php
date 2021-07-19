@@ -54,6 +54,7 @@ return [
             $theme->asset()->usePath()->add('style', 'css/style.css', [], [], $version);
             $theme->asset()->usePath()->add('custom', 'css/custom.css', [], [], $version);
             $theme->asset()->usePath()->add('fix', 'css/fix.css', [], [], $version);
+            $theme->asset()->usePath()->add('video', 'css/video-js.css', [], [], $version);
 
             if (BaseHelper::siteLanguageDirection() == 'rtl') {
                 $theme->asset()->usePath()->add('rtl', 'css/rtl.css', [], [], $version);
@@ -81,6 +82,8 @@ return [
                 ->add('sticky-sidebar-js', 'plugins/sticky-sidebar/sticky-sidebar.min.js', ['jquery']);
             $theme->asset()->container('footer')->usePath()
                 ->add('select2-js', 'plugins/select2/js/select2.min.js', ['jquery']);
+            $theme->asset()->container('footer')->usePath()
+                ->add('video-js', 'js/video.min.js', ['jquery']);
 
             $theme->asset()->container('footer')->usePath()->add('main', 'js/main.js', ['jquery'], [], $version);
             $theme->asset()->container('footer')->usePath()

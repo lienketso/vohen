@@ -64,6 +64,8 @@ class Product extends BaseModel
         'wide_unit',
         'height_unit',
         'weight_unit',
+        'origin',
+        'brand_shop',
         'tax_id',
         'status',
         'views',

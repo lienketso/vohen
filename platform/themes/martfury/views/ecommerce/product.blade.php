@@ -17,28 +17,61 @@
                                     <div class="ps-wrapper">
                                         <div class="ps-product__gallery" data-arrow="true">
                                             @foreach ($productImages as $img)
-                                                <div class="item">
-                                                    <a href="{{ RvMedia::getImageUrl($img) }}">
-                                                        <img src="{{ RvMedia::getImageUrl($img) }}" alt="{{ $product->name }}"/>
-                                                    </a>
-                                                </div>
+
+                                                @if(RvMedia::getMimeType($img)=='video/mp4')
+                                                    <div class="item">
+                                                    <video
+                                                            id="my-video"
+                                                            class="video-js"
+                                                            controls
+                                                            preload="auto"
+                                                            width=""
+                                                            height="300"
+                                                            poster=""
+                                                            data-setup="{}"
+                                                    >
+                                                        <source src="{{ RvMedia::getImageUrl($img, 'thumb') }}" type="video/mp4" />
+                                                        <source src="{{ RvMedia::getImageUrl($img, 'thumb') }}" type="video/webm" />
+
+                                                    </video>
+                                                    </div>
+                                                    @else
+                                                    <div class="item">
+                                                        <a href="{{ RvMedia::getImageUrl($img) }}">
+                                                            <img src="{{ RvMedia::getImageUrl($img) }}" alt="{{ $product->name }}"/>
+                                                        </a>
+                                                    </div>
+                                                @endif
+
                                             @endforeach
                                         </div>
                                     </div>
                                 </figure>
                                 <div class="ps-product__variants" data-item="4" data-md="4" data-sm="4" data-arrow="false">
                                     @foreach ($productImages as $img)
-                                        <div class="item">
-                                            <img src="{{ RvMedia::getImageUrl($img, 'thumb') }}" alt="{{ $product->name }}"/>
-                                        </div>
+                                        @if(RvMedia::getMimeType($img)=='video/mp4')
+                                            <div class="item">
+                                                <img src="{{ Theme::asset()->url('img/video.jpg') }}" alt="{{ $product->name }}">
+                                            </div>
+                                            @else
+                                            <div class="item">
+                                                <img src="{{ RvMedia::getImageUrl($img, 'thumb') }}" alt="{{ $product->name }}"/>
+                                            </div>
+                                        @endif
+
                                     @endforeach
                                 </div>
                             </div>
+
                             <div class="ps-product__info">
                                 <h1>{{ $product->name }}</h1>
                                 <div class="ps-product__meta">
-                                    @if ($product->brand_id)
+                                    @if ($product->brand_id && $product->brand_shop=='')
                                         <p>{{ __('Brand') }}: <a href="{{ $product->brand->url }}">{{ $product->brand->name }}</a></p>
+                                        <p><span>Xuất xứ : <strong>{{$product->origin}}</strong></span></p>
+                                        @else
+                                        <p>{{ __('Brand') }}: <a>{{ $product->brand_shop }}</a></p>
+                                        <p><span>Xuất xứ : <strong>{{$product->origin}}</strong></span></p>
                                     @endif
 
                                     @if (EcommerceHelper::isReviewEnabled())
@@ -350,6 +383,7 @@
                                         <a href="{{ $product->store->url }}" class="more-products">{{ __('More Products from :store',  ['store' => $product->store->name]) }}</a>
                                     </div>
                                 @endif
+
                             </div>
                         </div>
                     </div>

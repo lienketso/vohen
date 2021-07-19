@@ -110,7 +110,7 @@ class DashboardController
     {
         if (setting('media_chunk_enabled') != '1') {
             $validator = Validator::make($request->all(), [
-                'file.0' => 'required|image|mimes:jpg,jpeg,png',
+                'file.0' => 'required|mimes:jpg,jpeg,png,mp4',
             ]);
 
             if ($validator->fails()) {

@@ -3,7 +3,13 @@
         <div class="container">
             <article class="ps-product--header-sticky">
                 <div class="ps-product__thumbnail">
-                    <img src="{{ RvMedia::getImageUrl($product->image, 'small', false, RvMedia::getDefaultImage()) }}" alt="{{ $product->name }}">
+                    @if(RvMedia::getMimeType($product->image)=='video/mp4')
+                    <img src="{{ Theme::asset()->url('img/video.jpg') }}"
+                         alt="{{ $product->name }}">
+                        @else
+                        <img src="{{ RvMedia::getImageUrl($product->image, 'small', false, RvMedia::getDefaultImage()) }}"
+                             alt="{{ $product->name }}">
+                    @endif
                 </div>
                 <div class="ps-product__wrapper">
                     <div class="ps-product__content"><a class="ps-product__title" href="{{ $product->url }}">{{ $product->name }}</a>

@@ -101,8 +101,16 @@ class ProductForm extends BaseProductForm
                     'rows' => 4,
                 ],
             ])
+            ->add('origin', 'text', [
+                'label'      => 'Xuất xứ',
+                'label_attr' => ['class' => 'text-title-field'],
+                'attr'       => [
+                    'placeholder'  => 'Nguồn gốc xuât xứ sản phẩm',
+                    'data-counter' => 150,
+                ],
+            ])
             ->add('images', 'customImages', [
-                'label'      => trans('plugins/ecommerce::products.form.image'),
+                'label'      => 'Hình ảnh ( note : chấp nhận video định dạng mp4 )',
                 'label_attr' => ['class' => 'control-label'],
                 'values'     => $productId ? $this->getModel()->images : [],
             ])
@@ -125,6 +133,14 @@ class ProductForm extends BaseProductForm
                 'label'      => trans('plugins/ecommerce::products.form.brand'),
                 'label_attr' => ['class' => 'control-label'],
                 'choices'    => $brands,
+            ])
+            ->add('brand_shop', 'text', [
+                'label'      => 'Thương hiệu riêng',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'placeholder'  => 'Nếu có',
+                    'data-counter' => 150,
+                ],
             ])
             ->add('product_collections[]', 'multiCheckList', [
                 'label'      => trans('plugins/ecommerce::products.form.collections'),

@@ -10,7 +10,6 @@
     <!-- Fonts-->
     <link href="https://fonts.googleapis.com/css?family={{ urlencode(theme_option('primary_font', 'Work Sans')) }}:300,400,500,600,700&amp;amp;subset=latin-ext" rel="stylesheet" type="text/css">
     <!-- CSS Library-->
-
     <style>
         :root {
             --color-1st: {{ theme_option('primary_color', '#0a64b4') }};

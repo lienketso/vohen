@@ -82,7 +82,7 @@
             maxFilesize: {{ setting('media_chunk_enabled') == '1' ? setting('media_chunk_size', config('core.media.media.chunk.chunk_size')) : 2 }}, // MB
             maxFiles: null, // max files upload,
             paramName: 'file',
-            acceptedFiles: 'image/*',
+            acceptedFiles: 'image/*, video/*',
             url: '{{ route('marketplace.vendor.upload') }}',
             sending: function(file, xhr, formData) {
                 formData.append('_token', '{{ csrf_token() }}');

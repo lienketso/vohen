@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class Product extends BaseModel
 {
@@ -695,4 +696,11 @@ class Product extends BaseModel
 
         return '(' . mapped_implode(', ', $attributes, ': ') . ')';
     }
+
+    public function getCountSold(){
+        return $this->hasMany(OrderProduct::class,'product_id');
+
+    }
+
+
 }

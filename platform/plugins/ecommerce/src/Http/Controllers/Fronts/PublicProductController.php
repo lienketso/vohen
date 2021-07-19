@@ -7,6 +7,7 @@ use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Http\Requests\ReviewRequest;
 use Botble\Ecommerce\Models\Brand;
+use Botble\Ecommerce\Models\OrderProduct;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductCategory;
 use Botble\Ecommerce\Models\ProductTag;
@@ -150,6 +151,7 @@ class PublicProductController
 
         $products = $productService->getProduct($request, null, null, $with, $withCount);
 
+
         if ($request->ajax()) {
             $total = $products->total();
             $message = $total > 1 ? __(':total Products found', compact('total')) : __(':total Product found',
@@ -173,6 +175,7 @@ class PublicProductController
         SeoHelper::setTitle(__('Products'))->setDescription(__('Products'));
 
         do_action(PRODUCT_MODULE_SCREEN_NAME);
+
 
         return Theme::scope('ecommerce.products', compact('products'),
             'plugins/ecommerce::themes.products')->render();
@@ -224,9 +227,11 @@ class PublicProductController
                 'tags.slugable',
                 'categories',
                 'categories.slugable',
+                'getCountSold'
             ],
             'withCount' => $withCount,
         ]);
+
 
         if (!$product) {
             abort(404);
@@ -313,6 +318,8 @@ class PublicProductController
                 'take'      => 1,
             ]);
         }
+
+
 
         return Theme::scope('ecommerce.product',
             compact('product','countProduct','startStore', 'selectedAttrs', 'productImages', 'variationDefault', 'productVariation'),

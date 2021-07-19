@@ -16349,3 +16349,18 @@ form .navigation--mobile-product > * {
   bottom: 0;
   background: rgba(0, 0, 0, 0.02);
 }
+
+.ps-product .ps-product__content > p.ps-product-sale {
+  color: #666;
+  font-size: 1.2rem;
+  text-align: right;
+}
+
+.ps-product--detail .ps-product__desc p {
+  position: relative;
+}
+
+.ps-product--detail .ps-product__desc p span {
+  position: absolute;
+  right: 0;
+}

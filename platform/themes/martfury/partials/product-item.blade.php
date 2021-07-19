@@ -40,6 +40,7 @@
                 </div>
             @endif
             <p class="ps-product__price @if ($product->front_sale_price !== $product->price) sale @endif">{{ format_price($product->front_sale_price_with_taxes) }} @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</p>
+            <p class="ps-product-sale">Đã bán ({{$product->getCountSold->sum('qty')}})</p>
         </div>
     </div>
 @endif

@@ -57,7 +57,9 @@
                                 <h4 class="ps-product__price @if ($product->front_sale_price !== $product->price) sale @endif"><span>{{ format_price($product->front_sale_price_with_taxes) }}</span> @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</h4>
                                 <div class="ps-product__desc">
                                     @if (is_plugin_active('marketplace') && $product->store_id)
-                                        <p>{{ __('Sold By') }}: <a href="{{ $product->store->url }}"><strong>{{ $product->store->name }}</strong></a></p>
+                                        <p>{{ __('Sold By') }}: <a href="{{ $product->store->url }}"><strong>{{ $product->store->name }}</strong></a>
+                                            <span><strong>{{$product->getCountSold->sum('qty')}}</strong> Đã bán</span>
+                                        </p>
                                     @endif
 
                                     <div class="ps-list--dot">

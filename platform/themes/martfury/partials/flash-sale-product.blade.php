@@ -23,6 +23,7 @@
 </div>
 <div class="ps-product__container">
     <p class="ps-product__price @if ($product->front_sale_price !== $product->price) sale @endif">{{ format_price($product->front_sale_price_with_taxes) }} @if ($product->front_sale_price !== $product->price) <del>{{ format_price($product->price_with_taxes) }} </del> @endif</p>
+    <p class="ps-product-sale">Đã bán 20</p>
     <div class="ps-product__content">
         @if (is_plugin_active('marketplace') && $product->store->id)
             <p class="ps-product__vendor">

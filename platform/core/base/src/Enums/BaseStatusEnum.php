@@ -9,12 +9,14 @@ use Html;
  * @method static BaseStatusEnum DRAFT()
  * @method static BaseStatusEnum PUBLISHED()
  * @method static BaseStatusEnum PENDING()
+ * @method static BaseStatusEnum BLOCKED()
  */
 class BaseStatusEnum extends Enum
 {
     public const PUBLISHED = 'published';
     public const DRAFT = 'draft';
     public const PENDING = 'pending';
+    public const BLOCKED = 'blocked';
 
     /**
      * @var string
@@ -35,6 +37,9 @@ class BaseStatusEnum extends Enum
                     ->toHtml();
             case self::PUBLISHED:
                 return Html::tag('span', self::PUBLISHED()->label(), ['class' => 'label-success status-label'])
+                    ->toHtml();
+            case self::BLOCKED:
+                return Html::tag('span', self::BLOCKED()->label(), ['class' => 'label-danger status-label'])
                     ->toHtml();
             default:
                 return parent::toHtml();

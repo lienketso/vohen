@@ -390,6 +390,7 @@ if (!function_exists('get_related_products')) {
             $params['condition'][] = ['ec_products.id', 'IN', $relatedIds];
         } else {
             $params['condition'][] = ['ec_products.id', '!=', $product->id];
+
         }
 
         return app(ProductInterface::class)->getProducts($params);

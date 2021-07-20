@@ -115,6 +115,13 @@
                         {!! Form::customEditor('content', old('content', $store->content)) !!}
                         {!! Form::error('content', $errors) !!}
                     </div>
+                    <div class="form-group">
+                        <label for="description">Đóng / Mở shop:</label>
+                        <select name="status" id="status" class="control-label">
+                            <option value="published" {{($store->status=='published') ? 'selected' : ''}}>Đang hoạt động</option>
+                            <option value="blocked" {{($store->status=='blocked') ? 'selected' : ''}}>Tạm khóa</option>
+                        </select>
+                    </div>
                 </div>
                 @include('plugins/marketplace::customers.bank-info-content', ['model' => $store->customer])
             </div>

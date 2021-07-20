@@ -336,6 +336,8 @@
                                                     @if (!auth('customer')->check())
                                                         <p class="text-danger">{{ __('Please') }} <a href="{{ route('customer.login') }}">{{ __('login') }}</a> {{ __('to write review!') }}</p>
                                                     @endif
+
+                                                @if($orderInfo!=null)
                                                     <div class="form-group form-group__rating">
                                                         <label for="review-star">{{ __('Your rating of this product') }}</label>
                                                         <select name="star" class="ps-rating" data-read-only="false" id="review-star">
@@ -354,6 +356,9 @@
                                                     <div class="form-group submit">
                                                         <button class="ps-btn @if (!auth('customer')->check()) btn-disabled @endif" type="submit" @if (!auth('customer')->check()) disabled @endif>{{ __('Submit Review') }}</button>
                                                     </div>
+                                                    @else
+                                                    <p class="text-danger">Bạn cần mua sản phẩm mới có thể viết đánh giá !</p>
+                                                @endif
                                                 {!! Form::close() !!}
                                             </div>
                                         </div>

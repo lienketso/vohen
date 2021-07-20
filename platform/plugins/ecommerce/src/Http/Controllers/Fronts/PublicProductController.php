@@ -7,6 +7,7 @@ use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Base\Supports\Helper;
 use Botble\Ecommerce\Http\Requests\ReviewRequest;
 use Botble\Ecommerce\Models\Brand;
+use Botble\Ecommerce\Models\Order;
 use Botble\Ecommerce\Models\OrderProduct;
 use Botble\Ecommerce\Models\Product;
 use Botble\Ecommerce\Models\ProductCategory;
@@ -75,6 +76,8 @@ class PublicProductController
      */
     protected $slugRepository;
 
+    protected $orderRepository;
+
     /**
      * PublicProductController constructor.
      * @param ProductInterface $productRepository
@@ -92,7 +95,8 @@ class PublicProductController
         BrandInterface $brandRepository,
         ProductVariationInterface $productVariationRepository,
         ReviewInterface $reviewRepository,
-        SlugInterface $slugRepository
+        SlugInterface $slugRepository,
+        OrderInterface $orderRepository
     ) {
         $this->productRepository = $productRepository;
         $this->productCategoryRepository = $productCategoryRepository;
@@ -101,6 +105,7 @@ class PublicProductController
         $this->productVariationRepository = $productVariationRepository;
         $this->reviewRepository = $reviewRepository;
         $this->slugRepository = $slugRepository;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -227,10 +232,18 @@ class PublicProductController
                 'tags.slugable',
                 'categories',
                 'categories.slugable',
-                'getCountSold'
+                'getCountSold',
+                'getOrder'
             ],
             'withCount' => $withCount,
         ]);
+
+        //nếu sản phẩm được khách mua hàng thì mới cho rating
+       $orders = $product->getOrder->first();
+       $orderInfo = null;
+       if($orders!=null){
+           $orderInfo = $this->orderRepository->getFirstBy(['id'=>$orders->order_id,'user_id'=>auth('customer')->id()]);
+       }
 
 
         if (!$product) {
@@ -322,7 +335,8 @@ class PublicProductController
 
 
         return Theme::scope('ecommerce.product',
-            compact('product','countProduct','startStore', 'selectedAttrs', 'productImages', 'variationDefault', 'productVariation'),
+            compact('product','countProduct','startStore','orderInfo', 'selectedAttrs', 'productImages',
+                'variationDefault', 'productVariation'),
             'plugins/ecommerce::themes.product')
             ->render();
     }

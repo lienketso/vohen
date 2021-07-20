@@ -704,5 +704,9 @@ class Product extends BaseModel
 
     }
 
+    public function getOrder(){
+        return $this->hasMany(OrderProduct::class,'product_id');
+    }
+
 
 }

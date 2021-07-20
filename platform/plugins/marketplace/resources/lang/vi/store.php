@@ -4,6 +4,10 @@ return [
     'name'   => 'Cửa hàng',
     'create' => 'Tạo cửa hàng mới',
     'edit'   => 'Sửa cửa hàng',
+    'statuses' => [
+        'published'    => 'Đang hoạt động',
+        'closed' => 'Đang đóng',
+    ],
     'forms'  => [
         'logo'                => 'Logo',
         'email'               => 'Email',

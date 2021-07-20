@@ -157,3 +157,20 @@ a {
   font-style: italic;
   font-size: 0.9em;
 }
+
+.list-link-order {
+  padding: 10px;
+  background: #fff;
+  margin-bottom: 15px;
+}
+
+.list-link-order a {
+  color: #000;
+  padding-right: 15px;
+}
+.list-link-order a:hover, .list-link-order a.active {
+  color: #0d95e8;
+  font-weight: bold;
+  border-bottom: 2px solid;
+  padding-bottom: 13px;
+}

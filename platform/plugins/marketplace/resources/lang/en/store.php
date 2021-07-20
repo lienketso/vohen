@@ -4,6 +4,10 @@ return [
     'name'   => 'Stores',
     'create' => 'New store',
     'edit'   => 'Edit store',
+    'statuses' => [
+        'published'    => 'Published',
+        'closed' => 'Closed',
+    ],
     'forms'  => [
         'logo'                => 'Logo',
         'email'               => 'Email',

@@ -139,13 +139,16 @@ class OrderController extends BaseController
      * @return JsonResponse|View|Response
      * @throws Throwable
      */
-    public function index(OrderTable $table)
+    public function index(OrderTable $table, Request $request)
     {
         page_title()->setTitle(__('Orders'));
 
+        $status = $request->get('status');
         $orders = auth('customer')->user()->store->orders()->get();
 
-        return $table->render('plugins/marketplace::themes.dashboard.table.base', compact('orders'));
+
+        return $table->render('plugins/marketplace::themes.dashboard.table.base-order',
+            compact('orders','status'));
     }
 
     /**

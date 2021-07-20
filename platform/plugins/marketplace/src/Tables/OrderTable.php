@@ -8,6 +8,7 @@ use Botble\Ecommerce\Repositories\Interfaces\OrderInterface;
 use Botble\Table\Abstracts\TableAbstract;
 use EcommerceHelper;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
 class OrderTable extends TableAbstract
@@ -23,17 +24,21 @@ class OrderTable extends TableAbstract
      */
     protected $hasFilter = true;
 
+    protected $request;
+
     /**
      * OrderTable constructor.
      * @param DataTables $table
      * @param UrlGenerator $urlGenerator
      * @param OrderInterface $orderRepository
      */
-    public function __construct(DataTables $table, UrlGenerator $urlGenerator, OrderInterface $orderRepository)
+    public function __construct(DataTables $table, UrlGenerator $urlGenerator, OrderInterface $orderRepository, Request $request)
     {
+        $this->request = $request;
         $this->repository = $orderRepository;
         $this->setOption('id', 'table-vendor-orders');
         parent::__construct($table, $urlGenerator);
+
     }
 
     /**
@@ -106,6 +111,25 @@ class OrderTable extends TableAbstract
             ->with(['user', 'payment'])
             ->where('is_finished', 1)
             ->where('store_id', auth('customer')->user()->store->id);
+        //nếu có lọc trạng thái
+        if($this->request->get('status')){
+            $query = $this->repository->getModel()
+                ->select([
+                    'id',
+                    'status',
+                    'user_id',
+                    'created_at',
+                    'amount',
+                    'tax_amount',
+                    'currency_id',
+                    'shipping_amount',
+                    'payment_id',
+                ])
+                ->with(['user', 'payment'])
+                ->where('is_finished', 1)
+                ->where('status',$this->request->get('status'))
+                ->where('store_id', auth('customer')->user()->store->id);
+        }
 
         return $this->applyScopes($query);
     }

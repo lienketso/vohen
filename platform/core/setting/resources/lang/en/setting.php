@@ -7,7 +7,7 @@ return [
         'theme'                                 => 'Theme',
         'description'                           => 'Setting site information',
         'title'                                 => 'General',
-        'general_block'                         => 'General Information',
+        'general_block'                         => 'Thông tin chung',
         'rich_editor'                           => 'Rich Editor',
         'site_title'                            => 'Site title',
         'admin_email'                           => 'Admin Email',

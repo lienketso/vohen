@@ -25,4 +25,12 @@ return [
     'create_discount_validate_code_required_if'                                 => 'Nhập mã khuyến mại',
     'create_discount_validate_value_required'                                   => 'Giá trị phải lớn hơn 0',
     'create_discount_validate_target_required'                                  => 'Chọn đối tượng cho chương trình khuyến mại',
+    'enums'                                            => [
+        'type-options' => [
+            'amount'     => 'Giá cố định',
+            'percentage' => 'Giảm giá %',
+            'shipping'   => 'Miễn phí vận chuyển',
+            'same-price' => 'Đồng giá',
+        ]
+    ]
 ];

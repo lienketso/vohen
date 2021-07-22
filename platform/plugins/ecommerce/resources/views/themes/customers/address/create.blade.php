@@ -72,8 +72,8 @@
                 <label for="is_default">
                     <input type="checkbox" name="is_default" value="1" id="is_default">
                     {{ __('Use this address as default.') }}
-
                 </label>
+                àasfasf
             </div>
              {!! Form::error('is_default', $errors) !!}
 

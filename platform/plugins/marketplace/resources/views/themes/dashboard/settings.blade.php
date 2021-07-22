@@ -6,7 +6,7 @@
         <div class="ps-form__content">
             <ul class="nav nav-tabs ">
                 <li class="nav-item">
-                    <a href="#tab_information" class="nav-link active" data-toggle="tab">{{ __('General Information') }}</a>
+                    <a href="#tab_information" class="nav-link active" data-toggle="tab">Thông tin chung</a>
                 </li>
                 @include('plugins/marketplace::customers.bank-info-tab')               
             </ul>
@@ -130,7 +130,7 @@
             <div class="form-group text-center">
                 <div class="form-group submit">
                     <div class="ps-form__submit text-center">
-                        <button class="ps-btn success">{{ __('Save settings') }}</button>
+                        <button class="ps-btn success">Lưu cấu hình</button>
                     </div>
                 </div>
             </div>

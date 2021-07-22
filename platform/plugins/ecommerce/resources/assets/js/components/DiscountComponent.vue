@@ -4,7 +4,7 @@
             <div class="wrapper-content">
                 <div class="pd-all-20 ws-nm">
                     <label class="title-product-main text-no-bold"><span
-                            v-if="!is_promotion">{{ __('Create coupon code')}}</span><span v-if="is_promotion">{{ __('Create discount promotion') }}</span></label>
+                            v-if="!is_promotion">Tạo mã giảm giá</span><span v-if="is_promotion">{{ __('Create discount promotion') }}</span></label>
                     <a href="#" class="btn-change-link float-right" v-on:click="generateCouponCode($event)"
                        v-show="!is_promotion">{{ __('Generate coupon code')}}</a>
                     <div class="form-group mt15 mb0">

@@ -4,7 +4,7 @@
             <div class="wrapper-content">
                 <div class="pd-all-20 ws-nm">
                     <label class="title-product-main text-no-bold">
-                        <span>{{ __('Create coupon code')}}</span>
+                        <span>Tạo mã giảm giá</span>
                     </label>
                     <a href="#" v-if="generateUrl" class="btn-change-link float-right" v-on:click="generateCouponCode($event)">{{ __('Generate coupon code')}}</a>
                     <div class="form-group mt15">
@@ -68,7 +68,7 @@
                     <label class="text-title-field">{{ __('Start date')}}</label>
                     <div class="next-field__connected-wrapper z-index-9">
                         <div class="input-group date form_datetime form_datetime bs-datetime">
-                            <input type="text" placeholder="Select date..." data-date-format="dd-mm-yyyy" name="start_date"
+                            <input type="text" placeholder="Chọn ngày..." data-date-format="dd-mm-yyyy" name="start_date"
                                    class="next-field--connected next-input z-index-9 datepicker" autocomplete="off">
                             <span class="input-group-prepend">
                                 <button class="btn default" type="button">
@@ -77,7 +77,7 @@
                             </span>
                         </div>
                         <div class="input-group">
-                            <input type="text" placeholder="Select time..." name="start_time"
+                            <input type="text" placeholder="Chọn giờ..." name="start_time"
                                    class="next-field--connected next-input z-index-9 time-picker timepicker timepicker-24">
                             <span class="input-group-prepend">
                                 <button class="btn default" type="button">
@@ -91,7 +91,7 @@
                     <label class="text-title-field">{{ __('End date')}}</label>
                     <div class="next-field__connected-wrapper z-index-9">
                         <div class="input-group date form_datetime form_datetime bs-datetime">
-                            <input type="text" placeholder="Select date..."
+                            <input type="text" placeholder="Chọn ngày..."
                                 data-date-format="dd-mm-yyyy"
                                 name="end_date"
                                 class="next-field--connected next-input z-index-9 datepicker"
@@ -103,7 +103,7 @@
                             </span>
                         </div>
                         <div class="input-group">
-                            <input type="text" placeholder="Select time..." name="end_time"
+                            <input type="text" placeholder="Chọn giờ..." name="end_time"
                                    class="next-field--connected next-input z-index-9 time-picker timepicker timepicker-24"
                                    v-bind:disabled="unlimited_time">
                             <span class="input-group-prepend">
@@ -150,7 +150,7 @@
                 value: null,
                 target: 'all-orders',
                 can_use_with_promotion: false,
-                value_label: 'Discount',
+                value_label: 'Giảm giá',
                 hidden_product_search_panel: true,
                 product_collection_id: null,
                 product_collections: [],
@@ -199,7 +199,7 @@
                 let context = this;
 
                 context.discountUnit = this.currency;
-                context.value_label = 'Discount';
+                context.value_label = 'Giảm giá';
 
                 switch (context.type_option) {
                     case 'amount':
@@ -210,7 +210,7 @@
                         context.discountUnit = '%';
                         break;
                     case 'shipping':
-                        context.value_label = 'when shipping fee less than';
+                        context.value_label = 'khi phí ship nhỏ hơn';
                         break;
                     case 'same-price':
                         context.target = 'group-products';

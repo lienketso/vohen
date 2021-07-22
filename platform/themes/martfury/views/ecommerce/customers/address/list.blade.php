@@ -18,6 +18,7 @@
                 <thead>
                 <tr>
                     <th>{{ __('Address') }}</th>
+                    <th>Loại địa chỉ</th>
                     <th>{{ __('Is default?') }}</th>
                     <th>{{ __('Actions') }}</th>
                 </tr>
@@ -28,6 +29,10 @@
                         <tr>
                             <td style="white-space: inherit;">
                                 <p>{{ $address->name }}, {{ $address->address }}, {{ $address->city }}, {{ $address->state }}@if (count(EcommerceHelper::getAvailableCountries()) > 1), {{ $address->country_name }} @endif @if (EcommerceHelper::isZipCodeEnabled()), {{ $address->zip_code }} @endif - {{ $address->phone }}</p>
+                            </td>
+                            <td>
+                                @if($address->type=='receive') <span class="info-type color_one">Địa chỉ nhận hàng</span> @endif
+                                @if($address->type=='pickup') <span class="info-type color_two">Địa chỉ lấy hàng</span> @endif
                             </td>
                             <td style="width: 120px;">
                                 @if ($address->is_default) {{ __('Yes') }} @else {{ __('No') }} @endif

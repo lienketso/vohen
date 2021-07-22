@@ -2,7 +2,7 @@
     <div class="form-group">
         <div class="ps-form__content">
             <div class="form-group">
-                <label for="bank_info_name">{{ __('Bank name') }}:</label>
+                <label for="bank_info_name">Tên ngân hàng :</label>
                 <input id="bank_info_name"
                     type="text"
                     class="form-control"
@@ -13,7 +13,7 @@
             {!! Form::error('bank_info[name]', $errors) !!}
 
             <div class="form-group">
-                <label for="bank_info_number">{{ __('Bank number') }}:</label>
+                <label for="bank_info_number">Số tài khoản :</label>
                 <input id="bank_info_number"
                     type="text"
                     class="form-control"

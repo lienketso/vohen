@@ -67,6 +67,14 @@
             @endif
 
             <div class="form-group">
+                <label for="address">Loại địa chỉ :</label>
+                <div class="ps-radio">
+                <p><input type="radio" name="type" id="is-receive" value="receive"> <label for="is-receive">Địa chỉ nhận hàng</label></p>
+                <p><input type="radio" name="type" id="is-pickup" value="pickup"> <label for="is-pickup">Địa chỉ lấy hàng</label></p>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <div class="ps-checkbox">
                     <input class="form-control" type="checkbox" value="1" name="is_default" id="is-default">
                     <label for="is-default">{{ __('Use this address as default') }}</label>

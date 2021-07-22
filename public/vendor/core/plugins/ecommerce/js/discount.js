@@ -726,7 +726,7 @@ var render = function() {
         _c("div", { staticClass: "pd-all-20 ws-nm" }, [
           _c("label", { staticClass: "title-product-main text-no-bold" }, [
             !_vm.is_promotion
-              ? _c("span", [_vm._v(_vm._s(_vm.__("Create coupon code")))])
+              ? _c("span", [_vm._v("Tạo mã giảm giá")])
               : _vm._e(),
             _vm.is_promotion
               ? _c("span", [

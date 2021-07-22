@@ -65,6 +65,16 @@
             @endif
 
             <div class="form-group">
+                <label for="address">Loại địa chỉ :</label>
+                <div class="ps-radio">
+                    <p><input type="radio" name="type" id="is-receive" value="receive" {{($address->type=='receive')? 'checked' : ''}}>
+                        <label for="is-receive">Địa chỉ nhận hàng</label></p>
+                    <p><input type="radio" name="type" id="is-pickup" value="pickup" {{($address->type=='pickup')? 'checked' : ''}}>
+                        <label for="is-pickup">Địa chỉ lấy hàng</label></p>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <div class="ps-checkbox">
                     <input class="form-control" type="checkbox" name="is_default" value="1" @if ($address->is_default) checked @endif id="is-default">
                     <label for="is-default">{{ __('Use this address as default') }}</label>

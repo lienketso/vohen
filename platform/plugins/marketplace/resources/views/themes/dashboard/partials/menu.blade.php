@@ -21,6 +21,11 @@
             'name'  => __('Coupons')
         ],
         [
+            'key'   => 'marketplace.vendor.marketing',
+            'icon'  => 'icon-gift',
+            'name'  => 'Chương trình marketing'
+        ],
+        [
             'key'   => 'marketplace.vendor.withdrawals.index',
             'icon'  => 'icon-bag-dollar',
             'name'  => __('Withdrawals')

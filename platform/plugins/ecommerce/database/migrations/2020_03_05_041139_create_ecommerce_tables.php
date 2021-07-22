@@ -324,6 +324,7 @@ class CreateEcommerceTables extends Migration
             $table->string('address');
             $table->integer('customer_id')->unsigned();
             $table->tinyInteger('is_default')->default(0)->unsigned();
+            $table->string('type', 50)->default('receive')->comment('loại địa chỉ');
             $table->timestamps();
         });
 

@@ -16371,3 +16371,20 @@ form .navigation--mobile-product > * {
 .video-js {
   width: 100% !important;
 }
+
+.ps-radio input {
+  position: absolute;
+  visibility: hidden;
+}
+
+.info-type {
+  font-size: 12px;
+}
+
+.color_one {
+  color: #00CC33;
+}
+
+.color_two {
+  color: #FF9966;
+}

@@ -48,6 +48,11 @@ Route::group(['namespace' => 'Botble\Marketplace\Http\Controllers\Fronts', 'midd
                 'uses' => 'DashboardController@index',
             ]);
 
+            Route::get('marketing',[
+               'as' => 'marketing',
+               'uses'=> 'MarketingController@index'
+            ]);
+
             Route::get('orders', [
                 'as'   => 'orders',
                 'uses' => 'OrderController@index',

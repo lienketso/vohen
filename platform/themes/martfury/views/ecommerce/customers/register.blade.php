@@ -5,9 +5,15 @@
             <div class="ps-form__content">
                 <h4>{{ __('Register An Account') }}</h4>
                 <div class="form-group">
-                    <input class="form-control" name="name" id="txt-name" type="text" value="{{ old('name') }}" placeholder="{{ __('Your Name') }}">
+                    <input class="form-control" name="name" id="txt-name" type="text" value="{{ old('name') }}" placeholder="{{ __('Your Name') }} *">
                     @if ($errors->has('name'))
                         <span class="text-danger">{{ $errors->first('name') }}</span>
+                    @endif
+                </div>
+                <div class="form-group">
+                    <input class="form-control" name="phone" id="txt-phone" type="text" value="{{ old('phone') }}" autocomplete="email" placeholder="Số điện thoại *">
+                    @if ($errors->has('phone'))
+                        <span class="text-danger">{{ $errors->first('phone') }}</span>
                     @endif
                 </div>
                 <div class="form-group">
@@ -16,8 +22,9 @@
                         <span class="text-danger">{{ $errors->first('email') }}</span>
                     @endif
                 </div>
+
                 <div class="form-group">
-                    <input class="form-control" type="password" name="password" id="txt-password" autocomplete="new-password" placeholder="{{ __('Password') }}">
+                    <input class="form-control" type="password" name="password" id="txt-password" autocomplete="new-password" placeholder="{{ __('Password') }} *">
                     @if ($errors->has('password'))
                         <span class="text-danger">{{ $errors->first('password') }}</span>
                     @endif

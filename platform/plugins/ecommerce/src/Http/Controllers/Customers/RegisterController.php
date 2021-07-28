@@ -150,6 +150,7 @@ class RegisterController extends Controller
     {
         $rules = [
             'name'     => 'required|max:255',
+            'phone'=>'required|numeric|min:9|unique:ec_customers',
             'email'    => 'required|email|max:255|unique:ec_customers',
             'password' => 'required|min:6|confirmed',
         ];
@@ -182,6 +183,7 @@ class RegisterController extends Controller
         return $this->customerRepository->create([
             'name'     => $data['name'],
             'email'    => $data['email'],
+            'phone'     => $data['phone'],
             'password' => bcrypt($data['password']),
         ]);
     }

@@ -6,4 +6,6 @@ return [
     'edit'     => 'Sửa câu hỏi',
     'question' => 'Câu hỏi',
     'answer'   => 'Trả lời',
+    'category' => 'Danh mục',
+    'all'      => 'Tất cả',
 ];

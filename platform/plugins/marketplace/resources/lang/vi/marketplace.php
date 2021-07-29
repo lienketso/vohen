@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'name'            => 'Marketplace',
+    'name'            => 'Gian hàng',
     'email'           => [
         'store_name'                  => 'Tên cửa hàng',
         'store_new_order_title'       => 'Gửi đơn đặt hàng đến cửa hàng',

@@ -120,6 +120,7 @@
     "Delete product": "Delete product",
     "Deleted review successfully!": "Deleted review successfully!",
     "Description": "Description",
+    "Content": "Content",
     "Discount": "Discount",
     "Discount promotion": "Discount promotion",
     "Don't Have an Account?": "Don't Have an Account?",
@@ -498,5 +499,7 @@
     "reviews for \":product\"": "reviews for \":product\"",
     "to": "to",
     "to write review!": "to write review!",
-    "when shipping free less than or equal": "when shipping free less than or equal"
+    "when shipping free less than or equal": "when shipping free less than or equal",
+    "Bank name": "Bank name",
+    "Bank number": "Bank number"
 }

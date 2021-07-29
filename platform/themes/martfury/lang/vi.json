@@ -120,6 +120,7 @@
     "Delete product": "Xóa sản phẩm",
     "Deleted review successfully!": "Xóa đánh giá thành công!",
     "Description": "Mô tả",
+    "Content": "Nội dung",
     "Discount": "Giảm giá",
     "Discount promotion": "Khuyến mãi giảm giá",
     "Don't Have an Account?": "Chưa có tài khoản?",
@@ -505,5 +506,7 @@
     "Shop Name": "Tên cửa hàng",
     "Shop URL": "Đường dẫn cửa hàng",
     "Phone Number": "Số điện thoại",
-    "Top Categories": "Danh mục hàng đầu"
+    "Top Categories": "Danh mục hàng đầu",
+    "Bank name": "Tên ngân hàng",
+    "Bank number": "Số tài khoản"
 }
